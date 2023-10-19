@@ -1,0 +1,17 @@
+import logging
+from logging.handlers import RotatingFileHandler
+
+logging.basicConfig(
+    format="[%(asctime)s]:[%(name)s]:[%(levelname)s] - %(message)s",
+    level=logging.INFO,
+    datefmt="%H:%M:%S",
+    handlers=[
+        RotatingFileHandler("HellBot.log", maxBytes=(1024 * 1024 * 5), backupCount=10),
+        logging.StreamHandler(),
+    ],
+)
+
+
+logging.getLogger("pyrogram").setLevel(logging.ERROR)
+
+LOGS = logging.getLogger("HellBot")
