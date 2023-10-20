@@ -1,8 +1,4 @@
-from typing import Callable
-
 from pyrogram import Client
-from pyrogram.filters import Filter
-from pyrogram.handlers import MessageHandler
 
 from .config import Config, Symbols
 from .database import db
@@ -55,30 +51,17 @@ class HellClient(Client):
         await self.start_bot()
         await self.start_user()
 
-    async def on_message(self, filters=None, group: int = 0) -> Callable:
-        def decorator(func: Callable) -> Callable:
-            for user in self.users:
-                if isinstance(user, Client):
-                    user.add_handler(MessageHandler(func, filters), group)
-                elif isinstance(user, Filter) or user is None:
-                    if not hasattr(func, "handlers"):
-                        func.handlers = []
-                    func.handlers.append(
-                        (
-                            MessageHandler(func, user),
-                            group if filters is None else filters,
-                        )
-                    )
-            return func
-
-        return decorator
-
-    # async def logit(self, tag: str, text: str, file: str = None) -> None:
-    #     msg = f"**#{tag.upper()}**\n\n{text}"
-    #     if file:
-    #         await self.bot.send_document(Config.LOGGER_ID, file, caption=msg)
-    #     else:
-    #         await self.bot.send_message(Config.LOGGER_ID, msg, disable_web_page_preview=True)
+    async def log(self, tag: str, text: str, file: str = None) -> None:
+        msg = f"**#{tag.upper()}**\n\n{text}"
+        try:
+            if file:
+                await self.bot.send_document(Config.LOGGER_ID, file, caption=msg)
+            else:
+                await self.bot.send_message(
+                    Config.LOGGER_ID, msg, disable_web_page_preview=True
+                )
+        except Exception as e:
+            raise Exception(f"{Symbols.cross_mark} LogErr: {e}")
 
 
 hellbot = HellClient()

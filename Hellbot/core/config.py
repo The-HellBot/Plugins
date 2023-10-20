@@ -57,3 +57,6 @@ class Symbols:
     diamond_2 = "◈"
     radio_select = "◉"
     radio_unselect = "〇"
+
+
+all_configs = {key: value for key, value in Config.__dict__.items() if not key.startswith("__")}
