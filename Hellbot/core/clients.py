@@ -1,4 +1,5 @@
 from pyrogram import Client
+from pyrogram.types import Message
 
 from .config import Config, Symbols
 from .database import db
@@ -50,6 +51,13 @@ class HellClient(Client):
         )
         await self.start_bot()
         await self.start_user()
+
+    async def edit_or_reply(self, message: Message, text: str) -> Message:
+        if message.from_user and message.from_user.id in Config.SUDO_USERS:
+            if message.reply_to_message:
+                return await message.reply_to_message.reply_text(text)
+            return await message.reply_text(text)
+        return await message.edit_text(text)
 
     async def log(self, tag: str, text: str, file: str = None) -> None:
         msg = f"**#{tag.upper()}**\n\n{text}"
