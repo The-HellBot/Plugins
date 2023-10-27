@@ -1,4 +1,3 @@
-import pyroaddon
 from pyrogram import idle
 
 from Hellbot.core import Users, db, hellbot

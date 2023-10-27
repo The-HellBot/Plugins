@@ -10,7 +10,7 @@ from pyrogram.types import (
     ReplyKeyboardRemove,
 )
 
-from Hellbot.core import Config, db, hellbot
+from Hellbot.core import Config, db, hellbot, Symbols
 from Hellbot.functions.keyboard import gen_inline_keyboard
 
 from . import START_MSG
@@ -26,7 +26,8 @@ async def session_menu(_, message: Message):
             [
                 [KeyboardButton("New 💫"), KeyboardButton("Delete ❌")],
                 [KeyboardButton("List 📜"), KeyboardButton("Home 🏠")],
-            ]
+            ],
+            resize_keyboard=True,
         ),
     )
 
@@ -55,7 +56,7 @@ async def new_session(_, message: Message):
         return
     try:
         client = Client(
-            name="hellbot",
+            name="Hellbot",
             api_id=Config.API_ID,
             api_hash=Config.API_HASH,
             in_memory=True,
@@ -110,10 +111,6 @@ async def new_session(_, message: Message):
     filters.regex(r"Delete ❌") & filters.user(Config.OWNER_ID) & filters.private
 )
 async def delete_session(_, message: Message):
-    await message.reply_text(
-        "**Okay!** Let's delete a session.",
-        reply_markup=ReplyKeyboardRemove(),
-    )
     all_sessions = await db.get_all_sessions()
     if not all_sessions:
         await message.reply_text("No sessions found in database.")
@@ -121,7 +118,6 @@ async def delete_session(_, message: Message):
     collection = []
     for i in all_sessions:
         collection.append((i["user_id"], f"rm_session:{i['user_id']}"))
-
     buttons = gen_inline_keyboard(collection, 2)
     buttons.append([InlineKeyboardButton("Cancel ❌", "auth_close")])
     await message.reply_text(
@@ -155,8 +151,8 @@ async def list_sessions(_, message: Message):
         await message.reply_text("No sessions found in database.")
         return
     text = "**List of sessions:**\n\n"
-    for i in all_sessions:
-        text += f"**User ID:** `{i['user_id']}`\n**Session String:** `{i['session_string']}`\n\n"
+    for i, session in enumerate(all_sessions):
+        text += f"{Symbols.cross_mark} [{i}]: **User ID:** `{session['user_id']}`\n"
     await message.reply_text(text)
 
 

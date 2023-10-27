@@ -11,7 +11,6 @@ def on_message(
     command: list = None,
     group: int = 0,
     chat_type: ChatType = None,
-    admin_only: bool = False,
     allow_sudo: bool = False,
 ):
     if allow_sudo:
@@ -31,15 +30,11 @@ def on_message(
 
     def decorator(func):
         async def wrapper(client: Client, message: Message):
-            if admin_only and not await is_user_admin(message, hellbot.me.id):
-                await hellbot.edit_or_reply(message, "I am not admin here!")
-                return
+            if not await is_user_admin(message, message.from_user.id):
+                return await hellbot.edit_or_reply(message, "I am not an admin here!")
 
             if chat_type and message.chat.type != chat_type:
-                await hellbot.edit_or_reply(
-                    message, f"Use this command in {chat_type.name} only!"
-                )
-                return
+                return await hellbot.edit_or_reply(message, f"Use this command in {chat_type.name} only!")
 
             await func(client, message)
 

@@ -1,3 +1,8 @@
+import glob
+import importlib
+import sys
+from pathlib import Path
+
 from pyrogram import Client
 from pyrogram.types import Message
 
@@ -25,8 +30,7 @@ class HellClient(Client):
                     name=f"HellUser#{i + 1}",
                     api_id=Config.API_ID,
                     api_hash=Config.API_HASH,
-                    session_name=session["user_id"],
-                    plugins=dict(root="Hellbot.plugins.user"),
+                    session_string=session["session"],
                 )
                 await client.start()
                 me = await client.get_me()
@@ -35,7 +39,7 @@ class HellClient(Client):
                     f"{Symbols.arrow_right * 2} Started User {i + 1}: '{me.first_name}' {Symbols.arrow_left * 2}"
                 )
             except Exception as e:
-                LOGS.error(f"{Symbols.cross_mark} {i + 1}: {e}")
+                LOGS.error(f"{i + 1}: {e}")
                 continue
 
     async def start_bot(self) -> None:
@@ -45,12 +49,34 @@ class HellClient(Client):
             f"{Symbols.arrow_right * 2} Started HellBot Client: '{me.username}' {Symbols.arrow_left * 2}"
         )
 
+    async def load_plugin(self) -> None:
+        files = glob.glob("Hellbot/plugins/user/*.py")
+        count = 0
+        for file in files:
+            with open(file) as f:
+                path = Path(f.name)
+                shortname = path.stem.replace(".py", "")
+                if shortname.startswith("__"):
+                    continue
+                fpath = Path(f"Hellbot/plugins/user/{shortname}.py")
+                name = "Hellbot.plugins.user." + shortname
+                spec = importlib.util.spec_from_file_location(name, fpath)
+                load = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(load)
+                sys.modules["Hellbot.plugins.user." + shortname] = load
+                count += 1
+            f.close()
+        LOGS.info(
+            f"{Symbols.bullet * 3} Loaded User Plugin: '{count}' {Symbols.bullet * 3}"
+        )
+
     async def startup(self) -> None:
         LOGS.info(
             f"{Symbols.bullet * 3} Starting HellBot Client & User {Symbols.bullet * 3}"
         )
         await self.start_bot()
         await self.start_user()
+        await self.load_plugin()
 
     async def edit_or_reply(self, message: Message, text: str) -> Message:
         if message.from_user and message.from_user.id in Config.SUDO_USERS:
