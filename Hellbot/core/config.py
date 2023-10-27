@@ -25,6 +25,11 @@ class Config:
     BANNED_USERS = filters.user()
     SUDO_USERS = filters.user()
 
+    # Global config: do not edit
+    HELP_DICT = {}
+    CMD_MENU = {}
+    CMD_INFO = {}
+
 
 class Limits:
     AdminRoleLength = 16
@@ -59,4 +64,6 @@ class Symbols:
     radio_unselect = "〇"
 
 
-all_configs = {key: value for key, value in Config.__dict__.items() if not key.startswith("__")}
+all_configs = {
+    key: value for key, value in Config.__dict__.items() if not key.startswith("__")
+}

@@ -1,6 +1,7 @@
+import pyroaddon
 from pyrogram import idle
 
-from Hellbot.core import hellbot, db, Users
+from Hellbot.core import Users, db, hellbot
 
 
 async def main():

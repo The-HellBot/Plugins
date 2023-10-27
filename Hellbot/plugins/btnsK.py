@@ -3,7 +3,7 @@
 from pyrogram.types import KeyboardButton, ReplyKeyboardMarkup
 
 
-SETTINNGS_KB = ReplyKeyboardMarkup(
+SETTINGS_KB = ReplyKeyboardMarkup(
     [
         [KeyboardButton("Clients 👥")],
         [KeyboardButton("Home 🏠")],
