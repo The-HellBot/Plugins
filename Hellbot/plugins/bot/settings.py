@@ -10,4 +10,4 @@ from ..btnsK import SETTINGS_KB
     filters.command("settings") & Config.AUTH_USERS & filters.private
 )
 async def addclient(_, message: Message):
-    await message.reply_text("**⚙️ Settings Menu:**", reply_markup=SETTINGS_KB)
+    await message.reply_text("**⚙️ 𝖲𝖾𝗍𝗍𝗂𝗇𝗀𝗌 𝖬𝖾𝗇𝗎:**", reply_markup=SETTINGS_KB)

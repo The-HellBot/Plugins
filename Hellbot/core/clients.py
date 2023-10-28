@@ -1,8 +1,10 @@
 import glob
 import importlib
+import os
 import sys
 from pathlib import Path
 
+import pyroaddon    # pylint: disable=unused-import
 from pyrogram import Client
 from pyrogram.types import Message
 
@@ -38,6 +40,11 @@ class HellClient(Client):
                 LOGS.info(
                     f"{Symbols.arrow_right * 2} Started User {i + 1}: '{me.first_name}' {Symbols.arrow_left * 2}"
                 )
+                is_in_logger = await self.validate_logger(client)
+                if not is_in_logger:
+                    LOGS.warning(
+                        f"Client #{i+1}: '{me.first_name}' is not in Logger Group! Check and add manually for proper functioning."
+                    )
             except Exception as e:
                 LOGS.error(f"{i + 1}: {e}")
                 continue
@@ -56,6 +63,10 @@ class HellClient(Client):
             with open(file) as f:
                 path = Path(f.name)
                 shortname = path.stem.replace(".py", "")
+                unload = await db.get_env("UNLOAD_PLUGINS")
+                if unload and shortname in unload:
+                    os.remove(Path(f"Hellbot/plugins/user/{shortname}.py"))
+                    continue
                 if shortname.startswith("__"):
                     continue
                 fpath = Path(f"Hellbot/plugins/user/{shortname}.py")
@@ -69,6 +80,21 @@ class HellClient(Client):
         LOGS.info(
             f"{Symbols.bullet * 3} Loaded User Plugin: '{count}' {Symbols.bullet * 3}"
         )
+
+    async def validate_logger(self, client: Client) -> bool:
+        try:
+            await client.get_chat_member(Config.LOGGER_ID, "me")
+            return True
+        except Exception:
+            return await self.join_logger(client)
+
+    async def join_logger(self, client: Client) -> bool:
+        try:
+            invite_link = await self.bot.export_chat_invite_link(Config.LOGGER_ID)
+            await client.join_chat(invite_link)
+            return True
+        except Exception:
+            return False
 
     async def startup(self) -> None:
         LOGS.info(

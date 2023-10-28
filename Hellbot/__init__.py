@@ -20,6 +20,10 @@ if Config.DATABASE_URL is None:
     LOGS.error("Please set your DATABASE_URL !")
     quit(1)
 
+if Config.LOGGER_ID == 0:
+    LOGS.error("Please set your LOGGER_ID !")
+    quit(1)
+
 if Config.OWNER_ID == 0:
     LOGS.error("Please set your OWNER_ID !")
     quit(1)

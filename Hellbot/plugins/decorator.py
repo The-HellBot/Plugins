@@ -31,10 +31,10 @@ def on_message(
     def decorator(func):
         async def wrapper(client: Client, message: Message):
             if not await is_user_admin(message, message.from_user.id):
-                return await hellbot.edit_or_reply(message, "I am not an admin here!")
+                return await hellbot.edit_or_reply(message, "𝖨 𝖺𝗆 𝗇𝗈𝗍 𝖺𝗇 𝖺𝖽𝗆𝗂𝗇 𝗁𝖾𝗋𝖾!")
 
             if chat_type and message.chat.type != chat_type:
-                return await hellbot.edit_or_reply(message, f"Use this command in {chat_type.name} only!")
+                return await hellbot.edit_or_reply(message, f"𝖴𝗌𝖾 𝗍𝗁𝗂𝗌 𝖼𝗈𝗆𝗆𝖺𝗇𝖽 𝗂𝗇 {chat_type.name} 𝗈𝗇𝗅𝗒!")
 
             await func(client, message)
 
