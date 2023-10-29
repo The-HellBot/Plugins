@@ -10,10 +10,10 @@ from pyrogram.types import (
     ReplyKeyboardRemove,
 )
 
-from Hellbot.core import Config, db, hellbot, Symbols
+from Hellbot.core import Config, Symbols, db, hellbot
 from Hellbot.functions.keyboard import gen_inline_keyboard
 
-from . import START_MSG
+from . import START_MSG, BotHelp
 
 
 @hellbot.bot.on_message(
@@ -160,3 +160,10 @@ async def list_sessions(_, message: Message):
 )
 async def go_home(_, message: Message):
     await message.reply_text(START_MSG, reply_markup=ReplyKeyboardRemove())
+
+
+BotHelp("Sessions").add(
+    "session", "To manage user sessions of the bot."
+).info(
+    "Manage Userbot Sessions"
+).done()

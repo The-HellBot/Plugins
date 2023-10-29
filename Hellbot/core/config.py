@@ -26,9 +26,13 @@ class Config:
     SUDO_USERS = filters.user()
 
     # Global config: do not edit
-    HELP_DICT = {}
-    CMD_MENU = {}
+    BOT_CMD_INFO = {}
+    BOT_CMD_MENU = {}
+    BOT_HELP = {}
+
     CMD_INFO = {}
+    CMD_MENU = {}
+    HELP_DICT = {}
 
 
 class Limits:

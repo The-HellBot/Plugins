@@ -1,11 +1,13 @@
+import asyncio
 import glob
 import importlib
 import os
 import sys
 from pathlib import Path
 
-import pyroaddon    # pylint: disable=unused-import
+import pyroaddon  # pylint: disable=unused-import
 from pyrogram import Client
+from pyrogram.enums import ParseMode
 from pyrogram.types import Message
 
 from .config import Config, Symbols
@@ -104,14 +106,39 @@ class HellClient(Client):
         await self.start_user()
         await self.load_plugin()
 
-    async def edit_or_reply(self, message: Message, text: str) -> Message:
+
+class CustomMethods(HellClient):
+    async def input(self, message: Message) -> str:
+        """Get the input from the user"""
+        return message.text.split(" ", 1)[1].strip() or ""
+
+    async def edit(
+        self, message: Message, text: str, parse_mode: ParseMode = ParseMode.DEFAULT
+    ) -> Message:
+        """Edit or Reply to a message, if possible"""
         if message.from_user and message.from_user.id in Config.SUDO_USERS:
             if message.reply_to_message:
-                return await message.reply_to_message.reply_text(text)
-            return await message.reply_text(text)
-        return await message.edit_text(text)
+                return await message.reply_to_message.reply_text(
+                    text, parse_mode=parse_mode
+                )
+            return await message.reply_text(text, parse_mode=parse_mode)
+        return await message.edit_text(text, parse_mode=parse_mode)
+
+    async def delete(self, message: Message, text: str, delete: int = 10) -> None:
+        """ " Edit a message and delete it after a certain period of time"""
+        to_del = await self.edit(message, text)
+        await asyncio.sleep(delete)
+        await to_del.delete()
+
+    async def error(self, message: Message, text: str, delete: int = 10) -> None:
+        """Edit an error message and delete it after a certain period of time if mentioned"""
+        to_del = await self.edit(message, f"{Symbols.cross_mark} **Error:** \n\n{text}")
+        if delete != 0:
+            await asyncio.sleep(delete)
+            await to_del.delete()
 
     async def log(self, tag: str, text: str, file: str = None) -> None:
+        """Log a message to the Logger Group"""
         msg = f"**#{tag.upper()}**\n\n{text}"
         try:
             if file:
@@ -124,4 +151,4 @@ class HellClient(Client):
             raise Exception(f"{Symbols.cross_mark} LogErr: {e}")
 
 
-hellbot = HellClient()
+hellbot = CustomMethods()
