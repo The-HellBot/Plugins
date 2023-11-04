@@ -35,11 +35,11 @@ class Database:
             {"name": name}, {"$set": {"value": value}}, upsert=True
         )
 
-    async def get_env(self, name: str) -> str | list:
+    async def get_env(self, name: str) -> str | list | None:
         if await self.is_env(name):
             data = await self.env.find_one({"name": name})
             return data["value"]
-        return ""
+        return None
 
     async def rm_env(self, name: str) -> None:
         await self.env.delete_one({"name": name})

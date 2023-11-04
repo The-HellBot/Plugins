@@ -1,7 +1,7 @@
 from .clients import hellbot
-from .config import Config, Limits, Symbols
+from .config import ENV, Config, Limits, Symbols
 from .database import db
 from .logger import LOGS
 from .users import Users
 
-__all__ = ["hellbot", "Config", "Limits", "Symbols", "db", "LOGS", "Users"]
+__all__ = ["hellbot", "ENV", "Config", "Limits", "Symbols", "db", "LOGS", "Users"]

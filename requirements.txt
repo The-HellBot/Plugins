@@ -1,0 +1,5 @@
+motor
+pyroaddon
+pyrogram
+python-dotenv
+tgcrypto

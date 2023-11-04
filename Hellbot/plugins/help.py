@@ -42,13 +42,14 @@ class HelpMenu:
                 result += "`\n"
             if command["description"]:
                 result += (
-                    f"**{Symbols.bullet} 𝖣𝖾𝗌𝖼𝗋𝗂𝗉𝗍𝗂𝗈𝗇:** __{command['description']}__\n"
+                    f"**{Symbols.arrow_right} 𝖣𝖾𝗌𝖼𝗋𝗂𝗉𝗍𝗂𝗈𝗇:** __{command['description']}__\n"
                 )
             if command["example"]:
-                result += f"**{Symbols.bullet} 𝖤𝗑𝖺𝗆𝗉𝗅𝖾:** `{Config.HANDLERS[0]}{command['example']}`\n"
+                result += f"**{Symbols.arrow_right} 𝖤𝗑𝖺𝗆𝗉𝗅𝖾:** `{Config.HANDLERS[0]}{command['example']}`\n"
             if command["note"]:
-                result += f"**{Symbols.bullet} 𝖭𝗈𝗍𝖾:** __{command['note']}__\n"
-            result += "\n"
+                result += f"**{Symbols.arrow_right} 𝖭𝗈𝗍𝖾:** __{command['note']}__\n"
+
+            result += f"\n**<\> @Its_HellBot 🍀**"
 
             Config.CMD_INFO[command["command"]] = {
                 "command": f"{command['command']} {command['parameters'] if command['parameters'] else ''}",
@@ -92,7 +93,7 @@ class BotHelp:
             result += f"**{Symbols.radio_select} 𝖢𝗈𝗆𝗆𝖺𝗇𝖽:** `/{command['command']}`\n"
             if command["description"]:
                 result += (
-                    f"**{Symbols.bullet} 𝖣𝖾𝗌𝖼𝗋𝗂𝗉𝗍𝗂𝗈𝗇:** __{command['description']}__\n"
+                    f"**{Symbols.arrow_right} 𝖣𝖾𝗌𝖼𝗋𝗂𝗉𝗍𝗂𝗈𝗇:** __{command['description']}__\n"
                 )
             result += "\n"
 

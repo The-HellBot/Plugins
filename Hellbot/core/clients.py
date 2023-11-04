@@ -10,7 +10,7 @@ from pyrogram import Client
 from pyrogram.enums import ParseMode
 from pyrogram.types import Message
 
-from .config import Config, Symbols
+from .config import ENV, Config, Symbols
 from .database import db
 from .logger import LOGS
 
@@ -65,7 +65,7 @@ class HellClient(Client):
             with open(file) as f:
                 path = Path(f.name)
                 shortname = path.stem.replace(".py", "")
-                unload = await db.get_env("UNLOAD_PLUGINS")
+                unload = await db.get_env(ENV.unload_plugins)
                 if unload and shortname in unload:
                     os.remove(Path(f"Hellbot/plugins/user/{shortname}.py"))
                     continue

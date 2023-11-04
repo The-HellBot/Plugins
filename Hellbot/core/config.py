@@ -35,6 +35,12 @@ class Config:
     HELP_DICT = {}
 
 
+class ENV:
+    btn_in_help = "BUTTONS_IN_HELP"
+    help_emoji = "HELP_EMOJI"
+    unload_plugins = "UNLOAD_PLUGINS"
+
+
 class Limits:
     AdminRoleLength = 16
     AdminsLimit = 50
@@ -66,6 +72,10 @@ class Symbols:
     diamond_2 = "◈"
     radio_select = "◉"
     radio_unselect = "〇"
+    previous = "prev ⤙"
+    next = "⤚ next"
+    close = "✘"
+    back = "🔙 back"
 
 
 all_configs = {

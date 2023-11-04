@@ -6,7 +6,9 @@ logging.basicConfig(
     level=logging.INFO,
     datefmt="%H:%M:%S",
     handlers=[
-        RotatingFileHandler("HellBot.log", maxBytes=(1024 * 1024 * 5), backupCount=10),
+        RotatingFileHandler(
+            "HellBot.log", maxBytes=(1024 * 1024 * 5), backupCount=10, encoding="utf-8"
+        ),
         logging.StreamHandler(),
     ],
 )
