@@ -34,6 +34,8 @@ class Config:
     CMD_MENU = {}
     HELP_DICT = {}
 
+    AFK_CACHE = {}
+
 
 class ENV:
     """ Database ENV Names """

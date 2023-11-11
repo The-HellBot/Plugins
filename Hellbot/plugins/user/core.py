@@ -28,7 +28,9 @@ async def help(client: Client, message: Message):
     plugin = await hellbot.input(message)
     if plugin.lower() in Config.CMD_MENU:
         try:
-            await hellbot.edit(hell, Config.CMD_MENU[plugin.lower()])
+            await hellbot.edit(
+                hell, Config.CMD_MENU[plugin.lower()], ParseMode.MARKDOWN
+            )
             return
         except Exception as e:
             await hellbot.error(hell, str(e), 20)
@@ -54,7 +56,9 @@ async def plugin_info(_, message: Message):
     plugin = await hellbot.input(message)
     if plugin.lower() in Config.CMD_MENU:
         try:
-            await hellbot.edit(message, Config.CMD_MENU[plugin.lower()])
+            await hellbot.edit(
+                message, Config.CMD_MENU[plugin.lower()], ParseMode.MARKDOWN
+            )
             return
         except Exception as e:
             await hellbot.error(message, str(e), 20)
@@ -67,7 +71,15 @@ async def command_info(_, message: Message):
     cmd = await hellbot.input(message)
     if cmd.lower() in Config.CMD_INFO:
         try:
-            await hellbot.edit(message, Config.CMD_INFO[cmd.lower()])
+            cmd_dict = Config.CMD_INFO[cmd.lower()]
+            template = (
+                f"**🍀 𝖯𝗅𝗎𝗀𝗂𝗇:** `{cmd_dict['plugin']}.py`\n\n"
+                f"**{Symbols.anchor} 𝖢𝗈𝗆𝗆𝖺𝗇𝖽:** `{cmd_dict['command']}`\n"
+                f"**{Symbols.anchor} 𝖣𝖾𝗌𝖼𝗋𝗂𝗉𝗍𝗂𝗈𝗇:** __{cmd_dict['description']}__\n"
+                f"**{Symbols.anchor} 𝖤𝗑𝖺𝗆𝗉𝗅𝖾:** `{cmd_dict['example']}`\n"
+                f"**{Symbols.anchor} 𝖭𝗈𝗍𝖾:** __{cmd_dict['note']}__\n"
+            )
+            await hellbot.edit(message, template, ParseMode.MARKDOWN)
             return
         except Exception as e:
             await hellbot.error(message, str(e), 20)
@@ -92,6 +104,4 @@ HelpMenu("help").add(
     "<command name>",
     "Get the detailed info of the mentioned command.",
     "cmdinfo alive",
-).info(
-    "Help Menu"
-).done()
+).info("Help Menu").done()

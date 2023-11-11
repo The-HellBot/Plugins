@@ -39,7 +39,7 @@ async def gen_inline_help_buttons(page: int, plugins: list) -> tuple[list, int]:
                 Symbols.previous, f"help_page:{(max_pages - 1) if page == 0 else (page - 1)}",
             ),
             InlineKeyboardButton(
-                Symbols.close, "help_close:close"
+                Symbols.close, "help_data:c"
             ),
             InlineKeyboardButton(
                 Symbols.next, f"help_page:{0 if page == (max_pages - 1) else (page + 1)}",

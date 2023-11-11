@@ -35,12 +35,27 @@ def on_message(
                 return await hellbot.edit(message, "𝖨 𝖺𝗆 𝗇𝗈𝗍 𝖺𝗇 𝖺𝖽𝗆𝗂𝗇 𝗁𝖾𝗋𝖾!")
 
             if chat_type and message.chat.type not in chat_type:
-                return await hellbot.edit(message, f"𝖴𝗌𝖾 𝗍𝗁𝗂𝗌 𝖼𝗈𝗆𝗆𝖺𝗇𝖽 𝗂𝗇 {chat_type.name} 𝗈𝗇𝗅𝗒!")
+                return await hellbot.edit(
+                    message, f"𝖴𝗌𝖾 𝗍𝗁𝗂𝗌 𝖼𝗈𝗆𝗆𝖺𝗇𝖽 𝗂𝗇 {chat_type.name} 𝗈𝗇𝗅𝗒!"
+                )
 
             await func(client, message)
 
         for user in hellbot.users:
             user.add_handler(MessageHandler(wrapper, _filter), group)
+
+        return wrapper
+
+    return decorator
+
+
+def custom_handler(filters: filters.Filter, group: int = 0):
+    def decorator(func):
+        async def wrapper(client: Client, message: Message):
+            await func(client, message)
+
+        for user in hellbot.users:
+            user.add_handler(MessageHandler(wrapper, filters), group)
 
         return wrapper
 

@@ -1,4 +1,4 @@
-from pyrogram import filters
+from pyrogram import filters, Client
 from pyrogram.enums import ParseMode
 from pyrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 
@@ -37,16 +37,20 @@ async def help_page_cb(_, cb: CallbackQuery):
     page = int(cb.data.split(":")[1])
     buttons, max_page = await gen_inline_help_buttons(page, sorted(Config.CMD_MENU))
 
-    await cb.edit_message_text(
-        HELP_MENU_TEXT.format(
-            cb.from_user.mention,
-            len(Config.CMD_MENU),
-            len(Config.CMD_INFO),
-            page + 1,
-            max_page,
-        ),
-        reply_markup=InlineKeyboardMarkup(buttons),
-    )
+    try:
+        await cb.edit_message_text(
+            HELP_MENU_TEXT.format(
+                cb.from_user.mention,
+                len(Config.CMD_MENU),
+                len(Config.CMD_INFO),
+                page + 1,
+                max_page,
+            ),
+            reply_markup=InlineKeyboardMarkup(buttons),
+        )
+    except Exception:
+        # handles MessageNotModified error
+        pass
 
 
 @hellbot.bot.on_callback_query(filters.regex(r"help_menu"))
@@ -113,7 +117,7 @@ async def help_cmd_cb(_, cb: CallbackQuery):
     buttons = [
         [
             InlineKeyboardButton(Symbols.back, f"help_menu:{page}:{plugin}"),
-            InlineKeyboardButton(Symbols.close, "help_close:close"),
+            InlineKeyboardButton(Symbols.close, "help_data:c"),
         ]
     ]
 
@@ -124,18 +128,16 @@ async def help_cmd_cb(_, cb: CallbackQuery):
     )
 
 
-@hellbot.bot.on_callback_query(filters.regex(r"help_close"))
-async def help_close_cb(_, cb: CallbackQuery):
+@hellbot.bot.on_callback_query(filters.regex(r"help_data"))
+async def help_close_cb(client: Client, cb: CallbackQuery):
     if not await check_auth_click(cb):
         return
 
     action = str(cb.data.split(":")[1])
-    if action == "close":
+    if action == "c":
         await cb.edit_message_text(
             "**𝖧𝖾𝗅𝗉 𝖬𝖾𝗇𝗎 𝖢𝗅𝗈𝗌𝖾𝖽!**",
-            reply_markup=InlineKeyboardMarkup(
-                [[InlineKeyboardButton("Reopen Menu", "help_close:reopen")]]
-            ),
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Reopen", "help_data:reopen")]]),
         )
     elif action == "reopen":
         buttons, pages = await gen_inline_help_buttons(0, sorted(Config.CMD_MENU))

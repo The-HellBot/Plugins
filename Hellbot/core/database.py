@@ -1,4 +1,5 @@
 import datetime
+import time
 
 from motor import motor_asyncio
 from motor.core import AgnosticClient
@@ -12,6 +13,7 @@ class Database:
         self.client: AgnosticClient = motor_asyncio.AsyncIOMotorClient(uri)
         self.db = self.client["Hellbot"]
 
+        self.afk = self.db["afk"]
         self.env = self.db["env"]
         self.gban = self.db["gban"]
         self.session = self.db["session"]
@@ -119,6 +121,34 @@ class Database:
 
     async def get_gban(self) -> list:
         return [i async for i in self.gban.find({})]
+
+    async def set_afk(
+        self, user_id: int, reason: str, media: str, media_type: str
+    ) -> None:
+        await self.afk.update_one(
+            {"user_id": user_id},
+            {
+                "$set": {
+                    "reason": reason,
+                    "time": time.time(),
+                    "media": media,
+                    "media_type": media_type,
+                }
+            },
+            upsert=True,
+        )
+
+    async def get_afk(self, user_id: int):
+        data = await self.afk.find_one({"user_id": user_id})
+        return data
+
+    async def is_afk(self, user_id: int) -> bool:
+        if await self.afk.find_one({"user_id": user_id}):
+            return True
+        return False
+
+    async def rm_afk(self, user_id: int) -> None:
+        await self.afk.delete_one({"user_id": user_id})
 
 
 db = Database(Config.DATABASE_URL)

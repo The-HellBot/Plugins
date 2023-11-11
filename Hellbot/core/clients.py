@@ -111,19 +111,33 @@ class HellClient(Client):
 class CustomMethods(HellClient):
     async def input(self, message: Message) -> str:
         """Get the input from the user"""
-        return message.text.split(" ", 1)[1].strip() or ""
+        try:
+            output = message.text.split(" ", 1)[1].strip() or ""
+        except IndexError:
+            output = ""
+        return output
 
     async def edit(
-        self, message: Message, text: str, parse_mode: ParseMode = ParseMode.DEFAULT, no_link_preview: bool = True
+        self,
+        message: Message,
+        text: str,
+        parse_mode: ParseMode = ParseMode.DEFAULT,
+        no_link_preview: bool = True,
     ) -> Message:
         """Edit or Reply to a message, if possible"""
         if message.from_user and message.from_user.id in Config.SUDO_USERS:
             if message.reply_to_message:
                 return await message.reply_to_message.reply_text(
-                    text, parse_mode=parse_mode, disable_web_page_preview=no_link_preview
+                    text,
+                    parse_mode=parse_mode,
+                    disable_web_page_preview=no_link_preview,
                 )
-            return await message.reply_text(text, parse_mode=parse_mode, disable_web_page_preview=no_link_preview)
-        return await message.edit_text(text, parse_mode=parse_mode, disable_web_page_preview=no_link_preview)
+            return await message.reply_text(
+                text, parse_mode=parse_mode, disable_web_page_preview=no_link_preview
+            )
+        return await message.edit_text(
+            text, parse_mode=parse_mode, disable_web_page_preview=no_link_preview
+        )
 
     async def delete(self, message: Message, text: str, delete: int = 10) -> None:
         """Edit a message and delete it after a certain period of time"""
@@ -143,7 +157,12 @@ class CustomMethods(HellClient):
         msg = f"**#{tag.upper()}**\n\n{text}"
         try:
             if file:
-                await self.bot.send_document(Config.LOGGER_ID, file, caption=msg)
+                try:
+                    await self.bot.send_document(Config.LOGGER_ID, file, caption=msg)
+                except:
+                    await self.bot.send_message(
+                        Config.LOGGER_ID, msg, disable_web_page_preview=True
+                    )
             else:
                 await self.bot.send_message(
                     Config.LOGGER_ID, msg, disable_web_page_preview=True
@@ -152,11 +171,11 @@ class CustomMethods(HellClient):
             raise Exception(f"{Symbols.cross_mark} LogErr: {e}")
 
     async def check_and_log(self, tag: str, text: str, file: str = None) -> None:
-        """Check if 
+        """Check if
         -> the Logger Group is available
         -> the logging is enabled"""
         status = await db.get_env(ENV.is_logger)
-        if status.lower() == "true":
+        if status and status.lower() == "true":
             await self.log(tag, text, file)
 
 

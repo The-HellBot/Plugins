@@ -49,7 +49,7 @@ class HelpMenu:
             if command["note"]:
                 result += f"**{Symbols.arrow_right} 𝖭𝗈𝗍𝖾:** __{command['note']}__\n"
 
-            result += f"\n**<\> @Its_HellBot 🍀**"
+            result += "\n"
 
             Config.CMD_INFO[command["command"]] = {
                 "command": f"{command['command']} {command['parameters'] if command['parameters'] else ''}",

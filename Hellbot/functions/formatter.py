@@ -22,3 +22,17 @@ def readable_time(seconds: int) -> str:
     out_time += ":".join(time_list)
 
     return out_time
+
+
+def add_to_dict(data: dict, keys: list, value: str | int | bool = None) -> None:
+    current_level = data
+    for key in keys[:-1]:
+        current_level = current_level.setdefault(key, {})
+    current_level[keys[-1]] = value
+
+
+def get_from_dict(data: dict, key: list):
+    current_level = data
+    for k in key:
+        current_level = current_level[k]
+    return current_level
