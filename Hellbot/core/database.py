@@ -35,7 +35,7 @@ class Database:
             {"name": name}, {"$set": {"value": value}}, upsert=True
         )
 
-    async def get_env(self, name: str) -> str | list | None:
+    async def get_env(self, name: str) -> str | None:
         if await self.is_env(name):
             data = await self.env.find_one({"name": name})
             return data["value"]

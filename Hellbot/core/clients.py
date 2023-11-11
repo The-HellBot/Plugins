@@ -59,14 +59,15 @@ class HellClient(Client):
         )
 
     async def load_plugin(self) -> None:
-        files = glob.glob("Hellbot/plugins/user/*.py")
         count = 0
+        files = glob.glob("Hellbot/plugins/user/*.py")
+        unload = await db.get_env(ENV.unload_plugins) or ""
+        unload = unload.split(" ")
         for file in files:
             with open(file) as f:
                 path = Path(f.name)
                 shortname = path.stem.replace(".py", "")
-                unload = await db.get_env(ENV.unload_plugins)
-                if unload and shortname in unload:
+                if shortname in unload:
                     os.remove(Path(f"Hellbot/plugins/user/{shortname}.py"))
                     continue
                 if shortname.startswith("__"):
@@ -113,19 +114,19 @@ class CustomMethods(HellClient):
         return message.text.split(" ", 1)[1].strip() or ""
 
     async def edit(
-        self, message: Message, text: str, parse_mode: ParseMode = ParseMode.DEFAULT
+        self, message: Message, text: str, parse_mode: ParseMode = ParseMode.DEFAULT, no_link_preview: bool = True
     ) -> Message:
         """Edit or Reply to a message, if possible"""
         if message.from_user and message.from_user.id in Config.SUDO_USERS:
             if message.reply_to_message:
                 return await message.reply_to_message.reply_text(
-                    text, parse_mode=parse_mode
+                    text, parse_mode=parse_mode, disable_web_page_preview=no_link_preview
                 )
-            return await message.reply_text(text, parse_mode=parse_mode)
-        return await message.edit_text(text, parse_mode=parse_mode)
+            return await message.reply_text(text, parse_mode=parse_mode, disable_web_page_preview=no_link_preview)
+        return await message.edit_text(text, parse_mode=parse_mode, disable_web_page_preview=no_link_preview)
 
     async def delete(self, message: Message, text: str, delete: int = 10) -> None:
-        """ " Edit a message and delete it after a certain period of time"""
+        """Edit a message and delete it after a certain period of time"""
         to_del = await self.edit(message, text)
         await asyncio.sleep(delete)
         await to_del.delete()
@@ -149,6 +150,14 @@ class CustomMethods(HellClient):
                 )
         except Exception as e:
             raise Exception(f"{Symbols.cross_mark} LogErr: {e}")
+
+    async def check_and_log(self, tag: str, text: str, file: str = None) -> None:
+        """Check if 
+        -> the Logger Group is available
+        -> the logging is enabled"""
+        status = await db.get_env(ENV.is_logger)
+        if status.lower() == "true":
+            await self.log(tag, text, file)
 
 
 hellbot = CustomMethods()

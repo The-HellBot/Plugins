@@ -36,9 +36,12 @@ class Config:
 
 
 class ENV:
+    """ Database ENV Names """
     btn_in_help = "BUTTONS_IN_HELP"
     help_emoji = "HELP_EMOJI"
+    ping_pic = "PING_PIC"
     unload_plugins = "UNLOAD_PLUGINS"
+    is_logger = "IS_LOGGER"
 
 
 class Limits:
@@ -63,6 +66,7 @@ class Limits:
 
 
 class Symbols:
+    anchor = "⚘"
     arrow_left = "«"
     arrow_right = "»"
     bullet = "•"
@@ -81,3 +85,5 @@ class Symbols:
 all_configs = {
     key: value for key, value in Config.__dict__.items() if not key.startswith("__")
 }
+
+all_env: list[str] = [value for key, value in ENV.__dict__.items() if not key.startswith("__")]

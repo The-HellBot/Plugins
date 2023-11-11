@@ -12,3 +12,17 @@ COMMAND_MENU_TEXT = """
 
 **📃 𝖫𝗈𝖺𝖽𝖾𝖽 𝖢𝗈𝗆𝗆𝖺𝗇𝖽𝗌:** `{2}`
 """
+
+PING_TEXT = """
+**🍀 𝖯𝗂𝗇𝗀!**
+
+    ⚘  **ѕρєє∂:** {0} m/s
+    ⚘  **υρтιмє:** {1}
+    ⚘  **σωηєя:** {2}
+"""
+
+REPO_TEXT = """
+**🍀 𝖱𝖾𝗉𝗈:** [Github](https://github.com/The-HellBot/HellBot)
+**🍀 Updates:** @Its_HellBot
+**🍀 Support:** @HellBot_Chats
+"""
