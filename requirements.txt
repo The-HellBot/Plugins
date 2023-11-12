@@ -3,3 +3,4 @@ pyroaddon
 pyrogram
 python-dotenv
 tgcrypto
+pillow
