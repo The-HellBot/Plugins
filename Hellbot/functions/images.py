@@ -3,7 +3,7 @@ import time
 
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
-from .formatter import formatted_text
+from .formatter import format_text
 
 
 def convert_to_png(image: str) -> str:
@@ -63,7 +63,7 @@ def generate_alive_image(username: str, profile_pic: str, del_img: bool) -> str:
         "./Hellbot/resources/fonts/Montserrat.ttf", 60, encoding="utf-8"
     )
 
-    text = formatted_text(username[:20] + ("..." if len(username) > 20 else ""))
+    text = format_text(username[:20] + ("..." if len(username) > 20 else ""))
     text_length = draw.textlength(text, font)
 
     position = ((background.width - text_length) / 2, background.height - 155)

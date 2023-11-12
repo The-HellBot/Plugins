@@ -1,7 +1,7 @@
 import re
 
 
-def formatted_text(text: str) -> str:
+def format_text(text: str) -> str:
     emoji_pattern = re.compile(
         "["
         "\U0001F600-\U0001F64F"  # emoticons

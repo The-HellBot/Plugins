@@ -46,7 +46,9 @@ async def ping(_, message: Message):
             force_document=False,
         )
         return
-    await hellbot.edit(hell, PING_TEXT.format(round(speed, 3), uptime, message.from_user.mention))
+    await hellbot.edit(
+        hell, PING_TEXT.format(round(speed, 3), uptime, message.from_user.mention)
+    )
 
 
 HelpMenu("bot").add("alive", None, "Get the alive message of the bot.", "alive").add(

@@ -11,8 +11,8 @@ from pyrogram.types import (
 )
 
 from Hellbot.core import Config, Symbols, db, hellbot
-from Hellbot.functions.keyboard import gen_inline_keyboard
 
+from ..btnsG import gen_inline_keyboard
 from . import START_MSG, BotHelp
 
 
@@ -164,6 +164,4 @@ async def go_home(_, message: Message):
 
 BotHelp("Sessions").add(
     "session", "To manage user sessions of the bot."
-).info(
-    "Manage Userbot Sessions"
-).done()
+).info("Manage Userbot Sessions").done()
