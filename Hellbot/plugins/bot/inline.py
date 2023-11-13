@@ -7,8 +7,8 @@ from pyrogram.types import (
 )
 
 from Hellbot.core import Config, hellbot
+from Hellbot.functions.templates import help_template
 
-from .. import HELP_MENU_TEXT
 from ..btnsG import gen_inline_help_buttons
 
 
@@ -19,19 +19,16 @@ async def help_inline(_, query: InlineQuery):
     no_of_plugins = len(Config.CMD_MENU)
     no_of_commands = len(Config.CMD_INFO)
     buttons, pages = await gen_inline_help_buttons(0, sorted(Config.CMD_MENU))
+    caption = await help_template(
+        query.from_user.mention, (no_of_commands, no_of_plugins), (1, pages)
+    )
     await query.answer(
         results=[
             (
                 InlineQueryResultArticle(
                     "HellBot Help Menu 🍀",
                     InputTextMessageContent(
-                        HELP_MENU_TEXT.format(
-                            query.from_user.mention,
-                            no_of_plugins,
-                            no_of_commands,
-                            1,
-                            pages,
-                        ),
+                        caption,
                         disable_web_page_preview=True,
                     ),
                     description="Inline Query for Help Menu of HellBot",

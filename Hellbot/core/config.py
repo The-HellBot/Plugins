@@ -39,11 +39,17 @@ class Config:
 
 class ENV:
     """ Database ENV Names """
+
+    alive_pic = "ALIVE_PIC"
+    alive_template = "ALIVE_TEMPLATE"
     btn_in_help = "BUTTONS_IN_HELP"
+    command_template = "COMMAND_TEMPLATE"
     help_emoji = "HELP_EMOJI"
-    ping_pic = "PING_PIC"
-    unload_plugins = "UNLOAD_PLUGINS"
+    help_template = "HELP_TEMPLATE"
     is_logger = "IS_LOGGER"
+    ping_pic = "PING_PIC"
+    ping_template = "PING_TEMPLATE"
+    unload_plugins = "UNLOAD_PLUGINS"
 
 
 class Limits:

@@ -4,7 +4,6 @@ from pyrogram.types import Message
 
 from Hellbot.core import Config, Symbols, hellbot
 
-from .. import REPO_TEXT
 from . import HelpMenu, bot, handler, on_message
 
 
@@ -48,6 +47,7 @@ async def help(client: Client, message: Message):
 
 @on_message("repo", allow_sudo=True)
 async def repo(_, message: Message):
+    REPO_TEXT = "__🍀 𝖱𝖾𝗉𝗈:__ [Github](https://github.com/The-HellBot/HellBot)\n\n__🍀 Updates:__ @Its_HellBot\n__🍀 Support:__ @HellBot_Chats\n\n**By ©️ @HellBot_Networks**"
     await hellbot.edit(message, REPO_TEXT, no_link_preview=True)
 
 
@@ -92,9 +92,7 @@ HelpMenu("help").add(
     "<plugin name>",
     "Get the detailed help menu for that mentioned plugin or get the whole help menu instead.",
     "help alive",
-).add(
-    "repo", None, "Get the repo link of the bot.", "repo"
-).add(
+).add("repo", None, "Get the repo link of the bot.", "repo").add(
     "plinfo",
     "<plugin name>",
     "Get the detailed info of the mentioned plugin.",
@@ -104,4 +102,6 @@ HelpMenu("help").add(
     "<command name>",
     "Get the detailed info of the mentioned command.",
     "cmdinfo alive",
-).info("Help Menu").done()
+).info(
+    "Help Menu"
+).done()
