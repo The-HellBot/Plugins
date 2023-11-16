@@ -40,13 +40,18 @@ class Config:
 class ENV:
     """ Database ENV Names """
 
+    airing_template = "AIRING_TEMPLATE"
     alive_pic = "ALIVE_PIC"
     alive_template = "ALIVE_TEMPLATE"
+    anilist_user_template = "ANILIST_USER_TEMPLATE"
+    anime_template = "ANIME_TEMPLATE"
     btn_in_help = "BUTTONS_IN_HELP"
+    character_template = "CHARACTER_TEMPLATE"
     command_template = "COMMAND_TEMPLATE"
     help_emoji = "HELP_EMOJI"
     help_template = "HELP_TEMPLATE"
     is_logger = "IS_LOGGER"
+    manga_template = "MANGA_TEMPLATE"
     ping_pic = "PING_PIC"
     ping_template = "PING_TEMPLATE"
     unload_plugins = "UNLOAD_PLUGINS"
@@ -86,7 +91,7 @@ class Symbols:
     radio_unselect = "〇"
     previous = "prev ⤙"
     next = "⤚ next"
-    close = "✘"
+    close = "🗑️"
     back = "🔙 back"
 
 
