@@ -125,7 +125,7 @@ class CustomMethods(HellClient):
         no_link_preview: bool = True,
     ) -> Message:
         """Edit or Reply to a message, if possible"""
-        if message.from_user and message.from_user.id in Config.SUDO_USERS:
+        if message.from_user and message.from_user.id in Config.STAN_USERS:
             if message.reply_to_message:
                 return await message.reply_to_message.reply_text(
                     text,
@@ -139,20 +139,32 @@ class CustomMethods(HellClient):
             text, parse_mode=parse_mode, disable_web_page_preview=no_link_preview
         )
 
-    async def delete(self, message: Message, text: str, delete: int = 10) -> None:
+    async def _delete(self, message: Message, delay: int = 0) -> None:
+        """Delete a message after a certain period of time"""
+        await asyncio.sleep(delay)
+        await message.delete()
+
+    async def delete(
+        self,
+        message: Message,
+        text: str,
+        delete: int = 10,
+        in_background: bool = True
+    ) -> None:
         """Edit a message and delete it after a certain period of time"""
         to_del = await self.edit(message, text)
-        await asyncio.sleep(delete)
-        await to_del.delete()
+        if in_background:
+            asyncio.create_task(self._delete(to_del, delete))
+        else:
+            await self._delete(to_del, delete)
 
     async def error(self, message: Message, text: str, delete: int = 10) -> None:
         """Edit an error message and delete it after a certain period of time if mentioned"""
         to_del = await self.edit(message, f"{Symbols.cross_mark} **Error:** \n\n{text}")
-        if delete != 0:
-            await asyncio.sleep(delete)
-            await to_del.delete()
+        if delete:
+            asyncio.create_task(self._delete(to_del, delete))
 
-    async def log(self, tag: str, text: str, file: str = None) -> None:
+    async def _log(self, tag: str, text: str, file: str = None) -> None:
         """Log a message to the Logger Group"""
         msg = f"**#{tag.upper()}**\n\n{text}"
         try:
@@ -171,12 +183,12 @@ class CustomMethods(HellClient):
             raise Exception(f"{Symbols.cross_mark} LogErr: {e}")
 
     async def check_and_log(self, tag: str, text: str, file: str = None) -> None:
-        """Check if
-        -> the Logger Group is available
-        -> the logging is enabled"""
+        """Check if :
+        \n-> the Logger Group is available
+        \n-> the logging is enabled"""
         status = await db.get_env(ENV.is_logger)
         if status and status.lower() == "true":
-            await self.log(tag, text, file)
+            await self._log(tag, text, file)
 
 
 hellbot = CustomMethods()

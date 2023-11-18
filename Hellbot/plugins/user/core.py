@@ -7,7 +7,7 @@ from Hellbot.core import Config, Symbols, hellbot
 from . import HelpMenu, bot, handler, on_message
 
 
-@on_message("help", allow_sudo=True)
+@on_message("help", allow_stan=True)
 async def help(client: Client, message: Message):
     hell = await hellbot.edit(message, "**Processing...**")
     if len(message.command) == 1:
@@ -45,13 +45,13 @@ async def help(client: Client, message: Message):
     await hellbot.edit(hell, available_plugins, ParseMode.MARKDOWN)
 
 
-@on_message("repo", allow_sudo=True)
+@on_message("repo", allow_stan=True)
 async def repo(_, message: Message):
     REPO_TEXT = "__🍀 𝖱𝖾𝗉𝗈:__ [Github](https://github.com/The-HellBot/HellBot)\n\n__🍀 Updates:__ @Its_HellBot\n__🍀 Support:__ @HellBot_Chats\n\n**By ©️ @HellBot_Networks**"
     await hellbot.edit(message, REPO_TEXT, no_link_preview=True)
 
 
-@on_message("plinfo", allow_sudo=True)
+@on_message("plinfo", allow_stan=True)
 async def plugin_info(_, message: Message):
     plugin = await hellbot.input(message)
     if plugin.lower() in Config.CMD_MENU:
@@ -66,7 +66,7 @@ async def plugin_info(_, message: Message):
     await hellbot.error(message, f"**Invalid Plugin Name:** `{plugin}`", 20)
 
 
-@on_message("cmdinfo", allow_sudo=True)
+@on_message("cmdinfo", allow_stan=True)
 async def command_info(_, message: Message):
     cmd = await hellbot.input(message)
     if cmd.lower() in Config.CMD_INFO:

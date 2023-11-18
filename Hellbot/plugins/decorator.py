@@ -12,12 +12,12 @@ def on_message(
     group: int = 0,
     chat_type: list[ChatType] = None,
     admin_only: bool = False,
-    allow_sudo: bool = False,
+    allow_stan: bool = False,
 ):
-    if allow_sudo:
+    if allow_stan:
         _filter = (
             filters.command(command, Config.HANDLERS)
-            & (filters.me | Config.SUDO_USERS)
+            & (filters.me | Config.STAN_USERS)
             & ~filters.forwarded
             & ~filters.via_bot
         )
@@ -35,14 +35,13 @@ def on_message(
                 return await hellbot.edit(message, "𝖨 𝖺𝗆 𝗇𝗈𝗍 𝖺𝗇 𝖺𝖽𝗆𝗂𝗇 𝗁𝖾𝗋𝖾!")
 
             if chat_type and message.chat.type not in chat_type:
-                return await hellbot.edit(
-                    message, f"𝖴𝗌𝖾 𝗍𝗁𝗂𝗌 𝖼𝗈𝗆𝗆𝖺𝗇𝖽 𝗂𝗇 {chat_type.name} 𝗈𝗇𝗅𝗒!"
-                )
+                return await hellbot.edit(message, "𝖢𝖺𝗇'𝗍 𝗎𝗌𝖾 𝗍𝗁𝗂𝗌 𝖼𝗈𝗆𝗆𝖺𝗇𝖽 𝗁𝖾𝗋𝖾!")
 
             await func(client, message)
+            message.continue_propagation()
 
         for user in hellbot.users:
-            user.add_handler(MessageHandler(wrapper, _filter), group)
+            user.add_handler(MessageHandler(wrapper, _filter), group)        
 
         return wrapper
 
@@ -53,6 +52,7 @@ def custom_handler(filters: filters.Filter, group: int = 0):
     def decorator(func):
         async def wrapper(client: Client, message: Message):
             await func(client, message)
+            message.continue_propagation()
 
         for user in hellbot.users:
             user.add_handler(MessageHandler(wrapper, filters), group)

@@ -23,7 +23,7 @@ class Config:
     # users config: do not edit
     AUTH_USERS = filters.user()
     BANNED_USERS = filters.user()
-    SUDO_USERS = filters.user()
+    STAN_USERS = filters.user()
 
     # Global config: do not edit
     BOT_CMD_INFO = {}
@@ -82,17 +82,19 @@ class Symbols:
     anchor = "⚘"
     arrow_left = "«"
     arrow_right = "»"
+    back = "🔙 back"
     bullet = "•"
     check_mark = "✔"
+    close = "🗑️"
     cross_mark = "✘"
     diamond_1 = "◇"
     diamond_2 = "◈"
+    next = "⤚ next"
+    previous = "prev ⤙"
     radio_select = "◉"
     radio_unselect = "〇"
-    previous = "prev ⤙"
-    next = "⤚ next"
-    close = "🗑️"
-    back = "🔙 back"
+    triangle_left = "◂"
+    triangle_right = "▸"
 
 
 all_configs = {

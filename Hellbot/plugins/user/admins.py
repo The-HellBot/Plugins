@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 
 from pyrogram.types import ChatPermissions, ChatPrivileges, Message
@@ -11,7 +12,7 @@ from . import HelpMenu, group_only, handler, on_message
     "promote",
     chat_type=group_only,
     admin_only=True,
-    allow_sudo=True,
+    allow_stan=True,
 )
 async def promote(_, message: Message):
     if len(message.command) < 2 and not message.reply_to_message:
@@ -54,7 +55,7 @@ async def promote(_, message: Message):
     "demote",
     chat_type=group_only,
     admin_only=True,
-    allow_sudo=True,
+    allow_stan=True,
 )
 async def demote(_, message: Message):
     if len(message.command) < 2 and not message.reply_to_message:
@@ -93,7 +94,7 @@ async def demote(_, message: Message):
     "ban",
     chat_type=group_only,
     admin_only=True,
-    allow_sudo=True,
+    allow_stan=True,
 )
 async def ban(_, message: Message):
     if len(message.command) < 2 and not message.reply_to_message:
@@ -129,7 +130,7 @@ async def ban(_, message: Message):
     "unban",
     chat_type=group_only,
     admin_only=True,
-    allow_sudo=True,
+    allow_stan=True,
 )
 async def unban(_, message: Message):
     if len(message.command) < 2 and not message.reply_to_message:
@@ -158,7 +159,7 @@ async def unban(_, message: Message):
     "kick",
     chat_type=group_only,
     admin_only=True,
-    allow_sudo=True,
+    allow_stan=True,
 )
 async def kick(_, message: Message):
     if len(message.command) < 2 and not message.reply_to_message:
@@ -174,7 +175,7 @@ async def kick(_, message: Message):
         reason = (await hellbot.input(message)).split(" ", 1)[1].strip()
 
     try:
-        await message.chat.ban_member(user.id, until_date=datetime.timedelta(seconds=5))
+        await message.chat.ban_member(user.id)
     except Exception as e:
         return await hellbot.error(message, e)
 
@@ -188,13 +189,15 @@ async def kick(_, message: Message):
         "kick",
         f"**Kicked User**\n\n**User:** {user.mention}\n**User ID:** `{user.id}`\n**Reason:** `{reason}`\n**Admin:** `{message.from_user.mention}`\n**Group:** `{message.chat.title}`\n**Group ID:** `{message.chat.id}`",
     )
+    await asyncio.sleep(5)
+    await message.chat.unban_member(user.id)
 
 
 @on_message(
     "mute",
     chat_type=group_only,
     admin_only=True,
-    allow_sudo=True,
+    allow_stan=True,
 )
 async def mute(_, message: Message):
     if len(message.command) < 2 and not message.reply_to_message:
@@ -231,7 +234,7 @@ async def mute(_, message: Message):
     "unmute",
     chat_type=group_only,
     admin_only=True,
-    allow_sudo=True,
+    allow_stan=True,
 )
 async def unmute(_, message: Message):
     if len(message.command) < 2 and not message.reply_to_message:
@@ -263,7 +266,7 @@ async def unmute(_, message: Message):
     "pin",
     chat_type=group_only,
     admin_only=True,
-    allow_sudo=True,
+    allow_stan=True,
 )
 async def pin(_, message: Message):
     if not message.reply_to_message:
@@ -289,7 +292,7 @@ async def pin(_, message: Message):
     "unpin",
     chat_type=group_only,
     admin_only=True,
-    allow_sudo=True,
+    allow_stan=True,
 )
 async def unpin(_, message: Message):
     if not message.reply_to_message:
@@ -315,7 +318,7 @@ async def unpin(_, message: Message):
     "zombies",
     chat_type=group_only,
     admin_only=True,
-    allow_sudo=True,
+    allow_stan=True,
 )
 async def zombies(_, message: Message):
     hell = await hellbot.edit(message, "☠️ 𝖣𝖾𝗍𝖾𝖼𝗍𝗂𝗇𝗀 𝗓𝗈𝗆𝖻𝗂𝖾𝗌...")

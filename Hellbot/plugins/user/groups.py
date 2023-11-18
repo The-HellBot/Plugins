@@ -11,7 +11,7 @@ from . import HelpMenu, on_message, group_n_channel
     "setgpic",
     chat_type=group_n_channel,
     admin_only=True,
-    allow_sudo=True,
+    allow_stan=True,
 )
 async def setgpic(_, message: Message):
     if not message.reply_to_message or not message.reply_to_message.photo:
@@ -34,7 +34,7 @@ async def setgpic(_, message: Message):
     "setgtitle",
     chat_type=group_n_channel,
     admin_only=True,
-    allow_sudo=True,
+    allow_stan=True,
 )
 async def setgtitle(_, message: Message):
     if len(message.command) < 2:
@@ -59,7 +59,7 @@ async def setgtitle(_, message: Message):
     "setgabout",
     chat_type=group_n_channel,
     admin_only=True,
-    allow_sudo=True,
+    allow_stan=True,
 )
 async def setgabout(_, message: Message):
     if len(message.command) < 2:
@@ -83,7 +83,7 @@ async def setgabout(_, message: Message):
     "setgusername",
     chat_type=group_n_channel,
     admin_only=True,
-    allow_sudo=True,
+    allow_stan=True,
 )
 async def setgusername(client: Client, message: Message):
     user_status = (await message.chat.get_member(message.from_user.id)).status
@@ -111,7 +111,7 @@ async def setgusername(client: Client, message: Message):
     "getglink",
     chat_type=group_n_channel,
     admin_only=True,
-    allow_sudo=True,
+    allow_stan=True,
 )
 async def getglink(_, message: Message):
     link = await message.chat.export_invite_link()

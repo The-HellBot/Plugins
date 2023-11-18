@@ -14,10 +14,11 @@ class Database:
         self.db = self.client["Hellbot"]
 
         self.afk = self.db["afk"]
+        self.antiflood = self.db["antiflood"]
         self.env = self.db["env"]
         self.gban = self.db["gban"]
         self.session = self.db["session"]
-        self.sudo_users = self.db["sudo_users"]
+        self.stan_users = self.db["stan_users"]
 
     async def connect(self):
         try:
@@ -54,27 +55,27 @@ class Database:
     async def get_all_env(self) -> list:
         return [i async for i in self.env.find({})]
 
-    async def is_sudo(self, user_id: int) -> bool:
-        if await self.sudo_users.find_one({"user_id": user_id}):
+    async def is_stan(self, user_id: int) -> bool:
+        if await self.stan_users.find_one({"user_id": user_id}):
             return True
         return False
 
-    async def add_sudo(self, user_id: int) -> bool:
-        if await self.is_sudo(user_id):
+    async def add_stan(self, user_id: int) -> bool:
+        if await self.is_stan(user_id):
             return False
-        await self.sudo_users.insert_one(
+        await self.stan_users.insert_one(
             {"user_id": user_id, "date": self.get_datetime()}
         )
         return True
 
-    async def rm_sudo(self, user_id: int) -> bool:
-        if not await self.is_sudo(user_id):
+    async def rm_stan(self, user_id: int) -> bool:
+        if not await self.is_stan(user_id):
             return False
-        await self.sudo_users.delete_one({"user_id": user_id})
+        await self.stan_users.delete_one({"user_id": user_id})
         return True
 
-    async def get_sudos(self) -> list:
-        return [i async for i in self.sudo_users.find({})]
+    async def get_stans(self) -> list:
+        return [i async for i in self.stan_users.find({})]
 
     async def is_session(self, user_id: int) -> bool:
         if await self.session.find_one({"user_id": user_id}):
@@ -149,6 +150,33 @@ class Database:
 
     async def rm_afk(self, user_id: int) -> None:
         await self.afk.delete_one({"user_id": user_id})
+
+    async def set_flood(self, client_chat: tuple[int, int], settings: dict):
+        await self.antiflood.update_one(
+            {"client": client_chat[0], "chat": client_chat[1]},
+            {"$set": settings},
+            upsert=True,
+        )
+
+    async def get_flood(self, client_chat: tuple[int, int]):
+        data = await self.antiflood.find_one(
+            {"client": client_chat[0], "chat": client_chat[1]}
+        )
+        return data or {}
+
+    async def is_flood(self, client_chat: tuple[int, int]) -> bool:
+        data = await self.get_flood(client_chat)
+
+        if not data:
+            return False
+
+        if data["limit"] == 0:
+            return False
+
+        return True
+
+    async def get_all_floods(self) -> list:
+        return [i async for i in self.antiflood.find({})]
 
 
 db = Database(Config.DATABASE_URL)

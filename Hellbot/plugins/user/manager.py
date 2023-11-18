@@ -6,7 +6,7 @@ from Hellbot.core.config import all_env
 from . import on_message
 
 
-@on_message("getvar", allow_sudo=True)
+@on_message("getvar", allow_stan=True)
 async def getvar(_, message: Message):
     if len(message.command) < 2:
         return await hellbot.delete(message, "Give a varname to fetch value.")
@@ -23,7 +23,7 @@ async def getvar(_, message: Message):
         await hellbot.delete(message, f"**𝖵𝖺𝗋𝗂𝖺𝖻𝗅𝖾 {varname} 𝖽𝗈𝖾𝗌 𝗇𝗈𝗍 𝖾𝗑𝗂𝗌𝗍𝗌!**")
 
 
-@on_message("getallvar", allow_sudo=True)
+@on_message("getallvar", allow_stan=True)
 async def getallvar(_, message: Message):
     text = "**𝖫𝗂𝗌𝗍 𝗈𝖿 𝖺𝗅𝗅 𝖣𝖡 𝗏𝖺𝗋𝗂𝖺𝖻𝗅𝖾 𝖺𝗋𝖾:**\n\n"
     for env in all_env:
@@ -31,7 +31,7 @@ async def getallvar(_, message: Message):
     await hellbot.edit(message, text)
 
 
-@on_message("setvar", allow_sudo=True)
+@on_message("setvar", allow_stan=True)
 async def setvar(_, message: Message):
     if len(message.command) < 3:
         return await hellbot.delete(
@@ -48,7 +48,7 @@ async def setvar(_, message: Message):
     )
 
 
-@on_message("delvar", allow_sudo=True)
+@on_message("delvar", allow_stan=True)
 async def delvar(_, message: Message):
     if len(message.command) < 2:
         return await hellbot.delete(message, "**𝖦𝗂𝗏𝖾 𝗏𝖺𝗋𝗇𝖺𝗆𝖾 𝖺𝗅𝗈𝗇𝗀 𝗐𝗂𝗍𝗁 𝗍𝗁𝖾 𝖼𝗈𝗆𝗆𝖺𝗇𝖽!**")

@@ -14,7 +14,7 @@ from Hellbot.functions.templates import alive_template, ping_template
 from . import HelpMenu, on_message
 
 
-@on_message("alive", allow_sudo=True)
+@on_message("alive", allow_stan=True)
 async def alive(client: Client, message: Message):
     hell = await hellbot.edit(message, "Processing ...")
 
@@ -43,7 +43,7 @@ async def alive(client: Client, message: Message):
         pass
 
 
-@on_message("ping", allow_sudo=True)
+@on_message("ping", allow_stan=True)
 async def ping(client: Client, message: Message):
     start_time = time.time()
     hell = await hellbot.edit(message, "**Pong ~**")

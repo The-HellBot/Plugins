@@ -8,7 +8,7 @@ class Users:
     async def AuthUsers(self):
         temp_list = []
         temp_list.append(Config.OWNER_ID)
-        temp_list.extend(await db.get_sudos())
+        temp_list.extend(await db.get_stans())
         temp_list.extend([(await client.get_me()).id for client in hellbot.users])
         users = list(set(temp_list))
         for user in users:
@@ -18,12 +18,12 @@ class Users:
             f"{Symbols.arrow_right * 2} Added Authorized Users {Symbols.arrow_left * 2}"
         )
 
-    async def SudoUsers(self):
-        users = await db.get_sudos()
+    async def StanUsers(self):
+        users = await db.get_stans()
         for user in users:
-            Config.SUDO_USERS.add(user)
+            Config.STAN_USERS.add(user)
         LOGS.info(
-            f"{Symbols.arrow_right * 2} Added Sudo Users {Symbols.arrow_left * 2}"
+            f"{Symbols.arrow_right * 2} Added Stan Users {Symbols.arrow_left * 2}"
         )
 
     async def GbanUsers(self):
@@ -37,5 +37,5 @@ class Users:
     async def setup(self):
         LOGS.info(f"{Symbols.bullet * 3} Setting Up Users {Symbols.bullet * 3}")
         await self.AuthUsers()
-        await self.SudoUsers()
+        await self.StanUsers()
         await self.GbanUsers()

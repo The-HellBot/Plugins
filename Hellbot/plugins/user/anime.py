@@ -17,7 +17,7 @@ from Hellbot.functions.scraping import (
 from . import HelpMenu, on_message
 
 
-@on_message("anime", allow_sudo=True)
+@on_message("anime", allow_stan=True)
 async def anime(_, message: Message):
     if len(message.command) < 2:
         return await hellbot.delete(message, "Give me an anime name to search!")
@@ -36,7 +36,7 @@ async def anime(_, message: Message):
         os.remove(photo)
 
 
-@on_message("manga", allow_sudo=True)
+@on_message("manga", allow_stan=True)
 async def manga(_, message: Message):
     if len(message.command) < 2:
         return await hellbot.delete(message, "Give me a manga name to search!")
@@ -55,7 +55,7 @@ async def manga(_, message: Message):
         os.remove(photo)
 
 
-@on_message("character", allow_sudo=True)
+@on_message("character", allow_stan=True)
 async def character(_, message: Message):
     if len(message.command) < 2:
         return await hellbot.delete(message, "Give me a character name to search!")
@@ -74,7 +74,7 @@ async def character(_, message: Message):
         os.remove(photo)
 
 
-@on_message("airing", allow_sudo=True)
+@on_message("airing", allow_stan=True)
 async def airing(_, message: Message):
     if len(message.command) < 2:
         return await hellbot.delete(message, "Give me an anime name to search!")
@@ -93,7 +93,7 @@ async def airing(_, message: Message):
         os.remove(photo)
 
 
-@on_message(["anilistuser", "aniuser"], allow_sudo=True)
+@on_message(["anilistuser", "aniuser"], allow_stan=True)
 async def anilist_user(_, message: Message):
     if len(message.command) < 2:
         return await hellbot.delete(message, "Give me an anilist username to search!")
@@ -112,7 +112,7 @@ async def anilist_user(_, message: Message):
         os.remove(photo)
 
 
-@on_message(["filler", "canon"], allow_sudo=True)
+@on_message(["filler", "canon"], allow_stan=True)
 async def fillers(_, message: Message):
     if len(message.command) < 2:
         return await hellbot.delete(message, "Give me an anime name to search!")
@@ -127,7 +127,7 @@ async def fillers(_, message: Message):
     await hell.edit(caption, disable_web_page_preview=True)
 
 
-@on_message("watchorder", allow_sudo=True)
+@on_message("watchorder", allow_stan=True)
 async def watch_order(_, message: Message):
     if len(message.command) < 2:
         return await hellbot.delete(message, "Give me an anime name to search!")
