@@ -31,8 +31,9 @@ def on_message(
 
     def decorator(func):
         async def wrapper(client: Client, message: Message):
-            if admin_only and not await is_user_admin(message, message.from_user.id):
-                return await hellbot.edit(message, "𝖨 𝖺𝗆 𝗇𝗈𝗍 𝖺𝗇 𝖺𝖽𝗆𝗂𝗇 𝗁𝖾𝗋𝖾!")
+            if admin_only and not message.chat.type == ChatType.PRIVATE:
+                if not await is_user_admin(message, message.from_user.id):
+                    return await hellbot.edit(message, "𝖨 𝖺𝗆 𝗇𝗈𝗍 𝖺𝗇 𝖺𝖽𝗆𝗂𝗇 𝗁𝖾𝗋𝖾!")
 
             if chat_type and message.chat.type not in chat_type:
                 return await hellbot.edit(message, "𝖢𝖺𝗇'𝗍 𝗎𝗌𝖾 𝗍𝗁𝗂𝗌 𝖼𝗈𝗆𝗆𝖺𝗇𝖽 𝗁𝖾𝗋𝖾!")

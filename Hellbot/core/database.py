@@ -15,6 +15,7 @@ class Database:
 
         self.afk = self.db["afk"]
         self.antiflood = self.db["antiflood"]
+        self.autopost = self.db["autopost"]
         self.env = self.db["env"]
         self.gban = self.db["gban"]
         self.session = self.db["session"]
@@ -177,6 +178,44 @@ class Database:
 
     async def get_all_floods(self) -> list:
         return [i async for i in self.antiflood.find({})]
+
+    async def set_autopost(self, client: int, from_channel: int, to_channel: int):
+        await self.autopost.update_one(
+            {"client": client},
+            {"$push": {
+                "autopost": {
+                    "from_channel": from_channel,
+                    "to_channel": to_channel,
+                    "date": self.get_datetime(),
+                }
+            }},
+            upsert=True,
+        )
+
+    async def get_autopost(self, client: int, from_channel: int):
+        data = await self.autopost.find_one({"client": client, "autopost": {"$elemMatch": {"from_channel": from_channel}}})
+        return data
+
+    async def is_autopost(self, client: int, from_channel: int, to_channel: int = None) -> bool:
+        if to_channel:
+            data = await self.autopost.find_one({"client": client, "autopost": {"$elemMatch": {"from_channel": from_channel, "to_channel": to_channel}}})
+        else:
+            data = await self.autopost.find_one({"client": client, "autopost": {"$elemMatch": {"from_channel": from_channel}}})
+        return True if data else False
+
+    async def rm_autopost(self, client: int, from_channel: int, to_channel: int):
+        await self.autopost.update_one(
+            {"client": client},
+            {"$pull": {
+                "autopost": {
+                    "from_channel": from_channel,
+                    "to_channel": to_channel,
+                }
+            }},
+        )
+
+    async def get_all_autoposts(self, client: int) -> list:
+        return [i async for i in self.autopost.find({"client": client})]
 
 
 db = Database(Config.DATABASE_URL)

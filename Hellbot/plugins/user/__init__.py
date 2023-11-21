@@ -2,6 +2,7 @@ from pyrogram.enums import ChatType
 
 from Hellbot.core.clients import hellbot
 from Hellbot.core.config import Config
+from Hellbot.core.database import db
 from Hellbot.plugins.decorator import custom_handler, on_message
 from Hellbot.plugins.help import HelpMenu
 
