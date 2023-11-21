@@ -26,7 +26,7 @@ def readable_time(seconds: int) -> str:
     count = 0
     out_time = ""
     time_list = []
-    time_suffix_list = ["s", "m", "h", "days"]
+    time_suffix_list = ["secs", "mins", "hrs", "days"]
 
     while count < 4:
         count += 1
@@ -46,6 +46,18 @@ def readable_time(seconds: int) -> str:
     out_time += ":".join(time_list)
 
     return out_time
+
+
+def humanbytes(size: int):
+    if not size:
+        return ""
+    power = 2**10
+    number = 0
+    dict_power_n = {0: " ", 1: "Ki", 2: "Mi", 3: "Gi", 4: "Ti"}
+    while size > power:
+        size /= power
+        number += 1
+    return str(round(size, 2)) + " " + dict_power_n[number] + "B"
 
 
 def add_to_dict(data: dict, keys: list, value: str | int | bool = None) -> None:

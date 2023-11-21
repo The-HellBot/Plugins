@@ -6,8 +6,9 @@ from pyrogram import Client, filters
 from pyrogram.types import ChatPermissions, Message
 
 from Hellbot.core import Config, Symbols, db
-from Hellbot.functions.antiflood import Flood
-from . import custom_handler, group_only, hellbot, on_message
+from Hellbot.functions.setup import Flood
+
+from . import HelpMenu, custom_handler, group_only, hellbot, on_message
 
 
 @on_message("setflood", chat_type=group_only, admin_only=True, allow_stan=True)
@@ -84,7 +85,7 @@ async def antiflood(client: Client, message: Message):
     last_user, count = Flood.getLastUser(client.me.id, message.chat.id)
 
     if last_user == message.from_user.id:
-        if (count+1) >= limit:
+        if (count + 1) >= limit:
             template = (
                 "**🤫 𝖠𝗇𝗍𝗂𝖥𝗅𝗈𝗈𝖽 {mode}!!** \n\n"
                 "**{symbol} 𝖴𝗌𝖾𝗋:** `{mention}`\n"
@@ -97,14 +98,19 @@ async def antiflood(client: Client, message: Message):
                 until_date = datetime.datetime.fromtimestamp(time.time() + mtime)
                 try:
                     await client.restrict_chat_member(
-                        message.chat.id, message.from_user.id, permission, until_date,
+                        message.chat.id,
+                        message.from_user.id,
+                        permission,
+                        until_date,
                     )
                 except Exception as e:
                     return await hellbot.error(
                         hell, f"__Error in Antiflood while trying to mute!__\n{str(e)}"
                     )
 
-                Flood.updateFlood(client.me.id, message.chat.id, message.from_user.id, 0)
+                Flood.updateFlood(
+                    client.me.id, message.chat.id, message.from_user.id, 0
+                )
                 till_date = "Forever" if mtime == 0 else until_date.ctime()
 
                 return await hell.edit(
@@ -132,7 +138,9 @@ async def antiflood(client: Client, message: Message):
                         till_date="Kicked Users can join back after 5 seconds!",
                     )
                 )
-                Flood.updateFlood(client.me.id, message.chat.id, message.from_user.id, 0)
+                Flood.updateFlood(
+                    client.me.id, message.chat.id, message.from_user.id, 0
+                )
                 await asyncio.sleep(5)
                 await client.unban_chat_member(message.chat.id, message.from_user.id)
                 return
@@ -141,14 +149,18 @@ async def antiflood(client: Client, message: Message):
                 until_date = datetime.datetime.fromtimestamp(time.time() + mtime)
                 try:
                     await client.ban_chat_member(
-                        message.chat.id, message.from_user.id, until_date,
+                        message.chat.id,
+                        message.from_user.id,
+                        until_date,
                     )
                 except Exception as e:
                     return await hellbot.error(
                         hell, f"__Error in Antiflood while trying to ban!__\n{str(e)}"
                     )
-                
-                Flood.updateFlood(client.me.id, message.chat.id, message.from_user.id, 0)
+
+                Flood.updateFlood(
+                    client.me.id, message.chat.id, message.from_user.id, 0
+                )
                 till_date = "Forever" if mtime == 0 else until_date.ctime()
 
                 return await hell.edit(
@@ -163,7 +175,20 @@ async def antiflood(client: Client, message: Message):
                 return
         else:
             count += 1
-            Flood.updateFlood(client.me.id, message.chat.id, message.from_user.id, count)
+            Flood.updateFlood(
+                client.me.id, message.chat.id, message.from_user.id, count
+            )
             return
     else:
         Flood.updateFlood(client.me.id, message.chat.id, message.from_user.id, 1)
+
+
+HelpMenu("antiflood").add(
+    "setflood",
+    "<limit> <mode> <time>",
+    "Set antiflood in the chat! All arguments are optional, bydefault limit is 5 and mode is permanent mute.",
+    "setflood 10 ban 1d",
+    "Mode can be mute, kick or ban. Time can be xd (days), xh (hours) or xm (minutes) where x is number.",
+).add("setflood 0", None, "Disable antiflood in the chat!", "setflood 0").info(
+    "Control Flood in the chat!"
+).done()
