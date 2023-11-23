@@ -19,6 +19,8 @@ class Config:
     # storage dir: you may or may not edit
     DWL_DIR = "./downloads/"
     TEMP_DIR = "./temp/"
+    CHROME_BIN = getenv("CHROME_BIN", "/usr/bin/chromium")
+    CHROME_DRIVER = getenv("CHROME_DRIVER", "/usr/bin/chromedriver")
 
     # users config: do not edit
     AUTH_USERS = filters.user()

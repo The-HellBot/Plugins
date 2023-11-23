@@ -5,4 +5,5 @@ pillow
 pyroaddon
 pyrogram
 python-dotenv
+selenium
 tgcrypto

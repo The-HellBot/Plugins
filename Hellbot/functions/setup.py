@@ -78,4 +78,52 @@ class AntiFlood:
         return False
 
 
+class Blacklists:
+    def __init__(self) -> None:
+        self.blacklists = {}
+
+    async def updateBlacklists(self):
+        datas = await db.get_blacklist_clients()
+        for data in datas:
+            client = data["client"]
+            chats = data["chats"]
+            for chat in chats:
+                blacklists = data["blacklist"]
+                self.blacklists[client] = {chat: blacklists}
+    
+    async def addBlacklist(self, client: int, chat: int, text: str):
+        try:
+            self.blacklists[client][chat].append(text)
+        except KeyError:
+            self.blacklists[client] = {chat: [text]}
+
+        await db.add_blacklist(client, chat, text)
+
+    async def rmBlacklist(self, client: int, chat: int, text: str):
+        try:
+            self.blacklists[client][chat].remove(text)
+        except KeyError:
+            return
+
+        await db.rm_blacklist(client, chat, text)
+
+    def getBlacklists(self, client: int, chat: int) -> list:
+        try:
+            return self.blacklists[client][chat]
+        except KeyError:
+            return []
+
+    def check_client_chat(self, client: int, chat: int) -> bool:
+        try:
+            chats = self.blacklists[client]
+        except KeyError:
+            return False
+
+        if chat in chats:
+            return True
+
+        return False
+
+
 Flood = AntiFlood()
+BList = Blacklists()
