@@ -19,8 +19,7 @@ class Config:
     # storage dir: you may or may not edit
     DWL_DIR = "./downloads/"
     TEMP_DIR = "./temp/"
-    CHROME_BIN = getenv("CHROME_BIN", "/usr/bin/chromium")
-    CHROME_DRIVER = getenv("CHROME_DRIVER", "/usr/bin/chromedriver")
+    CHROME_BIN = getenv("CHROME_BIN", "/app/.apt/usr/bin/google-chrome")
 
     # users config: do not edit
     AUTH_USERS = filters.user()
@@ -43,12 +42,15 @@ class ENV:
     """ Database ENV Names """
 
     airing_template = "AIRING_TEMPLATE"
+    airpollution_template = "AIRPOLLUTION_TEMPLATE"
     alive_pic = "ALIVE_PIC"
     alive_template = "ALIVE_TEMPLATE"
     anilist_user_template = "ANILIST_USER_TEMPLATE"
     anime_template = "ANIME_TEMPLATE"
     btn_in_help = "BUTTONS_IN_HELP"
     character_template = "CHARACTER_TEMPLATE"
+    climate_api = "CLIMATE_API"
+    climate_template = "CLIMATE_TEMPLATE"
     command_template = "COMMAND_TEMPLATE"
     help_emoji = "HELP_EMOJI"
     help_template = "HELP_TEMPLATE"
@@ -56,6 +58,7 @@ class ENV:
     manga_template = "MANGA_TEMPLATE"
     ping_pic = "PING_PIC"
     ping_template = "PING_TEMPLATE"
+    time_zone = "TIME_ZONE"
     unload_plugins = "UNLOAD_PLUGINS"
 
 

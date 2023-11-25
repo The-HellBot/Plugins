@@ -1,9 +1,12 @@
 bs4
+html_telegraph_poster
 httpx
 motor
 pillow
 pyroaddon
 pyrogram
 python-dotenv
+pytz
+requests
 selenium
 tgcrypto

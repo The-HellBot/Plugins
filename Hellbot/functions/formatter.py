@@ -22,6 +22,16 @@ def format_text(text: str) -> str:
     return re.sub(emoji_pattern, "", text)
 
 
+def superscript(text: str) -> str:
+    superscript_digits = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
+    return text.translate(superscript_digits)
+
+
+def subscript(text: str) -> str:
+    subscript_digits = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
+    return text.translate(subscript_digits)
+
+
 def readable_time(seconds: int) -> str:
     count = 0
     out_time = ""

@@ -107,7 +107,6 @@ AIRING_TEMPLATES = [
 """
 ]
 
-
 ANILIST_USER_TEMPLATES = [
     """
 **💫 {name}**
@@ -126,6 +125,46 @@ ANILIST_USER_TEMPLATES = [
 ╰────────────────•
 
 𝖶𝖾𝖻𝗌𝗂𝗍𝖾: {siteurl}
+"""
+]
+
+CLIMATE_TEMPLATES = [
+    """
+🌆 {city_name}, {country}
+
+╭────────────────•
+╰➢ **𝖶𝖾𝖺𝗍𝗁𝖾𝗋:** {weather}
+╰➢ **𝖳𝗂𝗆𝖾𝗓𝗈𝗇𝖾:** {timezone}
+╰➢ **𝖲𝗎𝗇𝗋𝗂𝗌𝖾:** {sunrise}
+╰➢ **𝖲𝗎𝗇𝗌𝖾𝗍:** {sunset}
+╰➢ **𝖶𝗂𝗇𝖽:** {wind}
+╰➢ **𝖳𝖾𝗆𝗉𝖾𝗋𝖺𝗍𝗎𝗋𝖾:** {temperature}°C
+╰➢ **𝖥𝖾𝖾𝗅𝗌 𝗅𝗂𝗄𝖾:** {feels_like}°C
+╰➢ **𝖬𝗂𝗇𝗂𝗆𝗎𝗆:** {temp_min}°C
+╰➢ **𝖬𝖺𝗑𝗂𝗆𝗎𝗆:** {temp_max}°C
+╰➢ **𝖯𝗋𝖾𝗌𝗌𝗎𝗋𝖾:** {pressure} hPa
+╰➢ **𝖧𝗎𝗆𝗂𝖽𝗂𝗍𝗒:** {humidity}%
+╰➢ **𝖵𝗂𝗌𝗂𝖻𝗂𝗅𝗂𝗍𝗒:** {visibility} m
+╰➢ **𝖢𝗅𝗈𝗎𝖽𝗌:** {clouds}%
+╰────────────────•
+"""
+]
+
+AIR_POLLUTION_TEMPLATES = [
+    """
+🌆 {city_name}
+
+╭────────────────•
+╰➢ **𝖠𝖰𝖨:** {aqi}
+╰➢ **𝖢𝖺𝗋𝖻𝗈𝗇 𝖬𝗈𝗇𝗈𝗑𝗂𝖽𝖾:** {co}
+╰➢ **𝖭𝗈𝗂𝗍𝗋𝗈𝗀𝖾𝗇 𝖬𝗈𝗇𝗈𝗑𝗂𝖽𝖾:** {no}
+╰➢ **𝖭𝗂𝗍𝗋𝗈𝗀𝖾𝗇 𝖣𝗂𝗈𝗑𝗂𝖽𝖾:** {no2}
+╰➢ **𝖮𝗓𝗈𝗇𝖾:** {o3}
+╰➢ **𝖲𝗎𝗅𝗉𝗁𝗎𝗋 𝖣𝗂𝗈𝗑𝗂𝖽𝖾:** {so2}
+╰➢ **𝖠𝗆𝗆𝗈𝗇𝗂𝖺:** {nh3}
+╰➢ **𝖥𝗂𝗇𝖾 𝖯𝖺𝗋𝗍𝗂𝖼𝗅𝖾𝗌 (PM{sub2_5}):** {pm2_5}
+╰➢ **𝖢𝗈𝖺𝗋𝗌𝖾 𝖯𝖺𝗋𝗍𝗂𝖼𝗅𝖾𝗌 (PM{sub10}):** {pm10}
+╰────────────────•
 """
 ]
 
@@ -180,118 +219,40 @@ async def command_template(file: str, info: str, commands: str) -> str:
     return message.format(file=file, info=info, commands=commands)
 
 
-async def anime_template(
-    name: str,
-    score: str,
-    source: str,
-    mtype: str,
-    episodes: str,
-    duration: str,
-    status: str,
-    format: str,
-    genre: str,
-    studio: str,
-    trailer: str,
-    siteurl: str,
-) -> str:
+async def anime_template(**kwargs) -> str:
     template = await db.get_env(ENV.anime_template)
     if template:
         message = template
     else:
         message = random.choice(ANIME_TEMPLATES)
-    return message.format(
-        name=name,
-        score=score,
-        source=source,
-        mtype=mtype,
-        episodes=episodes,
-        duration=duration,
-        status=status,
-        format=format,
-        genre=genre,
-        studio=studio,
-        trailer=trailer,
-        siteurl=siteurl,
-    )
+    return message.format(**kwargs)
 
 
-async def manga_templates(
-    name: str,
-    score: str,
-    source: str,
-    mtype: str,
-    chapters: str,
-    volumes: str,
-    status: str,
-    format: str,
-    genre: str,
-    siteurl: str,
-) -> str:
+async def manga_templates(**kwargs) -> str:
     template = await db.get_env(ENV.manga_template)
     if template:
         message = template
     else:
         message = random.choice(MANGA_TEMPLATES)
-    return message.format(
-        name=name,
-        score=score,
-        source=source,
-        mtype=mtype,
-        chapters=chapters,
-        volumes=volumes,
-        status=status,
-        format=format,
-        genre=genre,
-        siteurl=siteurl,
-    )
+    return message.format(**kwargs)
 
 
-async def character_templates(
-    name: str,
-    gender: str,
-    date_of_birth: str,
-    age: str,
-    blood_type: str,
-    favourites: str,
-    siteurl: str,
-    role_in: str,
-    description: str,
-) -> str:
+async def character_templates(**kwargs) -> str:
     template = await db.get_env(ENV.character_template)
     if template:
         message = template
     else:
         message = random.choice(CHARACTER_TEMPLATES)
-    return message.format(
-        name=name,
-        gender=gender,
-        date_of_birth=date_of_birth,
-        age=age,
-        blood_type=blood_type,
-        favourites=favourites,
-        siteurl=siteurl,
-        role_in=role_in,
-        description=description,
-    )
+    return message.format(**kwargs)
 
 
-async def airing_templates(
-    name: str,
-    status: str,
-    episode: str,
-    airing_info: str,
-) -> str:
+async def airing_templates(**kwargs) -> str:
     template = await db.get_env(ENV.airing_template)
     if template:
         message = template
     else:
         message = random.choice(AIRING_TEMPLATES)
-    return message.format(
-        name=name,
-        status=status,
-        episode=episode,
-        airing_info=airing_info,
-    )
+    return message.format(**kwargs)
 
 
 async def anilist_user_templates(
@@ -314,3 +275,21 @@ async def anilist_user_templates(
         volumes=manga[3],
         siteurl=siteurl,
     )
+
+
+async def climate_templates(**kwargs) -> str:
+    template = await db.get_env(ENV.climate_template)
+    if template:
+        message = template
+    else:
+        message = random.choice(CLIMATE_TEMPLATES)
+    return message.format(**kwargs)
+
+
+async def airpollution_templates(**kwargs) -> str:
+    template = await db.get_env(ENV.airpollution_template)
+    if template:
+        message = template
+    else:
+        message = random.choice(AIR_POLLUTION_TEMPLATES)
+    return message.format(**kwargs)

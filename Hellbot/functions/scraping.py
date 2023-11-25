@@ -2,7 +2,6 @@ import calendar
 import time
 
 import httpx
-import requests
 from bs4 import BeautifulSoup
 from urllib.parse import quote
 from Hellbot.core import Symbols
@@ -195,7 +194,7 @@ def get_date(data: dict) -> str:
 def search_anime_filler(search_term: str):
     BASE = "https://www.animefillerlist.com/shows/"
 
-    response = requests.get(BASE).text
+    response = httpx.get(BASE).text
     soup = BeautifulSoup(response, "html.parser")
     div = soup.findAll("div", {"class": "Group"})
 
@@ -213,7 +212,7 @@ def search_anime_filler(search_term: str):
 
     for result in results.keys():
         data = []
-        response = requests.get(BASE + results[result]).text
+        response = httpx.get(BASE + results[result]).text
         soup = BeautifulSoup(response, "html.parser")
         base_div = soup.find("div", {"id": "Condensed"})
 
@@ -248,7 +247,7 @@ async def get_filler_info(search_term: str) -> str:
 
 
 def search_watch_order(anime: str):
-    response = requests.get(f"https://www.animechrono.com/search?q={quote(anime)}")
+    response = httpx.get(f"https://www.animechrono.com/search?q={quote(anime)}")
     soup = BeautifulSoup(response.text, "html.parser")
 
     item_div = soup.find("div", {"class": "search-result-items"})
@@ -265,7 +264,7 @@ async def get_watch_order(search_term: str) -> str:
 
     for anime in animes:
         message += f"**{Symbols.anchor} {anime[0]}:** \n"
-        response = requests.get("https://www.animechrono.com" + anime[1]).text
+        response = httpx.get("https://www.animechrono.com" + anime[1]).text
         soup = BeautifulSoup(response, "html.parser")
 
         elements = soup.find_all("h2", {"class": "heading-5"})
@@ -312,7 +311,7 @@ async def get_anime_info(search_term: str) -> tuple[str, str]:
     if data["trailer"] and data["trailer"]["site"] == "youtube":
         trailer = f"[Youtube](https://youtu.be/{data['trailer']['id']})"
 
-    response = requests.get(f"https://img.anili.st/media/{anime_id}").content
+    response = httpx.get(f"https://img.anili.st/media/{anime_id}").content
     banner = f"anime_{anime_id}.jpg"
     with open(banner, "wb") as f:
         f.write(response)
@@ -360,7 +359,7 @@ async def get_manga_info(search_term: str) -> tuple[str, str]:
     genre = ", ".join(data["genres"]) if data["genres"] else "N/A"
     siteurl = f"[Anilist Website]({data['siteUrl']})" if data["siteUrl"] else "N/A"
 
-    response = requests.get(f"https://img.anili.st/media/{manga_id}").content
+    response = httpx.get(f"https://img.anili.st/media/{manga_id}").content
     banner = f"manga_{manga_id}.jpg"
     with open(banner, "wb") as f:
         f.write(response)
@@ -395,7 +394,7 @@ async def get_character_info(search_term: str) -> tuple[str, str]:
     else:
         role_in = ""
 
-    response = requests.get(data["image"]["large"]).content
+    response = httpx.get(data["image"]["large"]).content
     banner = f"character_{char_id}.jpg"
     with open(banner, "wb") as f:
         f.write(response)
@@ -435,7 +434,7 @@ async def get_airing_info(search_term: str) -> tuple[str, str]:
         except:
             episode = "N/A"
 
-    response = requests.get(f"https://img.anili.st/media/{data['id']}").content
+    response = httpx.get(f"https://img.anili.st/media/{data['id']}").content
     banner = f"airing_{data['id']}.jpg"
     with open(banner, "wb") as f:
         f.write(response)
@@ -462,7 +461,7 @@ async def get_anilist_user_info(search_term: str) -> tuple[str, str]:
     name = data['name']
     siteurl = f"[Anilist Website]({data['siteUrl']})" if data["siteUrl"] else "N/A"
 
-    response = requests.get(f"https://img.anili.st/user/{user_id}").content
+    response = httpx.get(f"https://img.anili.st/user/{user_id}").content
     banner = f"aniuser_{user_id}.jpg"
     with open(banner, "wb") as f:
         f.write(response)

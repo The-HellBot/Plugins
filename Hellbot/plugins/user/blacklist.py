@@ -53,10 +53,10 @@ async def blacklists(client: Client, message: Message):
 
 @custom_handler(filters.text & filters.incoming & ~Config.AUTH_USERS)
 async def handle_blacklists(client: Client, message: Message):
-    if not await BList.check_client_chat(client.me.id, message.chat.id):
+    if not BList.check_client_chat(client.me.id, message.chat.id):
         return
 
-    blacklists = await BList.getBlacklists(client.me.id, message.chat.id)
+    blacklists = BList.getBlacklists(client.me.id, message.chat.id)
     for blacklist in blacklists:
         pattern = r"( |^|[^\w])" + re.escape(blacklist) + r"( |$|[^\w])"
         if re.search(pattern, message.text, flags=re.IGNORECASE):
