@@ -111,7 +111,7 @@ async def media_to_voice(_, message: Message):
 
     hell = await hellbot.edit(message, "Converting ...")
     dwl_path = await message.reply_to_message.download()
-    voice_path = f"{round(time.time())}.opus"
+    voice_path = f"{round(time.time())}.ogg"
 
     cmd_list = [
         "ffmpeg",

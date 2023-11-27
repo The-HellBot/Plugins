@@ -1,6 +1,7 @@
 bs4
 html_telegraph_poster
 httpx
+lottie
 motor
 pillow
 pyroaddon
