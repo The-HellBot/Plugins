@@ -1,10 +1,12 @@
+import asyncio
 import math
 import os
+import shlex
 import time
 
 from pyrogram.types import Message
 
-from .formatter import readable_time, humanbytes
+from .formatter import humanbytes, readable_time
 
 
 async def progress(
@@ -41,3 +43,17 @@ async def get_files_from_directory(directory: str) -> list:
         for file in files:
             all_files.append(os.path.join(path, file))
     return all_files
+
+
+async def runcmd(cmd: str) -> tuple[str, str, int, int]:
+    args = shlex.split(cmd)
+    process = await asyncio.create_subprocess_exec(
+        *args, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+    )
+    stdout, stderr = await process.communicate()
+    return (
+        stdout.decode("utf-8", "replace").strip(),
+        stderr.decode("utf-8", "replace").strip(),
+        process.returncode,
+        process.pid,
+    )
