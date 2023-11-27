@@ -4,7 +4,7 @@ import time
 from urllib.parse import quote_plus
 
 import httpx
-from pytz import country_names, country_timezones
+from pytz import country_names, country_timezones, timezone
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -155,6 +155,7 @@ class ClimateDriver:
 
     async def getTime(self, timestamp: int) -> str:
         tz = await db.get_env(ENV.time_zone) or "Asia/Kolkata"
+        tz = timezone(tz)
         return datetime.datetime.fromtimestamp(timestamp, tz=tz).strftime("%I:%M %p")
 
     def getCountry(self, country_code: str) -> str:

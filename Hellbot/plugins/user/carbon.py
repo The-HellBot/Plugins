@@ -25,7 +25,7 @@ async def carbon(_, message: Message):
     await asyncio.sleep(4)
 
     await hell.edit("**[ 100% ]** __Uploading carbon...__")
-    await Driver.close(driver)
+    Driver.close(driver)
 
     await hell.reply_photo(image, caption=f"**𝖢𝖺𝗋𝖻𝗈𝗇𝖾𝖽:**\n`{code}`")
     await hell.delete()
@@ -49,7 +49,7 @@ async def karbon(_, message: Message):
     await asyncio.sleep(4)
 
     await hell.edit("**[ 100% ]** __Uploading karbon...__")
-    await Driver.close(driver)
+    Driver.close(driver)
 
     await hell.reply_photo(image, caption=f"**𝖢𝖺𝗋𝖻𝗈𝗇𝖾𝖽:**\n`{code}`")
     await hell.delete()
