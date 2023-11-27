@@ -9,7 +9,7 @@ from Hellbot.functions.convert import convert_to_gif
 from . import HelpMenu, hellbot, on_message
 
 
-@on_message("stog", allow_sudo=True)
+@on_message("stog", allow_stan=True)
 async def sticker_to_gif(_, message: Message):
     if not message.reply_to_message or not message.reply_to_message.sticker:
         return await hellbot.delete(
@@ -37,7 +37,7 @@ async def sticker_to_gif(_, message: Message):
     os.remove(gif_path)
 
 
-@on_message("stoi", allow_sudo=True)
+@on_message("stoi", allow_stan=True)
 async def sticker_to_image(_, message: Message):
     if not message.reply_to_message or not message.reply_to_message.sticker:
         return await hellbot.delete(
@@ -54,7 +54,7 @@ async def sticker_to_image(_, message: Message):
     os.remove(dwl_path)
 
 
-@on_message("itos", allow_sudo=True)
+@on_message("itos", allow_stan=True)
 async def image_to_sticker(_, message: Message):
     if not message.reply_to_message or not message.reply_to_message.photo:
         return await hellbot.delete(
@@ -104,7 +104,7 @@ async def image_to_file(_, message: Message):
     os.remove(dwl_path)
 
 
-@on_message("tovoice", allow_sudo=True)
+@on_message("tovoice", allow_stan=True)
 async def media_to_voice(_, message: Message):
     if not message.reply_to_message or not message.reply_to_message.media:
         return await hellbot.delete(message, "Reply to a media to convert it to voice.")
@@ -146,7 +146,7 @@ async def media_to_voice(_, message: Message):
     os.remove(dwl_path)
 
 
-@on_message("tomp3", allow_sudo=True)
+@on_message("tomp3", allow_stan=True)
 async def media_to_mp3(_, message: Message):
     if not message.reply_to_message or not message.reply_to_message.media:
         return await hellbot.delete(message, "Reply to a media to convert it to mp3.")

@@ -62,7 +62,7 @@ async def clone(client: Client, message: Message):
     )
 
 
-@on_message("revert", allow_sudo=True)
+@on_message("revert", allow_stan=True)
 async def revert(client: Client, message: Message):
     first_name = await db.get_env("CLONE_FIRST_NAME")
     last_name = await db.get_env("CLONE_LAST_NAME")
