@@ -86,7 +86,7 @@ class Blacklists:
         datas = await db.get_blacklist_clients()
         for data in datas:
             client = data["client"]
-            chats = data["chats"]
+            chats = data.get("chats", [])
             for chat in chats:
                 blacklists = data["blacklist"]
                 self.blacklists[client] = {chat: blacklists}
