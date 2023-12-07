@@ -6,8 +6,10 @@ motor
 pillow
 pyroaddon
 pyrogram
+pySmartDL
 python-dotenv
 pytz
 requests
 selenium
+speedtest-cli
 tgcrypto

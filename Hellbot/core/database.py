@@ -17,6 +17,7 @@ class Database:
         self.antiflood = self.db["antiflood"]
         self.autopost = self.db["autopost"]
         self.blacklist = self.db["blacklist"]
+        self.echo = self.db["echo"]
         self.env = self.db["env"]
         self.gban = self.db["gban"]
         self.session = self.db["session"]
@@ -273,6 +274,33 @@ class Database:
 
     async def get_blacklist_clients(self) -> list:
         return [i async for i in self.blacklist.find({})]
+
+    async def set_echo(self, client: int, chat: int, user: int):
+        await self.echo.update_one(
+            {"client": client, "chat": chat},
+            {"$push": {"echo": user}},
+            upsert=True,
+        )
+
+    async def rm_echo(self, client: int, chat: int, user: int):
+        await self.echo.update_one(
+            {"client": client, "chat": chat},
+            {"$pull": {"echo": user}},
+        )
+
+    async def is_echo(self, client: int, chat: int, user: int) -> bool:
+        data = await self.get_all_echo(client, chat)
+        if user in data:
+            return True
+        return False
+
+    async def get_all_echo(self, client: int, chat: int) -> list:
+        data = await self.echo.find_one({"client": client, "chat": chat})
+
+        if not data:
+            return []
+
+        return data["echo"]
 
 
 db = Database(Config.DATABASE_URL)

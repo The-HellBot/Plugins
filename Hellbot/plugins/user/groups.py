@@ -156,6 +156,34 @@ async def kickme(client: Client, message: Message):
         return await hellbot.delete(hell, f"Deym! Can't leave this chat.\n**Error:** `{e}`")
 
 
+@on_message("newgrroup", allow_stan=True)
+async def new_group(client: Client, message: Message):
+    if len(message.command) < 2:
+        return await hellbot.delete(message, "𝖨 𝗇𝖾𝖾𝖽 𝗌𝗈𝗆𝖾𝗍𝗁𝗂𝗇𝗀 𝗍𝗈 𝗌𝖾𝗍 𝖺𝗌 𝗀𝗋𝗈𝗎𝗉 𝗍𝗂𝗍𝗅𝖾.")
+
+    new_title = await hellbot.input(message)
+
+    try:
+        new_group = await client.create_group(new_title, hellbot.bot.me.id)
+        await hellbot.edit(message, f"**𝖦𝗋𝗈𝗎𝗉 𝗅𝗂𝗇𝗄:** [{new_group.title}]({new_group.invite_link})")
+    except Exception as e:
+        await hellbot.error(message, f"`{e}`", 20)
+
+
+@on_message("newchannel", allow_stan=True)
+async def new_channel(client: Client, message: Message):
+    if len(message.command) < 2:
+        return await hellbot.delete(message, "𝖨 𝗇𝖾𝖾𝖽 𝗌𝗈𝗆𝖾𝗍𝗁𝗂𝗇𝗀 𝗍𝗈 𝗌𝖾𝗍 𝖺𝗌 𝖼𝗁𝖺𝗇𝗇𝖾𝗅 𝗍𝗂𝗍𝗅𝖾.")
+
+    new_title = await hellbot.input(message)
+
+    try:
+        new_channel = await client.create_channel(new_title, "Created by HellBot")
+        await hellbot.edit(message, f"**𝖢𝗁𝖺𝗇𝗇𝖾𝗅 𝗅𝗂𝗇𝗄:** [{new_channel.title}]({new_channel.username})")
+    except Exception as e:
+        await hellbot.error(message, f"`{e}`", 20)
+
+
 HelpMenu("groups").add(
     "setgpic", "<reply to photo>", "Set the group profile picture.", "setgpic"
 ).add("setgtitle", "<title>", "Set the group title.", "setgtitle chat group").add(
@@ -173,6 +201,10 @@ HelpMenu("groups").add(
     "getglink", None, "Get the group invite link.", "getglink"
 ).add(
     "kickme", None, "Leave the chat in swag 😎!", "kickme"
+).add(
+    "newgroup", "<title>", "Create a new group.", "newgroup HellBot Group"
+).add(
+    "newchannel", "<title>", "Create a new channel.", "newchannel HellBot Channel"
 ).info(
     "Group Menu"
 ).done()
