@@ -19,6 +19,7 @@ class Database:
         self.blacklist = self.db["blacklist"]
         self.echo = self.db["echo"]
         self.env = self.db["env"]
+        self.filter = self.db["filter"]
         self.gban = self.db["gban"]
         self.session = self.db["session"]
         self.stan_users = self.db["stan_users"]
@@ -301,6 +302,46 @@ class Database:
             return []
 
         return data["echo"]
+
+    async def set_filter(
+        self, client: int, chat: int, keyword: str, fileId: str = None, text: str = None
+    ):
+        await self.filter.update_one(
+            {"client": client, "chat": chat},
+            {"$push": {"filter": {"keyword": keyword, "fileId": fileId, "text": text}}},
+            upsert=True,
+        )
+
+    async def rm_filter(self, client: int, chat: int, keyword: str):
+        await self.filter.update_one(
+            {"client": client, "chat": chat},
+            {"$pull": {"filter": {"keyword": keyword}}},
+        )
+
+    async def rm_all_filters(self, client: int, chat: int):
+        await self.filter.delete_one({"client": client, "chat": chat})
+
+    async def is_filter(self, client: int, chat: int, keyword: str) -> bool:
+        data = await self.get_filter(client, chat, keyword)
+        return True if data else False
+
+    async def get_filter(self, client: int, chat: int, keyword: str):
+        data = await self.filter.find_one(
+            {
+                "client": client,
+                "chat": chat,
+                "filter": {"$elemMatch": {"keyword": keyword}},
+            }
+        )
+        return data
+
+    async def get_all_filters(self, client: int, chat: int) -> list:
+        data = await self.filter.find_one({"client": client, "chat": chat})
+
+        if not data:
+            return []
+
+        return data["filter"]
 
 
 db = Database(Config.DATABASE_URL)

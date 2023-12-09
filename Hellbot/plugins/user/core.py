@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 
 from pyrogram import Client
-from pyrogram.enums import ParseMode
+from pyrogram.enums import MessagesFilter, ParseMode
 from pyrogram.types import Message
 
 from Hellbot.core import ENV, Config, Symbols
@@ -174,6 +174,59 @@ async def uninstall_plugins(_, message: Message):
         await hellbot.error(message, str(e), 20)
 
 
+@on_message("installall", allow_stan=True)
+async def installall(client: Client, message: Message):
+    if len(message.command) < 2:
+        return await hellbot.delete(
+            message, "Give me channel username to install plugins."
+        )
+
+    try:
+        chat = await client.get_chat(message.command[1])
+    except Exception as e:
+        return await hellbot.delete(message, f"**Invalid Channel Username:** `{e}`")
+
+    hell = await hellbot.edit(message, f"**Installing plugins from {chat.title}...**")
+    finalStr = f"{Symbols.check_mark} **𝖯𝗅𝗎𝗀𝗂𝗇𝗌 𝖨𝗇𝗌𝗍𝖺𝗅𝗅𝖾𝖽: {chat.title}**\n\n"
+    count = 0
+
+    async for msg in client.search_messages(chat.id, filter=MessagesFilter.DOCUMENT):
+        if msg.document.file_name.endswith(".py"):
+            dwl_path = await msg.download("./Hellbot/plugins/user/")
+            plugin = dwl_path.split("/")[-1].replace(".py", "").strip()
+            if plugin in Config.CMD_MENU:
+                os.remove(dwl_path)
+                finalStr += (
+                    f"   {Symbols.anchor} `{plugin}.py` - **𝖠𝗅𝗋𝖾𝖺𝖽𝗒 𝖨𝗇𝗌𝗍𝖺𝗅𝗅𝖾𝖽!**\n"
+                )
+                continue
+            if "(" in plugin:
+                os.remove(dwl_path)
+                finalStr += (
+                    f"   {Symbols.anchor} `{plugin}.py` - **𝖠𝗅𝗋𝖾𝖺𝖽𝗒 𝖨𝗇𝗌𝗍𝖺𝗅𝗅𝖾𝖽!**\n"
+                )
+                continue
+            try:
+                shortname = Path(dwl_path).stem.replace(".py", "")
+                path = Path(f"Hellbot/plugins/user/{shortname}.py")
+                name = "Hellbot.plugins.user." + shortname
+                spec = importlib.util.spec_from_file_location(name, path)
+                load = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(load)
+                sys.modules["Hellbot.plugins.user." + shortname] = load
+                count += 1
+                finalStr += f"   {Symbols.anchor} `{plugin}.py` - **𝖨𝗇𝗌𝗍𝖺𝗅𝗅𝖾𝖽!**\n"
+            except Exception as e:
+                os.remove(dwl_path)
+                finalStr += (
+                    f"   {Symbols.anchor} `{plugin}.py` - **𝖤𝗋𝗋𝗈𝗋 𝖨𝗇𝗌𝗍𝖺𝗅𝗅𝗂𝗇𝗀!**\n"
+                )
+                continue
+
+    finalStr += f"\n**🍀 𝖳𝗈𝗍𝖺𝗅 𝖯𝗅𝗎𝗀𝗂𝗇𝗌 𝖨𝗇𝗌𝗍𝖺𝗅𝗅𝖾𝖽:** `{count}`"
+    await hell.edit(finalStr, ParseMode.MARKDOWN, disable_web_page_preview=True)
+
+
 @on_message("unload", allow_stan=True)
 async def unload_plugins(_, message: Message):
     if len(message.command) < 2:
@@ -242,6 +295,12 @@ HelpMenu("help").add(
     "Uninstall the mentioned plugin.",
     "uninstall alive",
     "This will remove all the commands of that plugin from the bot till a restart is initiated.",
+).add(
+    "installall",
+    "<channel username>",
+    "Install all the plugins from the mentioned channel.",
+    "installall @plugins_for_hellbot",
+    "Do not install plugins from untrusted sources, they can be a malware. We're not responsible for any damage caused by them.",
 ).add(
     "unload",
     "<plugin name>",

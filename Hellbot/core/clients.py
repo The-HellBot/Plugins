@@ -145,11 +145,7 @@ class CustomMethods(HellClient):
         await message.delete()
 
     async def delete(
-        self,
-        message: Message,
-        text: str,
-        delete: int = 10,
-        in_background: bool = True
+        self, message: Message, text: str, delete: int = 10, in_background: bool = True
     ) -> None:
         """Edit a message and delete it after a certain period of time"""
         to_del = await self.edit(message, text)
