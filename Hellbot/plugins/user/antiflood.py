@@ -6,7 +6,7 @@ from pyrogram import Client, filters
 from pyrogram.types import ChatPermissions, Message
 
 from Hellbot.core import Config, Symbols, db
-from Hellbot.functions.setup import Flood
+from Hellbot.functions.utility import Flood
 
 from . import HelpMenu, custom_handler, group_only, hellbot, on_message
 

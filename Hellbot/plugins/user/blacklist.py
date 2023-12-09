@@ -4,7 +4,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 
 from Hellbot.core import Config, Symbols
-from Hellbot.functions.setup import BList
+from Hellbot.functions.utility import BList
 
 from . import HelpMenu, custom_handler, db, hellbot, on_message
 

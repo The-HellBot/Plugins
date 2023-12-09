@@ -1,4 +1,97 @@
+import asyncio
+import os
+import time
+
+from pyrogram import Client
+from pyrogram.enums import ChatType
+from pyrogram.errors import FloodWait
+from pyrogram.types import Message
+
 from Hellbot.core import db
+
+from .formatter import readable_time
+
+
+class Gcast:
+    def __init__(self) -> None:
+        self.file_name = "gcast_{0}.txt"
+        self.complete_msg = "**🍀 𝖦𝖼𝖺𝗌𝗍 𝖢𝗈𝗆𝗉𝗅𝖾𝗍𝖾𝖽!** \n\n**𝖬𝖾𝗌𝗌𝖺𝗀𝖾:** [click here]({0})\n**𝖢𝗈𝗎𝗇𝗍:** `{1} {2}`\n**𝖥𝗈𝗋𝗐𝖺𝗋𝖽 𝗍𝖺𝗀:** `{3}`\n**𝖳𝗂𝗆𝖾 𝗍𝖺𝗄𝖾𝗇:** `{4}`"
+
+    async def _send_msg(self, chat_id: int, msg: Message, tag: bool):
+        await msg.forward(chat_id) if tag else await msg.copy(chat_id)
+
+    async def start(self, message: Message, client: Client, mode: str, tag: bool):
+        link = message.link
+        status = "Enabled" if tag else "Removed"
+        start = time.time()
+
+        if mode == "all":
+            uCount, uFileName = await self.users(message, client, tag)
+            gCount, gFileName = await self.groups(message, client, tag)
+            count = uCount + gCount
+            with open(uFileName, "a", encoding="utf-8") as file1, open(
+                gFileName, "r", encoding="utf-8"
+            ) as file2:
+                file1.write(file2.read())
+            file2.close()
+            file1.close()
+            os.remove(gFileName)
+            fileName = uFileName
+        elif mode == "groups":
+            count, fileName = await self.groups(message, client, tag)
+        elif mode == "users":
+            count, fileName = await self.users(message, client, tag)
+        else:
+            return None
+
+        end = time.time()
+        outStr = self.complete_msg.format(link, count, mode, status, readable_time(int(end - start)))
+
+        return fileName, outStr
+
+    async def groups(self, message: Message, client: Client, tag: bool):
+        filename = self.file_name.format(round(time.time()))
+        count = 0
+
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write("Group ID | Error\n\n")
+            async for dialog in client.get_dialogs():
+                if dialog.chat.type == ChatType.SUPERGROUP:
+                    try:
+                        await self._send_msg(dialog.chat.id, message, tag)
+                        count += 1
+                    except FloodWait as fw:
+                        await asyncio.sleep(fw.x)
+                        await self._send_msg(dialog.chat.id, message, tag)
+                        count += 1
+                    except Exception as e:
+                        f.write(f"{dialog.chat.id} | {e}\n")
+
+        f.close()
+
+        return count, filename
+
+    async def users(self, message: Message, client: Client, tag: bool):
+        filename = self.file_name.format(round(time.time()))
+        count = 0
+
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write("User ID | Error\n\n")
+            async for dialog in client.get_dialogs():
+                if dialog.chat.type == ChatType.PRIVATE:
+                    try:
+                        await self._send_msg(dialog.chat.id, message, tag)
+                        count += 1
+                    except FloodWait as fw:
+                        await asyncio.sleep(fw.x)
+                        await self._send_msg(dialog.chat.id, message, tag)
+                        count += 1
+                    except Exception as e:
+                        f.write(f"{dialog.chat.id} | {e}\n")
+
+        f.close()
+
+        return count, filename
 
 
 class AntiFlood:
@@ -90,7 +183,7 @@ class Blacklists:
             for chat in chats:
                 blacklists = data["blacklist"]
                 self.blacklists[client] = {chat: blacklists}
-    
+
     async def addBlacklist(self, client: int, chat: int, text: str):
         try:
             self.blacklists[client][chat].append(text)

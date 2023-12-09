@@ -1,7 +1,7 @@
 from pyrogram import idle
 
 from Hellbot.core import Users, db, hellbot
-from Hellbot.functions.setup import Flood, BList
+from Hellbot.functions.utility import BList, Flood
 
 
 async def main():
