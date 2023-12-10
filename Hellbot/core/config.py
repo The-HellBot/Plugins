@@ -58,6 +58,7 @@ class ENV:
     manga_template = "MANGA_TEMPLATE"
     ping_pic = "PING_PIC"
     ping_template = "PING_TEMPLATE"
+    statistics_template = "STATISTICS_TEMPLATE"
     time_zone = "TIME_ZONE"
     unload_plugins = "UNLOAD_PLUGINS"
 

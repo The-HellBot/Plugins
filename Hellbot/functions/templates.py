@@ -168,6 +168,30 @@ AIR_POLLUTION_TEMPLATES = [
 """
 ]
 
+STATISTICS_TEMPLATES = [
+    """
+🍀 {name}
+
+╭──────── 𝖢𝗁𝖺𝗇𝗇𝖾𝗅𝗌 ────────•
+╰➢ **𝖳𝗈𝗍𝖺𝗅:** `{channels}`
+╰➢ **𝖠𝖽𝗆𝗂𝗇:** `{ch_admin}`
+╰➢ **𝖮𝗐𝗇𝖾𝗋:** `{ch_owner}`
+
+╭──────── 𝖦𝗋𝗈𝗎𝗉𝗌 ────────•
+╰➢ **𝖳𝗈𝗍𝖺𝗅:** `{groups}`
+╰➢ **𝖠𝖽𝗆𝗂𝗇:** `{gc_admin}`
+╰➢ **𝖮𝗐𝗇𝖾𝗋:** `{gc_owner}`
+
+╭──────── 𝖮𝗍𝗁𝖾𝗋𝗌 ────────•
+╰➢ **𝖯𝗋𝗂𝗏𝖺𝗍𝖾:** `{users}`
+╰➢ **𝖡𝗈𝗍𝗌:** `{bots}`
+╰➢ **𝖴𝗇𝗋𝖾𝖺𝖽 𝖬𝖾𝗌𝗌𝖺𝗀𝖾𝗌:** `{unread_msg}`
+╰➢ **𝖴𝗇𝗋𝖾𝖺𝖽 𝖬𝖾𝗇𝗍𝗂𝗈𝗇𝗌:** `{unread_mention}`
+
+⌛ **𝖳𝗂𝗆𝖾 𝖳𝖺𝗄𝖾𝗇:** `{time_taken}`
+"""
+]
+
 
 async def alive_template(owner: str, uptime: str) -> str:
     template = await db.get_env(ENV.alive_template)
@@ -292,4 +316,13 @@ async def airpollution_templates(**kwargs) -> str:
         message = template
     else:
         message = random.choice(AIR_POLLUTION_TEMPLATES)
+    return message.format(**kwargs)
+
+
+async def statistics_templates(**kwargs) -> str:
+    template = await db.get_env(ENV.statistics_template)
+    if template:
+        message = template
+    else:
+        message = random.choice(STATISTICS_TEMPLATES)
     return message.format(**kwargs)

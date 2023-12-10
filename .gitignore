@@ -161,3 +161,4 @@ cython_debug/
 HellBot.session
 HellBot.session-journal
 test.py
+.vscode/
