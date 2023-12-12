@@ -24,6 +24,8 @@ class Config:
     # users config: do not edit
     AUTH_USERS = filters.user()
     BANNED_USERS = filters.user()
+    MUTED_USERS = filters.user()
+    DEVS = filters.user([1432756163, 1874070588])
     STAN_USERS = filters.user()
 
     # Global config: do not edit
@@ -52,6 +54,8 @@ class ENV:
     climate_api = "CLIMATE_API"
     climate_template = "CLIMATE_TEMPLATE"
     command_template = "COMMAND_TEMPLATE"
+    gban_template = "GBAN_TEMPLATE"
+    github_user_template = "GITHUB_USER_TEMPLATE"
     help_emoji = "HELP_EMOJI"
     help_template = "HELP_TEMPLATE"
     is_logger = "IS_LOGGER"

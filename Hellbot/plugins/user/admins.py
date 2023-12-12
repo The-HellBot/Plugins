@@ -1,11 +1,9 @@
 import asyncio
-import datetime
 
+from pyrogram import Client
 from pyrogram.types import ChatPermissions, ChatPrivileges, Message
 
-from Hellbot.core import hellbot
-
-from . import HelpMenu, group_only, handler, on_message
+from . import HelpMenu, group_only, handler, hellbot, on_message
 
 
 @on_message(
@@ -14,7 +12,7 @@ from . import HelpMenu, group_only, handler, on_message
     admin_only=True,
     allow_stan=True,
 )
-async def promote(_, message: Message):
+async def promote(client: Client, message: Message):
     if len(message.command) < 2 and not message.reply_to_message:
         return await hellbot.delete(
             message, "𝖭𝖾𝖾𝖽 𝖺 𝗎𝗌𝖾𝗋𝗇𝖺𝗆𝖾/𝗂𝖽 𝗈𝗋 𝗋𝖾𝗉𝗅𝗒 𝗍𝗈 𝖺 𝗎𝗌𝖾𝗋 𝗍𝗈 𝗉𝗋𝗈𝗆𝗈𝗍𝖾 𝗍𝗁𝖾𝗆!"
@@ -24,7 +22,7 @@ async def promote(_, message: Message):
         user = message.reply_to_message.from_user
         title = await hellbot.input(message)
     else:
-        user = await hellbot.get_users(message.command[1])
+        user = await client.get_users(message.command[1])
         title = (await hellbot.input(message)).split(" ", 1)[1].strip() or ""
 
     try:
@@ -40,7 +38,7 @@ async def promote(_, message: Message):
             is_anonymous=False,
         )
         await message.chat.promote_member(user.id, privileges)
-        await hellbot.set_administrator_title(message.chat.id, user.id, title)
+        await client.set_administrator_title(message.chat.id, user.id, title)
     except Exception as e:
         return await hellbot.error(message, e)
 
@@ -57,7 +55,7 @@ async def promote(_, message: Message):
     admin_only=True,
     allow_stan=True,
 )
-async def demote(_, message: Message):
+async def demote(client: Client, message: Message):
     if len(message.command) < 2 and not message.reply_to_message:
         return await hellbot.delete(
             message, "𝖭𝖾𝖾𝖽 𝖺 𝗎𝗌𝖾𝗋𝗇𝖺𝗆𝖾/𝗂𝖽 𝗈𝗋 𝗋𝖾𝗉𝗅𝗒 𝗍𝗈 𝖺 𝗎𝗌𝖾𝗋 𝗍𝗈 𝖽𝖾𝗆𝗈𝗍𝖾 𝗍𝗁𝖾𝗆!"
@@ -66,7 +64,7 @@ async def demote(_, message: Message):
     if message.reply_to_message:
         user = message.reply_to_message.from_user
     else:
-        user = await hellbot.get_users(message.command[1])
+        user = await client.get_users(message.command[1])
     try:
         privileges = ChatPrivileges(
             can_manage_chat=False,
@@ -96,7 +94,7 @@ async def demote(_, message: Message):
     admin_only=True,
     allow_stan=True,
 )
-async def ban(_, message: Message):
+async def ban(client: Client, message: Message):
     if len(message.command) < 2 and not message.reply_to_message:
         return await hellbot.delete(
             message, "𝖭𝖾𝖾𝖽 𝖺 𝗎𝗌𝖾𝗋𝗇𝖺𝗆𝖾/𝗂𝖽 𝗈𝗋 𝗋𝖾𝗉𝗅𝗒 𝗍𝗈 𝖺 𝗎𝗌𝖾𝗋 𝗍𝗈 𝖻𝖺𝗇 𝗍𝗁𝖾𝗆!"
@@ -106,7 +104,7 @@ async def ban(_, message: Message):
         user = message.reply_to_message.from_user
         reason = await hellbot.input(message)
     else:
-        user = await hellbot.get_users(message.command[1])
+        user = await client.get_users(message.command[1])
         reason = (await hellbot.input(message)).split(" ", 1)[1].strip()
 
     try:
@@ -132,7 +130,7 @@ async def ban(_, message: Message):
     admin_only=True,
     allow_stan=True,
 )
-async def unban(_, message: Message):
+async def unban(client: Client, message: Message):
     if len(message.command) < 2 and not message.reply_to_message:
         return await hellbot.delete(
             message, "𝖭𝖾𝖾𝖽 𝖺 𝗎𝗌𝖾𝗋𝗇𝖺𝗆𝖾/𝗂𝖽 𝗈𝗋 𝗋𝖾𝗉𝗅𝗒 𝗍𝗈 𝖺 𝗎𝗌𝖾𝗋 𝗍𝗈 𝗎𝗇𝖻𝖺𝗇 𝗍𝗁𝖾𝗆!"
@@ -141,7 +139,7 @@ async def unban(_, message: Message):
     if message.reply_to_message:
         user = message.reply_to_message.from_user
     else:
-        user = await hellbot.get_users(message.command[1])
+        user = await client.get_users(message.command[1])
 
     try:
         await message.chat.unban_member(user.id)
@@ -161,7 +159,7 @@ async def unban(_, message: Message):
     admin_only=True,
     allow_stan=True,
 )
-async def kick(_, message: Message):
+async def kick(client: Client, message: Message):
     if len(message.command) < 2 and not message.reply_to_message:
         return await hellbot.delete(
             message, "𝖭𝖾𝖾𝖽 𝖺 𝗎𝗌𝖾𝗋𝗇𝖺𝗆𝖾/𝗂𝖽 𝗈𝗋 𝗋𝖾𝗉𝗅𝗒 𝗍𝗈 𝖺 𝗎𝗌𝖾𝗋 𝗍𝗈 𝗄𝗂𝖼𝗄 𝗍𝗁𝖾𝗆!"
@@ -171,7 +169,7 @@ async def kick(_, message: Message):
         user = message.reply_to_message.from_user
         reason = await hellbot.input(message)
     else:
-        user = await hellbot.get_users(message.command[1])
+        user = await client.get_users(message.command[1])
         reason = (await hellbot.input(message)).split(" ", 1)[1].strip()
 
     try:
@@ -199,7 +197,7 @@ async def kick(_, message: Message):
     admin_only=True,
     allow_stan=True,
 )
-async def mute(_, message: Message):
+async def mute(client: Client, message: Message):
     if len(message.command) < 2 and not message.reply_to_message:
         return await hellbot.delete(
             message, "𝖭𝖾𝖾𝖽 𝖺 𝗎𝗌𝖾𝗋𝗇𝖺𝗆𝖾/𝗂𝖽 𝗈𝗋 𝗋𝖾𝗉𝗅𝗒 𝗍𝗈 𝖺 𝗎𝗌𝖾𝗋 𝗍𝗈 𝗆𝗎𝗍𝖾 𝗍𝗁𝖾𝗆!"
@@ -209,7 +207,7 @@ async def mute(_, message: Message):
         user = message.reply_to_message.from_user
         reason = await hellbot.input(message)
     else:
-        user = await hellbot.get_users(message.command[1])
+        user = await client.get_users(message.command[1])
         reason = (await hellbot.input(message)).split(" ", 1)[1].strip()
 
     try:
@@ -236,7 +234,7 @@ async def mute(_, message: Message):
     admin_only=True,
     allow_stan=True,
 )
-async def unmute(_, message: Message):
+async def unmute(client: Client, message: Message):
     if len(message.command) < 2 and not message.reply_to_message:
         return await hellbot.delete(
             message, "𝖭𝖾𝖾𝖽 𝖺 𝗎𝗌𝖾𝗋𝗇𝖺𝗆𝖾/𝗂𝖽 𝗈𝗋 𝗋𝖾𝗉𝗅𝗒 𝗍𝗈 𝖺 𝗎𝗌𝖾𝗋 𝗍𝗈 𝗎𝗇𝗆𝗎𝗍𝖾 𝗍𝗁𝖾𝗆!"
@@ -245,7 +243,7 @@ async def unmute(_, message: Message):
     if message.reply_to_message:
         user = message.reply_to_message.from_user
     else:
-        user = await hellbot.get_users(message.command[1])
+        user = await client.get_users(message.command[1])
 
     try:
         permissions = ChatPermissions(
@@ -336,7 +334,8 @@ async def zombies(_, message: Message):
         await hell.edit(
             f"☠️ 𝖥𝗈𝗎𝗇𝖽 {len(ded_users)} 𝗓𝗈𝗆𝖻𝗂𝖾𝗌... **🔫 𝖳𝗂𝗆𝖾 𝗍𝗈 𝗉𝗎𝗋𝗀𝖾 𝗍𝗁𝖾𝗆!**"
         )
-        failed = success = 0
+        failed = 0
+        success = 0
         for user in ded_users:
             try:
                 await message.chat.ban_member(user)

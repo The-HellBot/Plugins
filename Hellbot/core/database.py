@@ -21,6 +21,7 @@ class Database:
         self.env = self.db["env"]
         self.filter = self.db["filter"]
         self.gban = self.db["gban"]
+        self.gmute = self.db["gmute"]
         self.session = self.db["session"]
         self.stan_users = self.db["stan_users"]
 
@@ -118,14 +119,43 @@ class Database:
         )
         return True
 
-    async def rm_gban(self, user_id: int) -> bool:
+    async def rm_gban(self, user_id: int):
         if not await self.is_gbanned(user_id):
-            return False
+            return None
+        reason = (await self.gban.find_one({"user_id": user_id}))["reason"]
         await self.gban.delete_one({"user_id": user_id})
-        return True
+        return reason
 
     async def get_gban(self) -> list:
         return [i async for i in self.gban.find({})]
+
+    async def get_gban_user(self, user_id: int) -> dict | None:
+        if not await self.is_gbanned(user_id):
+            return None
+        return await self.gban.find_one({"user_id": user_id})
+
+    async def is_gmuted(self, user_id: int) -> bool:
+        if await self.gmute.find_one({"user_id": user_id}):
+            return True
+        return False
+
+    async def add_gmute(self, user_id: int, reason: str) -> bool:
+        if await self.is_gmuted(user_id):
+            return False
+        await self.gmute.insert_one(
+            {"user_id": user_id, "reason": reason, "date": self.get_datetime()}
+        )
+        return True
+
+    async def rm_gmute(self, user_id: int):
+        if not await self.is_gmuted(user_id):
+            return None
+        reason = (await self.gmute.find_one({"user_id": user_id}))["reason"]
+        await self.gmute.delete_one({"user_id": user_id})
+        return reason
+
+    async def get_gmute(self) -> list:
+        return [i async for i in self.gmute.find({})]
 
     async def set_afk(
         self, user_id: int, reason: str, media: str, media_type: str

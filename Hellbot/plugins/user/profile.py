@@ -1,7 +1,11 @@
+import datetime
 import os
 
+import requests
 from pyrogram import Client
 from pyrogram.types import InputMediaPhoto, Message
+
+from Hellbot.functions.templates import github_user_templates
 
 from . import Config, HelpMenu, hellbot, on_message
 
@@ -170,6 +174,62 @@ async def delpfp(client: Client, message: Message):
     await client.delete_profile_photos(profile_pics)
 
 
+@on_message("github", allow_stan=True)
+async def gituser(_, message: Message):
+    if len(message.command) < 2:
+        return await hellbot.delete(message, "Pass a github username to search.")
+
+    hell = await hellbot.edit(message, "Processing...")
+    username = message.command[1]
+
+    try:
+        response = requests.get(f"https://api.github.com/users/{username}").json()
+        avatar_url = response["avatar_url"]
+        bio = response["bio"]
+        blog = response["blog"]
+        company = response["company"]
+        created_at = datetime.datetime.strptime(
+            response["created_at"], "%Y-%m-%dT%H:%M:%SZ"
+        )
+        email = response["email"]
+        followers = response["followers"]
+        following = response["following"]
+        git_id = response["id"]
+        id_type = response["type"]
+        location = response["location"]
+        name = response["name"]
+        profile_url = response["html_url"]
+        public_gists = response["public_gists"]
+        public_repos = response["public_repos"]
+        username = response["login"]
+        if not bio:
+            bio = "No bio found."
+
+        await message.reply_photo(
+            avatar_url,
+            caption=github_user_templates.format(
+                username=username,
+                git_id=git_id,
+                id_type=id_type,
+                name=name,
+                profile_url=profile_url,
+                blog=blog,
+                company=company,
+                email=email,
+                location=location,
+                public_repos=public_repos,
+                public_gists=public_gists,
+                followers=followers,
+                following=following,
+                created_at=created_at.strftime("%d %B %Y"),
+                bio=bio,
+            ),
+        )
+        await hell.delete()
+    except Exception as e:
+        return await hellbot.error(hell, f"`{str(e)}`")
+
+
 HelpMenu("profile").add(
     "getpfp",
     "<reply/username/id> <limit>",
@@ -200,6 +260,11 @@ HelpMenu("profile").add(
     "Delete the profile pics of the bot.",
     "delpfp 5",
     "To delete all profile pics pass 0 as limit.",
+).add(
+    "github",
+    "<username>",
+    "Get the github profile of a user.",
+    "github hellboy-op",
 ).info(
     "Profile Module"
 ).done()

@@ -13,3 +13,6 @@ requests
 selenium
 speedtest-cli
 tgcrypto
+glitch_this
+googlesearch-python
+wikipedia

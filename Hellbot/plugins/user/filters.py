@@ -109,7 +109,7 @@ async def allfilters(client: Client, message: Message):
         if filters:
             text = f"**🍀 𝖭𝗈. 𝗈𝖿 𝖥𝗂𝗅𝗍𝖾𝗋𝗌 𝗂𝗇 𝗍𝗁𝗂𝗌 𝖼𝗁𝖺𝗍:** `{len(filters)}`\n\n"
 
-            for i, filter in enumerate(filters):
+            for i, filter in enumerate(filters, 1):
                 text += f"** {'0' if i < 10 else ''}{i}:** `{filter['keyword']}`\n"
 
             await hell.edit(text)

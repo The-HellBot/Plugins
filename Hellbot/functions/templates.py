@@ -168,6 +168,27 @@ AIR_POLLUTION_TEMPLATES = [
 """
 ]
 
+GITHUB_USER_TEMPLATES = [
+    """
+🍀 {username} ({git_id})
+
+╭──────── {id_type} ────────•
+╰➢ **𝖭𝖺𝗆𝖾:** [{name}]({profile_url})
+╰➢ **𝖡𝗅𝗈𝗀:** {blog}
+╰➢ **𝖢𝗈𝗆𝗉𝖺𝗇𝗒:** {company}
+╰➢ **𝖤𝗆𝖺𝗂𝗅:** {email}
+╰➢ **𝖫𝗈𝖼𝖺𝗍𝗂𝗈𝗇:** {location}
+╰➢ **𝖱𝖾𝗉𝗈:** {public_repos}
+╰➢ **𝖦𝗂𝗌𝗍𝗌:** {public_gists}
+╰➢ **𝖥𝗈𝗅𝗅𝗈𝗐𝖾𝗋𝗌:** {followers}
+╰➢ **𝖥𝗈𝗅𝗅𝗈𝗐𝗂𝗇𝗀:** {following}
+╰➢ **𝖠𝖼𝖼𝗈𝗎𝗇𝗍 𝖼𝗋𝖾𝖺𝗍𝖾𝖽:** {created_at}
+╰────────────────•
+
+**💫 𝖡𝗂𝗈:** {bio}
+"""
+]
+
 STATISTICS_TEMPLATES = [
     """
 🍀 {name}
@@ -189,6 +210,17 @@ STATISTICS_TEMPLATES = [
 ╰➢ **𝖴𝗇𝗋𝖾𝖺𝖽 𝖬𝖾𝗇𝗍𝗂𝗈𝗇𝗌:** `{unread_mention}`
 
 ⌛ **𝖳𝗂𝗆𝖾 𝖳𝖺𝗄𝖾𝗇:** `{time_taken}`
+"""
+]
+
+GBAN_TEMPLATES = [
+    """
+╭──────── {gtype} ────────•
+╰➢ **𝖵𝗂𝖼𝗍𝗂𝗆:** {name}
+╰➢ **𝖲𝗎𝖼𝖼𝖾𝗌𝗌:** {success}
+╰➢ **𝖥𝖺𝗂𝗅𝖾𝖽:** {failed}
+╰➢ **𝖱𝖾𝖺𝗌𝗈𝗇:** {reason}
+╰────────────────•
 """
 ]
 
@@ -325,4 +357,22 @@ async def statistics_templates(**kwargs) -> str:
         message = template
     else:
         message = random.choice(STATISTICS_TEMPLATES)
+    return message.format(**kwargs)
+
+
+async def github_user_templates(**kwargs) -> str:
+    template = await db.get_env(ENV.github_user_template)
+    if template:
+        message = template
+    else:
+        message = random.choice(GITHUB_USER_TEMPLATES)
+    return message.format(**kwargs)
+
+
+async def gban_templates(**kwargs) -> str:
+    template = await db.get_env(ENV.gban_template)
+    if template:
+        message = template
+    else:
+        message = random.choice(GBAN_TEMPLATES)
     return message.format(**kwargs)
