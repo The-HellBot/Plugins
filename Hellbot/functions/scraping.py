@@ -3,7 +3,7 @@ import time
 
 import httpx
 from bs4 import BeautifulSoup
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 from Hellbot.core import Symbols
 
 from .paste import post_to_telegraph
@@ -157,6 +157,14 @@ anilist_user_query = """query($id: Int, $search: String) {
         }
 	}
 }"""
+
+
+def is_valid_url(text: str) -> bool:
+    try:
+        result = urlparse(text)
+        return all([result.scheme, result.netloc])
+    except ValueError:
+        return False
 
 
 def post_request(query: str, search_term: str):

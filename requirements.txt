@@ -1,4 +1,6 @@
 bs4
+glitch_this
+googlesearch-python
 html_telegraph_poster
 httpx
 lottie
@@ -13,6 +15,5 @@ requests
 selenium
 speedtest-cli
 tgcrypto
-glitch_this
-googlesearch-python
 wikipedia
+geopy
