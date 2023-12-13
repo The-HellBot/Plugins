@@ -1,13 +1,17 @@
 import io
 import os
+import time
 import urllib.request
 from shutil import rmtree
 
+import emoji
 import requests
 from bs4 import BeautifulSoup
+from edge_tts import Communicate
 from geopy.geocoders import Nominatim
 from geopy.location import Location
 from googlesearch import search
+from googletrans import LANGCODES, LANGUAGES, Translator
 from pyrogram import Client
 from pyrogram.types import InputMediaPhoto, Message
 from wikipedia import exceptions, summary
@@ -16,7 +20,7 @@ from Hellbot.functions.driver import Driver
 from Hellbot.functions.google import googleimagesdownload
 from Hellbot.functions.scraping import is_valid_url
 
-from . import Config, HelpMenu, Symbols, db, hellbot, on_message
+from . import Config, HelpMenu, Symbols, db, handler, hellbot, on_message
 
 
 @on_message("wikipedia", allow_stan=True)
@@ -204,12 +208,12 @@ async def cricketScore(_, message: Message):
 
     final = "**Cricket Live Score:\n\n**"
     for match in result:
-        final += f"{Symbols.bullet} `{match.text}`\n"
+        final += f"{Symbols.bullet} `{match.text}`\n\n"
 
     await hellbot.edit(message, final)
 
 
-@on_message(["dictionary", "meaning", "ub"], allow_stan=True)
+@on_message(["dictionary", "meaning"], allow_stan=True)
 async def wordMeaning(_, message: Message):
     BASE = "https://api.dictionaryapi.dev/api/v2/entries/en/{0}"
     if len(message.command) < 2:
@@ -245,3 +249,147 @@ async def wordMeaning(_, message: Message):
         await hell.delete()
     else:
         await hell.edit(outStr)
+
+
+@on_message(["translate", "tr"], allow_stan=True)
+async def translateHandler(_, message: Message):
+    if message.reply_to_message:
+        if len(message.command) < 2:
+            return await hellbot.edit(message, "Give some language code to translate.")
+        toLang = message.command[1]
+        text = message.reply_to_message.text or message.reply_to_message.caption
+    elif len(message.command) > 2:
+        msg = await hellbot.input(message)
+        toLang = message.command[1]
+        text = msg.split(" ", 1)[1]
+    else:
+        return await hellbot.delete(
+            message,
+            f"Either reply to a message with a language code or give input text and language code.\n\n**Example:** `{handler}tr en こんにちは世界`",
+            15,
+        )
+
+    hell = await hellbot.edit(message, f"Translating to `{toLang}`...")
+    text = emoji.demojize(text.strip())
+    translator = Translator()
+
+    try:
+        translated = translator.translate(text, toLang)
+        outStr = f"**🌐 𝖳𝗋𝖺𝗇𝗌𝗅𝖺𝗍𝖾𝖽 𝖿𝗋𝗈𝗆** __{translated.src}__ **𝗍𝗈** __{translated.dest}__**:**"
+        outStr += f"\n\n`{translated.text}`"
+        await hell.edit(outStr)
+    except Exception as e:
+        return await hellbot.error(hell, f"`{str(e)}`")
+
+
+@on_message("trcode", allow_stan=True)
+async def translateCodes(_, message: Message):
+    outStr = None
+
+    if len(message.command) > 1:
+        language = message.command[1]
+        fromCodeToLang = LANGUAGES.get(language.lower(), None)
+        fromLangToCode = LANGCODES.get(language.lower(), None)
+
+        if fromCodeToLang:
+            outStr = f"**{Symbols.bullet} Language Code:** `{language.lower()}`\n**{Symbols.bullet} Language:** `{fromCodeToLang}`"
+        elif fromLangToCode:
+            outStr = f"**{Symbols.bullet} Language:** `{language.lower()}`\n**{Symbols.bullet} Language Code:** `{fromLangToCode}`"
+        else:
+            outStr = None
+
+    if not outStr:
+        outStr = "**Language Codes:**\n\n"
+        for code in LANGUAGES:
+            outStr += f"**{code}**: {LANGUAGES[code]}\n"
+
+    await hellbot.edit(message, outStr)
+
+
+@on_message(["voice", "tts"], allow_stan=True)
+async def textToSpeech(_, message: Message):
+    if message.reply_to_message:
+        text = message.reply_to_message.text or message.reply_to_message.caption
+    elif len(message.command) > 2:
+        text = await hellbot.input(message)
+    else:
+        return await hellbot.delete(
+            message,
+            f"Either reply to a message with a language code or give input text and language code.\n\n**Example:** `{handler}tr en こんにちは世界`",
+            15,
+        )
+
+    hell = await hellbot.edit(message, "Processing...")
+    text = emoji.demojize(text.strip())
+
+    try:
+        comm = Communicate(
+            text,
+            "en-IN-NeerjaExpressiveNeural",
+            rate="+10%",
+            volume="+50%",
+            pitch="+5Hz",
+        )
+        path = f"{Config.DWL_DIR}tts{int(time.time())}.mp3"
+        await comm.save(path)
+
+        await message.reply_audio(
+            path,
+            caption=f"**🔊 𝖵𝗈𝗂𝖼𝖾:** `{text[:100]}...`",
+            performer="HellyAI",
+            title="Hellbot TTS",
+            thumb="./Hellbot/resources/images/hellbot_logo.png",
+        )
+        await hell.delete()
+    except Exception as e:
+        return await hellbot.error(hell, f"`{str(e)}`")
+
+
+HelpMenu("google").add(
+    "wikipedia",
+    "<query>",
+    "Searches for the given query on wikipedia.",
+    "wikipedia keanu reeves",
+).add(
+    "google", "<query>", "Searches for the given query on google.", "google the hellbot"
+).add(
+    "reverse",
+    "<reply to image/sticker>",
+    "Reverse searches the given image/sticker.",
+    "reverse",
+).add(
+    "gps", "<place name>", "Sends the pin location of the given place.", "gps new york"
+).add(
+    "webshot",
+    "<url>",
+    "Takes a screenshot of the given url.",
+    "webshot https://google.com",
+).add(
+    "cricket", None, "Sends the live cricket scores.", "cricket"
+).add(
+    "dictionary",
+    "<word>",
+    "Sends the meaning of the given word.",
+    "dictionary loyalty",
+    "An alias of 'meaning' can also be used.",
+).add(
+    "translate",
+    "<lannguage code> <text/reply to message>",
+    "Translates the given text to the given language code.",
+    "translate en こんにちは世界",
+    "An alias of 'tr' can also be used.",
+).add(
+    "trcode",
+    "<language / code>",
+    "Sends the language code and language name if found.",
+    "trcode en",
+    "If no language code is given, sends all the language codes.",
+).add(
+    "voice",
+    "<text/reply to message>",
+    "Sends the text as a voice message.",
+    "voice I'm Helly and this is an Text to Speech Example.",
+    "An alias of 'tts' can also be used.",
+).info(
+    "Every Google command you need."
+).done()

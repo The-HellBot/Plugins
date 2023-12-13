@@ -1,6 +1,9 @@
 bs4
+edge-tts
+geopy
 glitch_this
 googlesearch-python
+googletrans @ git+https://github.com/HellBoy-OP/py-googletrans
 html_telegraph_poster
 httpx
 lottie
@@ -16,4 +19,3 @@ selenium
 speedtest-cli
 tgcrypto
 wikipedia
-geopy
