@@ -2,9 +2,12 @@ import asyncio
 import math
 import os
 import shlex
+import shutil
 import time
 
 from pyrogram.types import Message
+
+from Hellbot.core import Config
 
 from .formatter import humanbytes, readable_time
 
@@ -57,3 +60,32 @@ async def runcmd(cmd: str) -> tuple[str, str, int, int]:
         process.returncode,
         process.pid,
     )
+
+
+async def update_dotenv(key: str, value: str) -> None:
+    with open(".env", "r") as file:
+        data = file.readlines()
+
+    for index, line in enumerate(data):
+        if line.startswith(f"{key}="):
+            data[index] = f"{key}={value}\n"
+            break
+
+    with open(".env", "w") as file:
+        file.writelines(data)
+
+
+async def restart(update: bool = False):
+    try:
+        shutil.rmtree(Config.DWL_DIR)
+        shutil.rmtree(Config.TEMP_DIR)
+    except BaseException:
+        pass
+
+    cmd = (
+        "git pull && pip3 install -U -r requirements.txt && bash start.sh"
+        if update
+        else "bash start.sh"
+    )
+
+    os.system(f"kill -9 {os.getpid()} && {cmd}")

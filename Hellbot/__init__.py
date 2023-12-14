@@ -1,6 +1,7 @@
 import time
 from platform import python_version
 
+import heroku3
 from pyrogram import __version__ as pyrogram_version
 
 from .core import LOGS, Config
@@ -13,6 +14,18 @@ __version__ = {
     "pyrogram": pyrogram_version,
     "python": python_version(),
 }
+
+
+try:
+    if Config.HEROKU_APIKEY is not None and Config.HEROKU_APPNAME is not None:
+        HEROKU_APP = heroku3.from_key(Config.HEROKU_APIKEY).apps()[
+            Config.HEROKU_APPNAME
+        ]
+    else:
+        HEROKU_APP = None
+except Exception as e:
+    LOGS.error(f"Heroku Api - {e}")
+    HEROKU_APP = None
 
 
 if Config.API_HASH is None:

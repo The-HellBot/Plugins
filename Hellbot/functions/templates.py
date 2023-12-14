@@ -224,6 +224,24 @@ GBAN_TEMPLATES = [
 """
 ]
 
+USAGE_TEMPLATES = [
+    """
+**📝 𝖣𝗂𝗌𝗄 & 𝖣𝗒𝗇𝗈 𝖴𝗌𝖺𝗀𝖾:**
+
+**➢ 𝖣𝗒𝗇𝗈 𝖴𝗌𝖺𝗀𝖾 𝖿𝗈𝗋** `{appName}`
+    ◈ __{appHours}hrs {appMinutes}mins__ | __{appPercentage}%__
+
+**➢ 𝖣𝗒𝗇𝗈 𝗋𝖾𝗆𝖺𝗂𝗇𝗂𝗇𝗀 𝗍𝗁𝗂𝗌 𝗆𝗈𝗇𝗍𝗁:**
+    ◈ __{hours}hrs {minutes}mins__ | __{percentage}%__
+
+**➢ 𝖣𝗂𝗌𝗄 𝖴𝗌𝖺𝗀𝖾:**
+    ◈ __{diskUsed}GB__ / __{diskTotal}GB__ | __{diskPercent}%__
+
+**➢ 𝖬𝖾𝗆𝗈𝗋𝗒 𝖴𝗌𝖺𝗀𝖾:**
+    ◈ __{memoryUsed}GB__ / __{memoryTotal}GB__ | __{memoryPercent}%__
+"""
+]
+
 
 async def alive_template(owner: str, uptime: str) -> str:
     template = await db.get_env(ENV.alive_template)
@@ -375,4 +393,13 @@ async def gban_templates(**kwargs) -> str:
         message = template
     else:
         message = random.choice(GBAN_TEMPLATES)
+    return message.format(**kwargs)
+
+
+async def usage_templates(**kwargs) -> str:
+    template = await db.get_env(ENV.usage_template)
+    if template:
+        message = template
+    else:
+        message = random.choice(USAGE_TEMPLATES)
     return message.format(**kwargs)

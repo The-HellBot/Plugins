@@ -16,6 +16,10 @@ class Config:
     LOGGER_ID = int(getenv("LOGGER_ID", 0))
     OWNER_ID = int(getenv("OWNER_ID", 0))
 
+    # heroku related configs
+    HEROKU_APPNAME = getenv("HEROKU_APPNAME", None)
+    HEROKU_APIKEY = getenv("HEROKU_APIKEY", None)
+
     # storage dir: you may or may not edit
     DWL_DIR = "./downloads/"
     TEMP_DIR = "./temp/"
@@ -65,6 +69,7 @@ class ENV:
     statistics_template = "STATISTICS_TEMPLATE"
     time_zone = "TIME_ZONE"
     unload_plugins = "UNLOAD_PLUGINS"
+    usage_template = "USAGE_TEMPLATE"
 
 
 class Limits:
@@ -107,8 +112,5 @@ class Symbols:
     triangle_right = "▸"
 
 
-all_configs = {
-    key: value for key, value in Config.__dict__.items() if not key.startswith("__")
-}
-
+os_configs = ["API_HASH", "API_ID", "BOT_TOKEN", "DATABASE_URL", "HANDLERS", "LOGGER_ID", "OWNER_ID"]
 all_env: list[str] = [value for key, value in ENV.__dict__.items() if not key.startswith("__")]
