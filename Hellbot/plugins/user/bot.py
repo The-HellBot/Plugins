@@ -63,10 +63,49 @@ async def ping(client: Client, message: Message):
     await hellbot.edit(hell, caption, no_link_preview=True)
 
 
-HelpMenu("bot").add("alive", None, "Get the alive message of the bot.", "alive").add(
+@on_message("history", allow_stan=True)
+async def history(client: Client, message: Message):
+    if not message.reply_to_message:
+        if len(message.command) < 2:
+            return await hellbot.delete(message, "Either reply to an user or give me a username to get history.")
+        try:
+            user = await client.get_users(message.command[1])
+        except Exception as e:
+            return await hellbot.error(message, f"`{str(e)}`")
+    else:
+        user = message.reply_to_message.from_user
+
+    hell = await hellbot.edit(message, "Processing ...")
+
+    try:
+        response = await client.ask("@SangMata_BOT", f"{user.id}", timeout=60)
+    except Exception as e:
+        return await hellbot.error(hell, f"`{str(e)}`")
+
+    if "you have used up your quota for today" in response.text:
+        return await hellbot.delete(hell, f"Your quota of using SangMata Bot is over. Wait till 00:00 UTC before using it again.")
+
+    await hellbot.edit(hell, response.text)
+
+
+HelpMenu("bot").add(
+    "alive",
+    None,
+    "Get the alive message of the bot.",
+    "alive",
+    "You can also customize alive message with suitable variables for it.",
+).add(
     "ping",
     None,
     "Check the ping speed and uptime of bot.",
     "ping",
     "You can also customize ping message by adding a media to it.",
-).info("Alive Menu").done()
+).add(
+    "history",
+    "<reply to user>/<username/id>",
+    "Get the username, name history of an user.",
+    "history @ForGo10_God",
+    "This command uses SangMata Bot to get the history."
+).info(
+    "Alive Menu"
+).done()

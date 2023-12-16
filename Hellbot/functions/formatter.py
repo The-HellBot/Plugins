@@ -1,3 +1,4 @@
+import math
 import re
 
 
@@ -82,3 +83,7 @@ def get_from_dict(data: dict, key: list):
     for k in key:
         current_level = current_level[k]
     return current_level
+
+
+def limit_per_page(limit: int) -> int:
+    return math.ceil(limit / 10)

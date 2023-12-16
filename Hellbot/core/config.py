@@ -69,6 +69,7 @@ class ENV:
     statistics_template = "STATISTICS_TEMPLATE"
     time_zone = "TIME_ZONE"
     unload_plugins = "UNLOAD_PLUGINS"
+    unsplash_api = "UNSPLASH_API"
     usage_template = "USAGE_TEMPLATE"
 
 

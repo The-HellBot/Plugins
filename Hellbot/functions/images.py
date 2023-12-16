@@ -1,9 +1,11 @@
 import os
+import random
 import time
 
+import httpx
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
-from .formatter import format_text
+from .formatter import format_text, limit_per_page
 
 
 def convert_to_png(image: str) -> str:
@@ -26,7 +28,9 @@ def add_rounded_corners(img: Image.Image, radius: int = 80):
     alpha.paste(circle.crop((0, 0, radius, radius)), (0, 0))
     alpha.paste(circle.crop((radius, 0, radius * 2, radius)), (w - radius, 0))
     alpha.paste(circle.crop((0, radius, radius, radius * 2)), (0, h - radius))
-    alpha.paste(circle.crop((radius, radius, radius * 2, radius * 2)), (w - radius, h - radius))
+    alpha.paste(
+        circle.crop((radius, radius, radius * 2, radius * 2)), (w - radius, h - radius)
+    )
 
     img.putalpha(alpha)
 
@@ -48,13 +52,17 @@ def generate_alive_image(username: str, profile_pic: str, del_img: bool) -> str:
 
     cropped_img = img_rotated.crop((left, top, right, bottom))
 
-    img_rotated = ImageOps.fit(cropped_img, (480, 480), method=0, bleed=0.0, centering=(0.5, 0.5))
+    img_rotated = ImageOps.fit(
+        cropped_img, (480, 480), method=0, bleed=0.0, centering=(0.5, 0.5)
+    )
 
     img_rounded = add_rounded_corners(img_rotated)
 
     img = img_rounded.rotate(-45, expand=True)
 
-    background = Image.open("./Hellbot/resources/images/hellbot_alive.png").convert("RGBA")
+    background = Image.open("./Hellbot/resources/images/hellbot_alive.png").convert(
+        "RGBA"
+    )
 
     background.paste(img, (383, 445), img)
 
@@ -72,6 +80,31 @@ def generate_alive_image(username: str, profile_pic: str, del_img: bool) -> str:
     output_img = f"alive_{round(time.time())}.png"
     background.save(output_img, "PNG")
 
-    if del_img: os.remove(profile_pic)
+    if del_img:
+        os.remove(profile_pic)
 
     return output_img
+
+
+async def get_wallpapers(
+    access: str,
+    limit: int,
+    query: str = "",
+    isRandom: bool = False,
+) -> list[str]:
+    headers = {"Authorization": f"Client-ID {access}"}
+
+    if isRandom:
+        api = f"https://api.unsplash.com/photos/random?count={limit}"
+        response = httpx.get(api, headers=headers)
+        results = response.json()
+        urls = [i["urls"]["raw"] for i in results]
+    else:
+        api = f"https://api.unsplash.com/search/photos?query={query}&page={limit_per_page(limit)}"
+        response = httpx.get(api, headers=headers)
+        result = response.json()
+        urls = [i["urls"]["raw"] for i in result["results"]]
+
+    random.shuffle(urls)
+
+    return urls[:limit]

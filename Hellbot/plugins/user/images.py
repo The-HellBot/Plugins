@@ -1,13 +1,99 @@
 import os
+from shutil import rmtree
 
 from glitch_this import ImageGlitcher
 from PIL import Image
 from pyrogram.enums import MessageMediaType
-from pyrogram.types import Message
+from pyrogram.types import InputMediaPhoto, Message
 
+from Hellbot.core import ENV
+from Hellbot.functions.google import googleimagesdownload
+from Hellbot.functions.images import get_wallpapers
 from Hellbot.functions.tools import runcmd
 
-from . import Config, HelpMenu, hellbot, on_message
+from . import Config, HelpMenu, db, hellbot, on_message
+
+
+@on_message(["image", "img"], allow_stan=True)
+async def searchImage(_, message: Message):
+    if len(message.command) < 2:
+        return await hellbot.delete(message, "Provide a search query.")
+
+    limit = 5
+    query = await hellbot.input(message)
+    hell = await hellbot.edit(message, "Searching...")
+
+    if ";" in query:
+        try:
+            query, limit = query.split(";", 1)
+            limit = int(limit)
+        except:
+            pass
+
+    googleImage = googleimagesdownload()
+    to_send = []
+    args = {
+        "keywords": query,
+        "limit": limit,
+        "format": "jpg",
+        "output_directory": Config.DWL_DIR,
+    }
+
+    path_args, _ = googleImage.download(args)
+    images = path_args.get(query)
+    for image in images:
+        to_send.append(InputMediaPhoto(image))
+
+    if to_send:
+        await hell.reply_media_group(to_send)
+        await hellbot.delete(hell, "Uploaded!")
+    else:
+        await hellbot.delete(hell, "No images found.")
+
+    try:
+        rmtree(Config.DWL_DIR + query + "/")
+    except:
+        pass
+
+
+@on_message("wallpaper", allow_stan=True)
+async def searchWallpaper(_, message: Message):
+    if len(message.command) < 2:
+        random = True
+        query = ""
+    else:
+        random = False
+        query = await hellbot.input(message)
+
+    to_send = []
+    limit = 10
+    hell = await hellbot.edit(message, "Processing...")
+
+    access = await db.get_env(ENV.unsplash_api)
+    if not access:
+        return await hellbot.delete(hell, "Unsplash API not found.")
+
+    if ";" in query:
+        try:
+            query, limit = query.split(";", 1)
+            limit = int(limit)
+        except:
+            pass
+
+    if limit > 30:
+        return await hellbot.delete(hell, "Limit should be less than 30.")
+    elif limit < 1:
+        return await hellbot.delete(hell, "Limit should be greater than 0.")
+
+    wallpapers = await get_wallpapers(access, limit, query, random)
+    if not wallpapers:
+        return await hellbot.delete(hell, "No wallpapers found.")
+
+    for wallpaper in wallpapers:
+        to_send.append(InputMediaPhoto(wallpaper))
+
+    await hell.reply_media_group(to_send)
+    await hellbot.delete(hell, "Uploaded!")
 
 
 @on_message("glitch", allow_stan=True)
@@ -80,8 +166,22 @@ async def glitcher(_, message: Message):
 
 
 HelpMenu("images").add(
+    "image",
+    "<query> ; <limit>",
+    "Search for x images on google and upload them to current chat,",
+    "image hellbot ; 5",
+    "An alias of 'img' can also be used.",
+).add(
+    "wallpaper",
+    "<query> ; <limit>",
+    "Search for x wallpapers on unsplash and upload them to current chat. Requires unsplash API.",
+    "wallpaper supra ; 5",
+    "If no query is given, random wallpapers will be uploaded.",
+).add(
     "glitch",
     "<reply to media>",
     "Glitch a media message. It includes sticker, gif, photo, video.",
     "glitch 4",
-).info("Image Tools").done()
+).info(
+    "Image Tools"
+).done()
