@@ -1,13 +1,12 @@
 import random
 
 from pyrogram import Client
-from pyrogram.enums import ChatMemberStatus
-from pyrogram.types import Message
+from pyrogram.enums import ChatMembersFilter, ChatMemberStatus
+from pyrogram.types import Message,ChatMember
 
-from Hellbot.core import hellbot
+from Hellbot.functions.templates import chat_info_templates
 
-from . import HelpMenu, on_message, group_n_channel
-
+from . import HelpMenu, group_n_channel, hellbot, on_message
 
 kickme_quotes = [
     "✌️ 𝖮𝗎𝗍𝗍𝖺 𝗁𝖾𝗋𝖾, 𝗅𝖾𝖺𝗏𝗂𝗇𝗀 𝗍𝗁𝖾 𝗌𝗍𝖺𝗀𝖾 𝗍𝗈 𝗍𝗁𝖾 𝗋𝖾𝖺𝗅 𝗌𝗍𝖺𝗋𝗌!",
@@ -153,7 +152,9 @@ async def kickme(client: Client, message: Message):
     try:
         await client.leave_chat(message.chat.id)
     except Exception as e:
-        return await hellbot.delete(hell, f"Deym! Can't leave this chat.\n**Error:** `{e}`")
+        return await hellbot.delete(
+            hell, f"Deym! Can't leave this chat.\n**Error:** `{e}`"
+        )
 
 
 @on_message("newgrroup", allow_stan=True)
@@ -165,7 +166,9 @@ async def new_group(client: Client, message: Message):
 
     try:
         new_group = await client.create_group(new_title, hellbot.bot.me.id)
-        await hellbot.edit(message, f"**𝖦𝗋𝗈𝗎𝗉 𝗅𝗂𝗇𝗄:** [{new_group.title}]({new_group.invite_link})")
+        await hellbot.edit(
+            message, f"**𝖦𝗋𝗈𝗎𝗉 𝗅𝗂𝗇𝗄:** [{new_group.title}]({new_group.invite_link})"
+        )
     except Exception as e:
         await hellbot.error(message, f"`{e}`", 20)
 
@@ -173,15 +176,142 @@ async def new_group(client: Client, message: Message):
 @on_message("newchannel", allow_stan=True)
 async def new_channel(client: Client, message: Message):
     if len(message.command) < 2:
-        return await hellbot.delete(message, "𝖨 𝗇𝖾𝖾𝖽 𝗌𝗈𝗆𝖾𝗍𝗁𝗂𝗇𝗀 𝗍𝗈 𝗌𝖾𝗍 𝖺𝗌 𝖼𝗁𝖺𝗇𝗇𝖾𝗅 𝗍𝗂𝗍𝗅𝖾.")
+        return await hellbot.delete(
+            message, "𝖨 𝗇𝖾𝖾𝖽 𝗌𝗈𝗆𝖾𝗍𝗁𝗂𝗇𝗀 𝗍𝗈 𝗌𝖾𝗍 𝖺𝗌 𝖼𝗁𝖺𝗇𝗇𝖾𝗅 𝗍𝗂𝗍𝗅𝖾."
+        )
 
     new_title = await hellbot.input(message)
 
     try:
         new_channel = await client.create_channel(new_title, "Created by HellBot")
-        await hellbot.edit(message, f"**𝖢𝗁𝖺𝗇𝗇𝖾𝗅 𝗅𝗂𝗇𝗄:** [{new_channel.title}]({new_channel.username})")
+        await hellbot.edit(
+            message, f"**𝖢𝗁𝖺𝗇𝗇𝖾𝗅 𝗅𝗂𝗇𝗄:** [{new_channel.title}]({new_channel.username})"
+        )
     except Exception as e:
         await hellbot.error(message, f"`{e}`", 20)
+
+
+@on_message("chatinfo", allow_stan=True)
+async def chatInfo(client: Client, message: Message):
+    if len(message.command) > 1:
+        try:
+            chat = await client.get_chat(message.command[1])
+        except Exception as e:
+            return await hellbot.error(message, f"`{e}`")
+    else:
+        chat = message.chat
+
+    hell = await hellbot.edit(message, "Fetching chat info...")
+
+    if chat.invite_link:
+        chat_link = f"[Invite Link]({chat.invite_link})"
+    elif chat.username:
+        chat_link = f"@{chat.username}"
+    else:
+        chat_link = "Private Chat"
+
+    chat_owner = None
+    admins_count = 0
+    bots_count = 0
+
+    async for admin in client.get_chat_members(
+        chat.id, filter=ChatMembersFilter.ADMINISTRATORS
+    ):
+        admins_count += 1
+        if admin.status == ChatMemberStatus.OWNER:
+            chat_owner = admin.user.mention
+
+    async for _ in client.get_chat_members(chat.id, ChatMembersFilter.BOTS):
+        bots_count += 1
+
+    chat_info = await chat_info_templates(
+        chatName=chat.title,
+        chatId=chat.id,
+        chatLink=chat_link,
+        chatOwner=chat_owner,
+        dcId=chat.dc_id,
+        membersCount=chat.members_count,
+        adminsCount=admins_count,
+        botsCount=bots_count,
+        description=chat.description,
+    )
+
+    if chat.photo:
+        await hell.reply_photo(
+            chat.photo.big_file_id,
+            caption=chat_info,
+        )
+        await hell.delete()
+    else:
+        await hell.edit(chat_info, disable_web_page_preview=True)
+
+
+@on_message("chatadmins", allow_stan=True)
+async def chatAdmins(client: Client, message: Message):
+    if len(message.command) < 2:
+        chat = message.chat
+    else:
+        try:
+            chat = await client.get_chat(message.command[1])
+        except Exception as e:
+            return await hellbot.error(message, f"`{e}`")
+
+    hell = await hellbot.edit(message, "Fetching chat admins...")
+
+    admin_count = 0
+    admins = "**💫 𝖠𝖽𝗆𝗂𝗇𝗌 𝗂𝗇 𝗍𝗁𝗂𝗌 𝖼𝗁𝖺𝗍:**\n\n"
+    async for admin in client.get_chat_members(
+        chat.id, filter=ChatMembersFilter.ADMINISTRATORS
+    ):
+        admin_count += 1
+        admins += f"**{'0' if admin_count < 10 else ''}{admin_count}:** {admin.user.mention} - `{admin.status}`\n"
+
+    await hell.edit(admins, disable_web_page_preview=True)
+
+
+@on_message("chatbots", allow_stan=True)
+async def chatBots(client: Client, message: Message):
+    if len(message.command) < 2:
+        chat = message.chat
+    else:
+        try:
+            chat = await client.get_chat(message.command[1])
+        except Exception as e:
+            return await hellbot.error(message, f"`{e}`")
+
+    hell = await hellbot.edit(message, "Fetching chat bots...")
+
+    bot_count = 0
+    bots = "**🤖 𝖡𝗈𝗍𝗌 𝗂𝗇 𝗍𝗁𝗂𝗌 𝖼𝗁𝖺𝗍:**\n\n"
+    async for bot in client.get_chat_members(chat.id, ChatMembersFilter.BOTS):
+        bot_count += 1
+        bots += f"**{'0' if bot_count < 10 else ''}{bot_count}:** @{bot.user.username}\n"
+
+    await hell.edit(bots, disable_web_page_preview=True)
+
+
+@on_message("id", allow_stan=True)
+async def chatId(_, message: Message):
+    if message.reply_to_message:
+        msg = message.reply_to_message
+    else:
+        msg = message
+
+    hell = await hellbot.edit(message, "Fetching message info...")
+
+    info = f"**💫 ChatID:** {msg.chat.id}\n"
+    info+= f"**🪪 MessageID:** {msg.id}\n\n"
+
+    if msg.from_user:
+        info += f"**👤 UserID:** `{msg.from_user.id}`\n\n"
+
+    if msg.forward_from:
+        info += f"**👤 Forwarded From:** `{msg.forward_from.id}`\n\n"
+
+    if msg.forward_from_chat:
+        info += f"**💫 Forwarded ChatID:** `{msg.forward_from_chat.id}`\n\n"
+
+    await hell.edit(info, disable_web_page_preview=True)
 
 
 HelpMenu("groups").add(
@@ -205,6 +335,14 @@ HelpMenu("groups").add(
     "newgroup", "<title>", "Create a new group.", "newgroup HellBot Group"
 ).add(
     "newchannel", "<title>", "Create a new channel.", "newchannel HellBot Channel"
+).add(
+    "chatinfo", "<chat id (optional)>", "Get info about the chat.", "chatinfo"
+).add(
+    "chatadmins", "<chat id (optional)>", "Get the list of admins of mentioned chat.", "chatadmins @Hellbot_Chats"
+).add(
+    "chatbots", "<chat id (optional)>", "Get the list of bots of mentioned chat.", "chatbots @Hellbot_Chats"
+).add(
+    "id", "<reply to message (optional)>", "Get the ID of the replied message, replied user, and more.", "id"
 ).info(
     "Group Menu"
 ).done()

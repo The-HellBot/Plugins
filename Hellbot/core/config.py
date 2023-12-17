@@ -55,6 +55,7 @@ class ENV:
     anime_template = "ANIME_TEMPLATE"
     btn_in_help = "BUTTONS_IN_HELP"
     character_template = "CHARACTER_TEMPLATE"
+    chat_info_template = "CHAT_INFO_TEMPLATE"
     climate_api = "CLIMATE_API"
     climate_template = "CLIMATE_TEMPLATE"
     command_template = "COMMAND_TEMPLATE"
@@ -71,6 +72,7 @@ class ENV:
     unload_plugins = "UNLOAD_PLUGINS"
     unsplash_api = "UNSPLASH_API"
     usage_template = "USAGE_TEMPLATE"
+    user_info_template = "USER_INFO_TEMPLATE"
 
 
 class Limits:

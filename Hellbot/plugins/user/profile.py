@@ -207,7 +207,7 @@ async def gituser(_, message: Message):
 
         await message.reply_photo(
             avatar_url,
-            caption=github_user_templates.format(
+            caption=await github_user_templates(
                 username=username,
                 git_id=git_id,
                 id_type=id_type,

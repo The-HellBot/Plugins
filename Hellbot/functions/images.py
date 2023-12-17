@@ -3,7 +3,7 @@ import random
 import time
 
 import httpx
-from PIL import Image, ImageDraw, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
 from .formatter import format_text, limit_per_page
 
@@ -108,3 +108,52 @@ async def get_wallpapers(
     random.shuffle(urls)
 
     return urls[:limit]
+
+
+async def deep_fry(img: Image.Image) -> Image.Image:
+    colours = (
+        (random.randint(50, 200), random.randint(40, 170), random.randint(40, 190)),
+        (random.randint(190, 255), random.randint(170, 240), random.randint(180, 250)),
+    )
+
+    img = img.copy().convert("RGB")
+    img = img.convert("RGB")
+
+    width, height = img.width, img.height
+
+    img = img.resize(
+        (
+            int(width ** random.uniform(0.8, 0.9)),
+            int(height ** random.uniform(0.8, 0.9)),
+        ),
+        resample=Image.LANCZOS,
+    )
+
+    img = img.resize(
+        (
+            int(width ** random.uniform(0.85, 0.95)),
+            int(height ** random.uniform(0.85, 0.95)),
+        ),
+        resample=Image.BILINEAR,
+    )
+
+    img = img.resize(
+        (
+            int(width ** random.uniform(0.89, 0.98)),
+            int(height ** random.uniform(0.89, 0.98)),
+        ),
+        resample=Image.BICUBIC,
+    )
+
+    img = img.resize((width, height), resample=Image.BICUBIC)
+    img = ImageOps.posterize(img, random.randint(3, 7))
+
+    overlay = img.split()[0]
+    overlay = ImageEnhance.Contrast(overlay).enhance(random.uniform(1.0, 2.0))
+    overlay = ImageEnhance.Brightness(overlay).enhance(random.uniform(1.0, 2.0))
+    overlay = ImageOps.colorize(overlay, colours[0], colours[1])
+
+    img = Image.blend(img, overlay, random.uniform(0.1, 0.4))
+    img = ImageEnhance.Sharpness(img).enhance(random.randint(5, 300))
+
+    return img

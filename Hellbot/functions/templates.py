@@ -242,6 +242,44 @@ USAGE_TEMPLATES = [
 """
 ]
 
+USER_INFO_TEMPLATES = [
+    """
+**🍀 𝖴𝗌𝖾𝗋 𝖨𝗇𝖿𝗈 𝗈𝖿 {mention}:**
+
+**➢ 𝖥𝗂𝗋𝗌𝗍 𝖭𝖺𝗆𝖾:** `{firstName}`
+**➢ 𝖫𝖺𝗌𝗍 𝖭𝖺𝗆𝖾:** `{lastName}`
+**➢ 𝖴𝗌𝖾𝗋𝖨𝖣:** `{userId}`
+
+**➢ 𝖢𝗈𝗆𝗆𝗈𝗇 𝖦𝗋𝗈𝗎𝗉𝗌:** `{commonGroups}`
+**➢ 𝖣𝖢-𝖨𝖣:** `{dcId}`
+**➢ 𝖯𝗂𝖼𝗍𝗎𝗋𝖾𝗌:** `{totalPictures}`
+**➢ 𝖱𝖾𝗌𝗍𝗋𝗂𝖼𝗍𝖾𝖽:** `{isRestricted}`
+**➢ 𝖵𝖾𝗋𝗂𝖿𝗂𝖾𝖽:** `{isVerified}`
+**➢ 𝖡𝗈𝗍:** `{isBot}`
+**➢ 𝖡𝗂𝗈:** `{bio}`
+
+**</> @HellBot_Networks**
+"""
+]
+
+CHAT_INFO_TEMPLATES = [
+    """
+**🍀 𝖢𝗁𝖺𝗍 𝖨𝗇𝖿𝗈:**
+
+**➢ 𝖢𝗁𝖺𝗍 𝖭𝖺𝗆𝖾:** `{chatName}`
+**➢ 𝖢𝗁𝖺𝗍 𝖨𝖣:** `{chatId}`
+**➢ 𝖢𝗁𝖺𝗍 𝖫𝗂𝗇𝗄:** {chatLink}
+**➢ 𝖮𝗐𝗇𝖾𝗋:** {chatOwner}
+**➢ 𝖣𝖢-𝖨𝖣:** `{dcId}`
+**➢ 𝖬𝖾𝗆𝖻𝖾𝗋𝗌:** `{membersCount}`
+**➢ 𝖠𝖽𝗆𝗂𝗇𝗌:** `{adminsCount}`
+**➢ 𝖡𝗈𝗍𝗌:** `{botsCount}`
+**➢ 𝖣𝖾𝗌𝖼𝗋𝗂𝗉𝗍𝗂𝗈𝗇:** `{description}`
+
+**</> @HellBot_Networks**
+"""
+]
+
 
 async def alive_template(owner: str, uptime: str) -> str:
     template = await db.get_env(ENV.alive_template)
@@ -402,4 +440,22 @@ async def usage_templates(**kwargs) -> str:
         message = template
     else:
         message = random.choice(USAGE_TEMPLATES)
+    return message.format(**kwargs)
+
+
+async def user_info_templates(**kwargs) -> str:
+    template = await db.get_env(ENV.user_info_template)
+    if template:
+        message = template
+    else:
+        message = random.choice(USER_INFO_TEMPLATES)
+    return message.format(**kwargs)
+
+
+async def chat_info_templates(**kwargs) -> str:
+    template = await db.get_env(ENV.chat_info_template)
+    if template:
+        message = template
+    else:
+        message = random.choice(CHAT_INFO_TEMPLATES)
     return message.format(**kwargs)

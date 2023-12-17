@@ -1,14 +1,15 @@
+import io
 import os
 from shutil import rmtree
 
 from glitch_this import ImageGlitcher
-from PIL import Image
+from PIL import Image, ImageEnhance, ImageOps
 from pyrogram.enums import MessageMediaType
 from pyrogram.types import InputMediaPhoto, Message
 
 from Hellbot.core import ENV
 from Hellbot.functions.google import googleimagesdownload
-from Hellbot.functions.images import get_wallpapers
+from Hellbot.functions.images import get_wallpapers, deep_fry
 from Hellbot.functions.tools import runcmd
 
 from . import Config, HelpMenu, db, hellbot, on_message
@@ -165,6 +166,42 @@ async def glitcher(_, message: Message):
         pass
 
 
+@on_message("deepfry", allow_stan=True)
+async def deepfry(_, message: Message):
+    if not message.reply_to_message or not message.reply_to_message.photo:
+        return await hellbot.delete(message, "Reply to a photo to deepfry it.")
+
+    if len(message.command) > 1:
+        try:
+            quality = int(message.command[1])
+        except ValueError:
+            quality = 2
+    else:
+        quality = 2
+
+    hell = await hellbot.edit(message, "Deepfrying...")
+    photo = await message.reply_to_message.download(Config.DWL_DIR)
+
+    if quality > 9:
+        quality = 9
+    elif quality < 1:
+        quality = 2
+
+    image = Image.open(photo)
+    for _ in range(quality):
+        image = await deep_fry(image)
+
+    fried = io.BytesIO()
+    fried.name = "deepfried.jpeg"
+    image.save(fried, "JPEG")
+    fried.seek(0)
+
+    await hell.reply_photo(fried)
+    await hellbot.delete(hell, "Deepfried!")
+
+    os.remove(photo)
+
+
 HelpMenu("images").add(
     "image",
     "<query> ; <limit>",
@@ -179,9 +216,14 @@ HelpMenu("images").add(
     "If no query is given, random wallpapers will be uploaded.",
 ).add(
     "glitch",
-    "<reply to media>",
-    "Glitch a media message. It includes sticker, gif, photo, video.",
+    "<reply to media> <intensity>",
+    "Glitch a media message. It includes sticker, gif, photo, video. The intensity can be changed by passing an integer between 1 and 8. Default is 2.",
     "glitch 4",
+).add(
+    "deepfry",
+    "<reply to photo> <quality>",
+    "Deepfry a photo. The quality can be changed by passing an integer between 1 and 9. Default is 2.",
+    "deepfry 5",
 ).info(
     "Image Tools"
 ).done()

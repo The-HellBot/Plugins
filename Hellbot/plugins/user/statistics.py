@@ -3,10 +3,11 @@ import time
 from pyrogram import Client
 from pyrogram.enums import ChatMemberStatus, ChatType
 from pyrogram.raw.functions.channels import GetAdminedPublicChannels
+from pyrogram.raw.functions.users import GetFullUser
 from pyrogram.types import Dialog, Message
 
 from Hellbot.functions.formatter import readable_time
-from Hellbot.functions.templates import statistics_templates
+from Hellbot.functions.templates import statistics_templates, user_info_templates
 
 from . import HelpMenu, Symbols, hellbot, on_message
 
@@ -127,12 +128,63 @@ async def reserved(client: Client, message: Message):
     await hell.edit(outStr)
 
 
+@on_message("info", allow_stan=True)
+async def userInfo(client: Client, message: Message):
+    if not message.reply_to_message:
+        if len(message.command) < 2:
+            return await hellbot.error(message, "Reply to a user or give username/id to get their info.")
+        try:
+            user = await client.get_users(message.command[1])
+        except Exception as e:
+            return await hellbot.error(message, str(e))
+    else:
+        user = message.reply_to_message.from_user
+
+    hell = await hellbot.edit(message, f"Getting info of {user.mention}...")
+
+    try:
+        resolved = await client.resolve_peer(user.id)
+        fullUser = await client.invoke(GetFullUser(id=resolved))
+        bio = fullUser.about
+    except:
+        bio = None
+
+    total_pfp = await client.get_chat_photos_count(user.id)
+    common_chats = len(await user.get_common_chats())
+
+    user_info = await user_info_templates(
+        mention=user.mention,
+        firstName=user.first_name,
+        lastName=user.last_name,
+        userId=user.id,
+        bio=bio,
+        dcId=user.dc_id,
+        totalPictures=total_pfp,
+        isRestricted=user.is_restricted,
+        isVerified=user.is_verified,
+        isBot=user.is_bot,
+        commonGroups=common_chats,
+    )
+
+    if user.photo:
+        await hell.reply_photo(
+            user.photo.big_file_id,
+            caption=user_info,
+        )
+        await hell.delete()
+    else:
+        await hell.edit(user_info, disable_web_page_preview=True)
+
+
+
 HelpMenu("statistics").add(
     "count", None, "A brief overview of the number of chats I am in."
 ).add(
     "stats", None, "A detailed overview of the number of chats I am in."
 ).add(
     "reserved", None, "List of all the public usernames in my possession."
+).add(
+    "info", "<reply> or <username/id>", "Get the user's detailed info.", "info @ForGo10God"
 ).info(
     "Statistics Module"
 ).done()
