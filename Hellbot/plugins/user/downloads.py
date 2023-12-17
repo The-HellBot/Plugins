@@ -73,9 +73,7 @@ async def download(_, message: Message):
                     f"**Downloaded to** `{dl.get_dest()}` **in** `{end_time}` **seconds.**"
                 )
             else:
-                await hellbot.error(
-                    hell, f"**Failed to download** `{len(dwl_url)} url(s)`", 10
-                )
+                await hellbot.error(hell, f"**Failed to download** `{len(dwl_url)} url(s)`")
         except Exception as e:
             return await hellbot.error(hell, f"`{e}`", 10)
     else:

@@ -7,6 +7,7 @@ import httpx
 from pytz import country_names, country_timezones, timezone
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 
 from Hellbot.core import ENV, Config, db
@@ -55,19 +56,20 @@ class ChromeDriver:
             )
 
         try:
-            chrome_options = Options()
-            chrome_options.binary_location = Config.CHROME_BIN
-            chrome_options.add_argument("--disable-dev-shm-usage")
-            chrome_options.add_argument("--ignore-certificate-errors")
-            chrome_options.add_argument("--disable-gpu")
-            chrome_options.add_argument("--headless=new")
-            chrome_options.add_argument("--test-type")
-            chrome_options.add_argument("--no-sandbox")
-            chrome_options.add_argument("--window-size=1920x1080")
-            chrome_options.add_experimental_option(
+            options = Options()
+            options.binary_location = Config.CHROME_BIN
+            options.add_argument("--disable-dev-shm-usage")
+            options.add_argument("--ignore-certificate-errors")
+            options.add_argument("--disable-gpu")
+            options.add_argument("--headless=new")
+            options.add_argument("--test-type")
+            options.add_argument("--no-sandbox")
+            options.add_argument("--window-size=1920x1080")
+            options.add_experimental_option(
                 "prefs", {"download.default_directory": "./"}
             )
-            driver = webdriver.Chrome(options=chrome_options)
+            service = Service(Config.CHROME_DRIVER)
+            driver = webdriver.Chrome(options, service)
             return driver, None
         except Exception as e:
             return None, f"ChromeDriverErr: {e}"
