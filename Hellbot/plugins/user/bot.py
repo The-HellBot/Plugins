@@ -6,12 +6,12 @@ from pyrogram import Client
 from pyrogram.types import Message
 
 from Hellbot import START_TIME
-from Hellbot.core import ENV, db, hellbot
+from Hellbot.core import ENV
 from Hellbot.functions.formatter import readable_time
 from Hellbot.functions.images import generate_alive_image
 from Hellbot.functions.templates import alive_template, ping_template
 
-from . import HelpMenu, on_message
+from . import Config, HelpMenu, db, hellbot, on_message
 
 
 @on_message("alive", allow_stan=True)
@@ -26,7 +26,11 @@ async def alive(client: Client, message: Message):
         else:
             user_pfp = "./Hellbot/resources/images/hellbot_logo.png"
             del_path = False
-        img = [generate_alive_image(message.from_user.first_name, user_pfp, del_path)]
+        img = [
+            generate_alive_image(
+                message.from_user.first_name, user_pfp, del_path, Config.FONT_PATH
+            )
+        ]
     else:
         img = img.split(" ")
 
@@ -67,7 +71,9 @@ async def ping(client: Client, message: Message):
 async def history(client: Client, message: Message):
     if not message.reply_to_message:
         if len(message.command) < 2:
-            return await hellbot.delete(message, "Either reply to an user or give me a username to get history.")
+            return await hellbot.delete(
+                message, "Either reply to an user or give me a username to get history."
+            )
         try:
             user = await client.get_users(message.command[1])
         except Exception as e:
@@ -83,7 +89,10 @@ async def history(client: Client, message: Message):
         return await hellbot.error(hell, f"`{str(e)}`")
 
     if "you have used up your quota for today" in response.text:
-        return await hellbot.delete(hell, f"Your quota of using SangMata Bot is over. Wait till 00:00 UTC before using it again.")
+        return await hellbot.delete(
+            hell,
+            f"Your quota of using SangMata Bot is over. Wait till 00:00 UTC before using it again.",
+        )
 
     await hellbot.edit(hell, response.text)
 
@@ -105,7 +114,7 @@ HelpMenu("bot").add(
     "<reply to user>/<username/id>",
     "Get the username, name history of an user.",
     "history @ForGo10_God",
-    "This command uses SangMata Bot to get the history."
+    "This command uses SangMata Bot to get the history.",
 ).info(
     "Alive Menu"
 ).done()

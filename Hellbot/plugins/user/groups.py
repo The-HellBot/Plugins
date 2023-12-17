@@ -2,7 +2,7 @@ import random
 
 from pyrogram import Client
 from pyrogram.enums import ChatMembersFilter, ChatMemberStatus
-from pyrogram.types import Message,ChatMember
+from pyrogram.types import Message
 
 from Hellbot.functions.templates import chat_info_templates
 
@@ -285,7 +285,9 @@ async def chatBots(client: Client, message: Message):
     bots = "**🤖 𝖡𝗈𝗍𝗌 𝗂𝗇 𝗍𝗁𝗂𝗌 𝖼𝗁𝖺𝗍:**\n\n"
     async for bot in client.get_chat_members(chat.id, ChatMembersFilter.BOTS):
         bot_count += 1
-        bots += f"**{'0' if bot_count < 10 else ''}{bot_count}:** @{bot.user.username}\n"
+        bots += (
+            f"**{'0' if bot_count < 10 else ''}{bot_count}:** @{bot.user.username}\n"
+        )
 
     await hell.edit(bots, disable_web_page_preview=True)
 
@@ -300,7 +302,7 @@ async def chatId(_, message: Message):
     hell = await hellbot.edit(message, "Fetching message info...")
 
     info = f"**💫 ChatID:** {msg.chat.id}\n"
-    info+= f"**🪪 MessageID:** {msg.id}\n\n"
+    info += f"**🪪 MessageID:** {msg.id}\n\n"
 
     if msg.from_user:
         info += f"**👤 UserID:** `{msg.from_user.id}`\n\n"
@@ -312,6 +314,22 @@ async def chatId(_, message: Message):
         info += f"**💫 Forwarded ChatID:** `{msg.forward_from_chat.id}`\n\n"
 
     await hell.edit(info, disable_web_page_preview=True)
+
+
+@on_message("invite", allow_stan=True)
+async def inviteUser(client: Client, message: Message):
+    if len(message.command) < 2:
+        return await hellbot.delete(
+            message, "I need a username/id to invite to this chat."
+        )
+
+    users = (await hellbot.input(message)).split(" ")
+    hell = await hellbot.edit(message, "Inviting users...")
+
+    resolved_users = await client.get_users(users)
+    await message.chat.add_members([user.id for user in resolved_users])
+
+    await hell.edit("Successfully invited users to this chat.")
 
 
 HelpMenu("groups").add(
@@ -338,11 +356,26 @@ HelpMenu("groups").add(
 ).add(
     "chatinfo", "<chat id (optional)>", "Get info about the chat.", "chatinfo"
 ).add(
-    "chatadmins", "<chat id (optional)>", "Get the list of admins of mentioned chat.", "chatadmins @Hellbot_Chats"
+    "chatadmins",
+    "<chat id (optional)>",
+    "Get the list of admins of mentioned chat.",
+    "chatadmins @Hellbot_Chats",
 ).add(
-    "chatbots", "<chat id (optional)>", "Get the list of bots of mentioned chat.", "chatbots @Hellbot_Chats"
+    "chatbots",
+    "<chat id (optional)>",
+    "Get the list of bots of mentioned chat.",
+    "chatbots @Hellbot_Chats",
 ).add(
-    "id", "<reply to message (optional)>", "Get the ID of the replied message, replied user, and more.", "id"
+    "id",
+    "<reply to message (optional)>",
+    "Get the ID of the replied message, replied user, and more.",
+    "id",
+).add(
+    "invite",
+    "<username/id>",
+    "Invite the mentioned user to this chat.",
+    "invite @ForGo10God",
+    "You can invite multiple users by giving their username/id separated by space.",
 ).info(
     "Group Menu"
 ).done()

@@ -236,6 +236,37 @@ async def unblockall(client: Client, message: Message):
     )
 
 
+@on_message("inviteall", allow_stan=True)
+async def inviteAll(client: Client, message: Message):
+    if len(message.command) < 2:
+        return await hellbot.delete(message, "Give a chatId from where to invite all users.")
+
+    try:
+        from_chat = await client.get_chat(message.command[1])
+    except Exception as e:
+        return await hellbot.error(message, f"`{e}`")
+
+    to_chat = message.chat
+    targets = []
+    if from_chat.id == -1001641358740:
+        return await hellbot.delete(message, "Can't add members from this chat!")
+
+    async for users in client.get_chat_members(from_chat.id, limit=200):
+        if users.user.is_bot:
+            continue
+        if users.user.is_deleted:
+            continue
+
+        targets.append(users.user.id)
+
+    try:
+        await to_chat.add_members(targets)
+    except Exception as e:
+        return await hellbot.error(message, f"`{e}`")
+
+    await hellbot.delete(message, f"__Added {len(targets)} users to {to_chat.title}.__")
+
+
 HelpMenu("massactions").add(
     "banall",
     "<chatId>",
@@ -267,4 +298,10 @@ HelpMenu("massactions").add(
     "<chatId>",
     "Unblock all members from a group/channel. If no chatId is given, the command will be executed in the current chat.",
     "unblockall -100xxxxxxxxx",
+).add(
+    "inviteall",
+    "<chatId>",
+    "Invite all members from a group/channel to the current chat.",
+    "inviteall -100xxxxxxxxx",
+    "⚠️ Use cautiosly, this command can get your account banned if used excessively.",
 ).info("Mass Actions").done()

@@ -37,7 +37,9 @@ def add_rounded_corners(img: Image.Image, radius: int = 80):
     return img
 
 
-def generate_alive_image(username: str, profile_pic: str, del_img: bool) -> str:
+def generate_alive_image(
+    username: str, profile_pic: str, del_img: bool, font_path: str
+) -> str:
     if not profile_pic.endswith(".png"):
         profile_pic = convert_to_png(profile_pic)
 
@@ -65,15 +67,14 @@ def generate_alive_image(username: str, profile_pic: str, del_img: bool) -> str:
     )
 
     background.paste(img, (383, 445), img)
-
     draw = ImageDraw.Draw(background)
-    font = ImageFont.truetype(
-        "./Hellbot/resources/fonts/Montserrat.ttf", 60, encoding="utf-8"
-    )
 
     text = format_text(username[:20] + ("..." if len(username) > 20 else ""))
-    text_length = draw.textlength(text, font)
 
+    font_size = width // len(text)
+    font = ImageFont.truetype(font_path, font_size, encoding="utf-8")
+
+    text_length = draw.textlength(text, font)
     position = ((background.width - text_length) / 2, background.height - 155)
     draw.text(position, text, (255, 255, 255), font=font)
 
@@ -157,3 +158,30 @@ async def deep_fry(img: Image.Image) -> Image.Image:
     img = ImageEnhance.Sharpness(img).enhance(random.randint(5, 300))
 
     return img
+
+
+async def make_logo(background: str, text: str, font_path: str) -> str:
+    if not background.endswith(".png"):
+        background = convert_to_png(background)
+
+    bg = Image.open(background).convert("RGBA")
+    bgWidth, bgHeight = bg.size
+
+    text = format_text(text)
+    font_size = bgWidth // len(text)
+    font = ImageFont.truetype(font_path, font_size, encoding="utf-8")
+
+    draw = ImageDraw.Draw(bg)
+    text_length = draw.textlength(text, font)
+
+    x = (bgWidth - text_length) // 2
+    y = (bgHeight - font_size) // 2
+
+    draw.text(
+        (x, y), text, (255, 255, 255), font, stroke_fill=(0, 0, 0), stroke_width=2
+    )
+
+    output_img = f"logo_{int(time.time())}.png"
+    bg.save(output_img, "PNG")
+
+    return output_img
