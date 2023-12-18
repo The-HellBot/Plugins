@@ -1,5 +1,6 @@
 import os
 import random
+import textwrap
 import time
 
 import httpx
@@ -185,3 +186,45 @@ async def make_logo(background: str, text: str, font_path: str) -> str:
     bg.save(output_img, "PNG")
 
     return output_img
+
+
+async def draw_meme(image_path: str, upper_text: str = "", lower_text: str = "") -> list[str]:
+    image = Image.open(image_path)
+    width, height = image.size
+
+    draw = ImageDraw.Draw(image)
+    font_size = int((30 / 500) * width)
+    font = ImageFont.truetype("./Hellbot/resources/fonts/Montserrat.ttf", font_size)
+
+    curr_height, padding = 20, 5
+    for utext in textwrap.wrap(upper_text, 25):
+        upper_width = draw.textlength(utext, font=font)
+        draw.text(
+            xy=((width - upper_width) / 2, curr_height),
+            text=utext,
+            font=font,
+            fill=(255, 255, 255),
+            stroke_fill=(0, 0, 0),
+            stroke_width=3,
+        )
+        curr_height += font_size + padding
+
+    curr_height = height - font_size
+    for ltext in reversed(textwrap.wrap(lower_text, 25)):
+        lower_width = draw.textlength(ltext, font=font)
+        draw.text(
+            xy=((width - lower_width) / 2, curr_height - font_size),
+            text=ltext,
+            font=font,
+            fill=(255, 255, 255),
+            stroke_fill=(0, 0, 0),
+            stroke_width=3,
+        )
+        curr_height -= font_size + padding
+
+    filename = f"meme_{int(time.time())}"
+    image.save(f"{filename}.png", "PNG", optimize=True)
+    image.save(f"{filename}.webp", "WEBP", optimize=True)
+    image.close()
+
+    return [f"{filename}.png", f"{filename}.webp"]

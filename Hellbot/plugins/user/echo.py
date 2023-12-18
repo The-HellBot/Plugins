@@ -69,6 +69,15 @@ async def echo_handler(client: Client, message: Message):
         await message.reply(message.text)
 
 
+@on_message(["resend", "copy"], allow_stan=True)
+async def reSend(_, message: Message):
+    if message.reply_to_message:
+        await message.reply_to_message.copy(
+            message.chat.id, reply_to_message_id=message.reply_to_message.id
+        )
+    await message.delete()
+
+
 HelpMenu("echo").add(
     "echo",
     "<reply> or <userid>",
@@ -85,6 +94,12 @@ HelpMenu("echo").add(
     None,
     "List all the users whose messages are being echoed in present chat!",
     "listecho",
+).add(
+    "resend",
+    "<reply>",
+    "Resend the replied message!",
+    "resend",
+    "An alias of 'copy' is also available!",
 ).info(
     "Is it Echoing?"
 ).done()
