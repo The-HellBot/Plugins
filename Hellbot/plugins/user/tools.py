@@ -1,11 +1,13 @@
-import base64, math
+import base64
+import math
+import os
+import time
 
 from pyrogram.types import Message
 
-from Hellbot.core import Symbols
+from Hellbot.core import Limits
 
-from . import HelpMenu, hellbot, on_message
-
+from . import Config, HelpMenu, Symbols, hellbot, on_message
 
 math_cmds = ["sin", "cos", "tan", "square", "cube", "sqroot", "factorial", "power"]
 
@@ -26,7 +28,7 @@ async def base64enc(_, message: Message):
     hell = await hellbot.edit(message, "Encoding...")
 
     encoded = base64.b64encode(text.encode()).decode()
-    await hellbot.edit(hell, f"**𝖡𝖺𝗌𝖾64 𝖤𝗇𝖼𝗈𝖽𝖾𝖽:**\n\n`{encoded}`")
+    await hell.edit(f"**𝖡𝖺𝗌𝖾64 𝖤𝗇𝖼𝗈𝖽𝖾𝖽:**\n\n`{encoded}`")
 
 
 @on_message("base64dec", allow_stan=True)
@@ -45,7 +47,7 @@ async def base64dec(_, message: Message):
     hell = await hellbot.edit(message, "Decoding...")
 
     decoded = base64.b64decode(text.encode()).decode()
-    await hellbot.edit(hell, f"**𝖡𝖺𝗌𝖾64 𝖣𝖾𝖼𝗈𝖽𝖾𝖽:**\n\n`{decoded}`")
+    await hell.edit(f"**𝖡𝖺𝗌𝖾64 𝖣𝖾𝖼𝗈𝖽𝖾𝖽:**\n\n`{decoded}`")
 
 
 @on_message(["calculate", "calc"], allow_stan=True)
@@ -60,8 +62,8 @@ async def calculator(_, message: Message):
     except Exception:
         result = "Invalid Expression"
 
-    await hellbot.edit(
-        hell, f"**{Symbols.bullet} 𝖤𝗑𝗉𝗋𝖾𝗌𝗌𝗂𝗈𝗇:** `{query}`\n\n**{Symbols.bullet} 𝖱𝖾𝗌𝗎𝗅𝗍:**\n`{result}`"
+    await hell.edit(
+        f"**{Symbols.bullet} 𝖤𝗑𝗉𝗋𝖾𝗌𝗌𝗂𝗈𝗇:** `{query}`\n\n**{Symbols.bullet} 𝖱𝖾𝗌𝗎𝗅𝗍,,:**\n`{result}`"
     )
 
 
@@ -74,7 +76,11 @@ async def maths(_, message: Message):
     query = message.command[2].lower()
 
     if cmd not in math_cmds:
-        return await hellbot.delete(message, f"**Unknown command!** \n\nAvailable Commands are: \n`{'`, `'.join(math_cmds)}`", 20)
+        return await hellbot.delete(
+            message,
+            f"**Unknown command!** \n\nAvailable Commands are: \n`{'`, `'.join(math_cmds)}`",
+            20,
+        )
 
     hell = await hellbot.edit(message, "Calculating...")
 
@@ -95,9 +101,51 @@ async def maths(_, message: Message):
     elif cmd == "power":
         result = math.pow(int(query), 2)
 
-    await hellbot.edit(
-        hell, f"**{Symbols.bullet} 𝖤𝗑𝗉𝗋𝖾𝗌𝗌𝗂𝗈𝗇:** `{cmd} {query}`\n\n**{Symbols.bullet} 𝖱𝖾𝗌𝗎𝗅𝗍:**\n`{result}`"
+    await hell.edit(
+        f"**{Symbols.bullet} 𝖤𝗑𝗉𝗋𝖾𝗌𝗌𝗂𝗈𝗇:** `{cmd} {query}`\n\n**{Symbols.bullet} 𝖱𝖾𝗌𝗎𝗅𝗍,,:**\n`{result}`"
     )
+
+
+@on_message("unpack", allow_stan=True)
+async def unpack(_, message: Message):
+    if not message.reply_to_message or not message.reply_to_message.document:
+        return await hellbot.delete(message, "Reply to a file to unpack.")
+
+    hell = await hellbot.edit(message, "Unpacking...")
+    filename = await message.reply_to_message.download(Config.TEMP_DIR)
+
+    with open(filename, "rb") as f:
+        data = f.read().decode()
+
+    try:
+        await hell.edit(
+            data[: Limits.MessageLength],
+            disable_web_page_preview=True,
+        )
+    except Exception as e:
+        await hellbot.error(hell, f"`{e}`")
+
+    os.remove(filename)
+
+
+@on_message("pack", allow_stan=True)
+async def pack(_, message: Message):
+    if not message.reply_to_message or not message.reply_to_message.text:
+        return await hellbot.delete(message, "Reply to a text to pack.")
+
+    filename = f"pack_{int(time.time())}.txt"
+    if len(message.command) >= 2:
+        filename = message.command[1]
+
+    with open(filename, "w") as f:
+        f.write(message.reply_to_message.text)
+
+    await message.reply_document(
+        filename,
+        caption=f"**💫 Packed into {filename}**",
+    )
+
+    os.remove(filename)
 
 
 HelpMenu("tools").add(
@@ -122,6 +170,16 @@ HelpMenu("tools").add(
     "Perform some basic math operations.",
     "math sin 90",
     f"Available Commands are: \n`{'`, `'.join(math_cmds)}`",
+).add(
+    "unpack",
+    "<reply to a file>",
+    "Unpack the file and send the text content.",
+    "unpack",
+).add(
+    "pack",
+    "<reply to a text> <filename (optional)>",
+    "Pack the text into a file.",
+    "pack script.js",
 ).info(
     "Basic Tools"
 ).done()

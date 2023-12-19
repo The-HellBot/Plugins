@@ -1,5 +1,6 @@
 from typing import Union
 
+import requests
 from pyrogram.types import Animation, Audio, Document, Photo, Sticker, Video
 
 from Hellbot.core import Symbols
@@ -77,3 +78,20 @@ async def get_metedata(
         return None
 
     return output
+
+
+def get_media_text_ocr(filename: str, api_key: str, language: str = "eng"):
+    payload = {
+        "isOverlayRequired": False,
+        "apikey": api_key,
+        "language": language,
+    }
+
+    with open(filename, "rb") as f:
+        r = requests.post(
+            "https://api.ocr.space/parse/image",
+            files={filename: f},
+            data=payload,
+        )
+
+    return r.json()

@@ -1,4 +1,5 @@
 bs4
+cinemagoer
 edge-tts
 geopy
 glitch_this

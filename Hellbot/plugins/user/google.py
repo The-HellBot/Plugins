@@ -12,15 +12,61 @@ from geopy.geocoders import Nominatim
 from geopy.location import Location
 from googlesearch import search
 from googletrans import LANGCODES, LANGUAGES, Translator
+from imdb import Cinemagoer, Movie
 from pyrogram import Client
 from pyrogram.types import InputMediaPhoto, Message
 from wikipedia import exceptions, summary
 
 from Hellbot.functions.driver import Driver
 from Hellbot.functions.google import googleimagesdownload
+from Hellbot.functions.paste import post_to_telegraph
 from Hellbot.functions.scraping import is_valid_url
 
 from . import Config, HelpMenu, Symbols, db, handler, hellbot, on_message
+
+
+imdb = Cinemagoer()
+mov_titles = [
+    "localized title",
+    "canonical title",
+    "smart canonical title",
+    "smart long imdb canonical title",
+    "long imdb canonical title",
+    "long imdb title",
+]
+
+final_msg = """
+<b>✦ 𝖳𝖬𝖴{}00𝖱𝖫 𝖨𝗇𝖿𝗈 𝖦𝖾𝗇𝗋𝖾𝗌 𝖱𝖺𝗍𝗂𝗇𝗀 𝖣𝗂�𝖾𝖼�𝗍��:</b> <code></code>
+<b>✦ 𝖨𝖬𝖣𝖻 𝖴𝖱𝖫:</b> <a href='https://www.imdb.com/title/tt{1}'>Click here.</a>
+<b>✦ 𝖠𝗂𝗋𝖽𝖺𝗍𝖾:</b> <code>{2}</code>
+<b>✦ 𝖦𝖾𝗇𝗋𝖾𝗌:</b> <code>{3}</code>
+<b>✦ 𝖱𝖺𝗍𝗂𝗇𝗀:</b> <code>{4}</code>
+<b>✦ 𝖱𝗎𝗇𝗍𝗂𝗆𝖾:</b> <code>{5}</code>
+<b>✦ 𝖣𝗂𝗋𝖾𝖼𝗍𝗈𝗋:</b> <code>{6}</code>
+
+<b><a href='{7}'>💫 𝖬𝗈𝗋𝖾 𝖽𝖾𝗍𝖺𝗂𝗅𝗌 𝗁𝖾𝗋𝖾!</a></b>
+"""
+
+telegraph_msg = """
+<img src='{0}'/>
+
+<b>✦ 𝖳𝗂𝗍𝗅𝖾:</b> <code>{1}</code>
+<b>✦ 𝖨𝖬𝖣𝖻 𝖴𝖱𝖫:</b> <a href='https://www.imdb.com/title/tt{2}'>Click here.</a>
+<b>✦ 𝖠𝗂𝗋𝖽𝖺𝗍𝖾:</b> <code>{3}</code>
+<b>✦ 𝖦𝖾𝗇𝗋𝖾𝗌:</b> <code>{4}</code>
+<b>✦ 𝖱𝖺𝗍𝗂𝗇𝗀:</b> <code>{5}</code>
+<b>✦ 𝖱𝗎𝗇𝗍𝗂𝗆𝖾:</b> <code>{6}</code>
+<b>✦ 𝖣𝗂𝗋𝖾𝖼𝗍𝗈𝗋:</b> <code>{7}</code>
+<b>✦ 𝖶𝗋𝗂𝗍𝖾𝗋:</b> <code>{8}</code>
+<b>✦ 𝖢𝗈𝗆𝗉𝗈𝗌𝖾𝗋𝗌:</b> <code>{9}</code>
+<b>✦ 𝖢𝖺𝗌𝗍:</b> <code>{10}</code>
+<b>✦ 𝖢𝗈𝗎𝗇𝗍𝗋𝗒:</b> <code>{11}</code>
+<b>✦ 𝖫𝖺𝗇𝗀𝗎𝖺𝗀𝖾:</b> <code>{12}</code>
+<b>✦ 𝖡𝗈𝗑 𝖮𝖿𝖿𝗂𝖼𝖾:</b> <code>{13}</code>
+<b>✦ 𝖯𝗅𝗈𝗍𝗋𝗌14𝖡𝗈𝗑 𝖮𝖿𝖿𝗂𝖼𝖾:</b> <
+
+<b>🍀 @HellBot_Networks</b>
+"""
 
 
 @on_message("wikipedia", allow_stan=True)
@@ -343,6 +389,87 @@ async def textToSpeech(_, message: Message):
         await hell.delete()
     except Exception as e:
         return await hellbot.error(hell, f"`{str(e)}`")
+
+
+@on_message("movie", allow_stan=True)
+async def movieSearch(_, message: Message):
+    if len(message.command) < 2:
+        return await hellbot.edit(message, "Give a movie name to search on IMDb.")
+
+    query = await hellbot.input(message)
+    hell = await hellbot.edit(message, "Searching...")
+    try:
+        movieObj: Movie.Movie = imdb.search_movie(query)[0]
+        movieId = movieObj.movieID
+        movieObj = imdb.get_movie(movieId)
+        movieKeys = list(movieObj.keys())
+
+        title = "No title found."
+        for i in mov_titles:
+            if i in movieKeys:
+                title = movieObj[i]
+                break
+
+        airdate = "N/A"
+        if "original air date" in movieKeys:
+            airdate = movieObj["original air date"]
+        elif "year" in movieKeys:
+            airdate = movieObj["year"]
+
+        runtime = movieObj.get("runtimes", ["N/A"])[0] + " min"
+        rating = str(movieObj.get("rating", "N/A"))
+        rating += " (by " + str(movieObj.get("votes", "N/A")) + " votes)"
+        genres = ", ".join(movieObj.get("genres", ["N/A"]))
+        countries = ", ".join(movieObj.get("countries", ["N/A"]))
+        languages = ", ".join(movieObj.get("languages", ["N/A"]))
+        plot = movieObj.get("plot outline", "N/A")
+        cast = ", ".join([str(actor) for actor in movieObj.get("cast", ["N/A"])])
+        directors = ", ".join(
+            [str(actor) for actor in movieObj.get("director", ["N/A"])]
+        )
+        writers = ", ".join([str(actor) for actor in movieObj.get("writer", ["N/A"])])
+        composers = ", ".join(
+            [str(actor) for actor in movieObj.get("composer", ["N/A"])]
+        )
+        box_office_info = movieObj.get("box office", {})
+        box_office = (
+            "\n".join([f"{key} --> {value}" for key, value in box_office_info.items()])
+            if box_office_info
+            else "N/A"
+        )
+        image = movieObj.get("full-size cover url", None)
+        link = post_to_telegraph(
+            f"IMDb Search: {title}",
+            telegraph_msg.format(
+                image,
+                title,
+                movieId,
+                airdate,
+                genres,
+                rating,
+                runtime,
+                directors,
+                writers,
+                composers,
+                cast,
+                countries,
+                languages,
+                box_office,
+                plot,
+            ),
+        )
+        await message.reply_photo(
+            image,
+            caption=final_msg.format(
+                title, movieId, airdate, genres, rating, runtime, directors, link
+            ),
+            parse_mode="html",
+        )
+        await hell.delete()
+    except IndexError:
+        await hellbot.delete(hell, "No results found.")
+    except Exception as e:
+        await hellbot.error(hell, str(e))
 
 
 HelpMenu("google").add(
