@@ -20,6 +20,12 @@ class Config:
     HEROKU_APPNAME = getenv("HEROKU_APPNAME", None)
     HEROKU_APIKEY = getenv("HEROKU_APIKEY", None)
 
+    # github related configs
+    PLUGINS_REPO = getenv("PLUGINS_REPO", "The-HellBot/Plugins")
+    PLUGINS_BRANCH = getenv("PLUGINS_BRANCH", "master")
+    DEPLOY_REPO = getenv("DEPLOY_REPO", "The-HellBot/Hellbot")
+    DEPLOY_BRANCH = getenv("DEPLOY_BRANCH", "master")
+
     # storage dir: you may or may not edit
     DWL_DIR = "./downloads/"
     TEMP_DIR = "./temp/"
@@ -61,6 +67,7 @@ class ENV:
     climate_api = "CLIMATE_API"
     climate_template = "CLIMATE_TEMPLATE"
     command_template = "COMMAND_TEMPLATE"
+    custom_pmpermit = "CUSTOM_PMPERMIT"
     gban_template = "GBAN_TEMPLATE"
     github_user_template = "GITHUB_USER_TEMPLATE"
     help_emoji = "HELP_EMOJI"
@@ -71,6 +78,8 @@ class ENV:
     ping_pic = "PING_PIC"
     ping_template = "PING_TEMPLATE"
     pm_logger = "PM_LOGGER"
+    pm_max_spam = "PM_MAX_SPAM"
+    pmpermit_pic = "PMPERMIT_PIC"
     statistics_template = "STATISTICS_TEMPLATE"
     time_zone = "TIME_ZONE"
     unload_plugins = "UNLOAD_PLUGINS"

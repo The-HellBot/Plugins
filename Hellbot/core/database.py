@@ -22,6 +22,7 @@ class Database:
         self.filter = self.db["filter"]
         self.gban = self.db["gban"]
         self.gmute = self.db["gmute"]
+        self.pmpermit = self.db["pmpermit"]
         self.session = self.db["session"]
         self.stan_users = self.db["stan_users"]
 
@@ -372,6 +373,27 @@ class Database:
             return []
 
         return data["filter"]
+
+    async def add_pmpermit(self, client: int, user: int, reason: str):
+        await self.pmpermit.update_one(
+            {"client": client, "user": user},
+            {"$set": {"date": self.get_datetime()}},
+            upsert=True,
+        )
+
+    async def rm_pmpermit(self, client: int, user: int):
+        await self.pmpermit.delete_one({"client": client, "user": user})
+
+    async def is_pmpermit(self, client: int, user: int) -> bool:
+        data = await self.get_pmpermit(client, user)
+        return True if data else False
+
+    async def get_pmpermit(self, client: int, user: int):
+        data = await self.pmpermit.find_one({"client": client, "user": user})
+        return data
+
+    async def get_all_pmpermits(self, client: int) -> list:
+        return [i async for i in self.pmpermit.find({"client": client})]
 
 
 db = Database(Config.DATABASE_URL)

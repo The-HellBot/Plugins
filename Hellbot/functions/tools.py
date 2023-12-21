@@ -5,9 +5,10 @@ import shlex
 import shutil
 import time
 
+from git import Repo
 from pyrogram.types import Message
 
-from Hellbot.core import Config
+from Hellbot.core import Config, Symbols
 
 from .formatter import humanbytes, readable_time
 
@@ -75,12 +76,24 @@ async def update_dotenv(key: str, value: str) -> None:
         file.writelines(data)
 
 
-async def restart(update: bool = False):
+async def restart(
+    update: bool = False,
+    clean_up: bool = False,
+    shutdown: bool = False,
+):
     try:
         shutil.rmtree(Config.DWL_DIR)
         shutil.rmtree(Config.TEMP_DIR)
     except BaseException:
         pass
+
+    if clean_up:
+        os.system(f"mkdir {Config.DWL_DIR}")
+        os.system(f"mkdir {Config.TEMP_DIR}")
+        return
+
+    if shutdown:
+        return os.system(f"kill -9 {os.getpid()}")
 
     cmd = (
         "git pull && pip3 install -U -r requirements.txt && bash start.sh"
@@ -89,3 +102,12 @@ async def restart(update: bool = False):
     )
 
     os.system(f"kill -9 {os.getpid()} && {cmd}")
+
+
+async def gen_changelogs(repo: Repo, branch: str) -> str:
+    changelogs = ""
+    commits = list(repo.iter_commits(f"HEAD..origin/{branch}"))[:5]
+    for index, commit in enumerate(commits):
+        changelogs += f"**{Symbols.triangle_right} {index + 1}.** {commit.summary}\n"
+
+    return changelogs
