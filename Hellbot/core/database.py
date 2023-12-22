@@ -24,6 +24,7 @@ class Database:
         self.gmute = self.db["gmute"]
         self.pmpermit = self.db["pmpermit"]
         self.session = self.db["session"]
+        self.snips = self.db["snips"]
         self.stan_users = self.db["stan_users"]
 
     async def connect(self):
@@ -373,6 +374,46 @@ class Database:
             return []
 
         return data["filter"]
+
+    async def set_snip(
+        self, client: int, chat: int, keyword: str, fileId: str = None, text: str = None
+    ):
+        await self.snips.update_one(
+            {"client": client, "chat": chat},
+            {"$push": {"snips": {"keyword": keyword, "fileId": fileId, "text": text}}},
+            upsert=True,
+        )
+
+    async def rm_snip(self, client: int, chat: int, keyword: str):
+        await self.snips.update_one(
+            {"client": client, "chat": chat},
+            {"$pull": {"snips": {"keyword": keyword}}},
+        )
+
+    async def rm_all_snips(self, client: int, chat: int):
+        await self.snips.delete_one({"client": client, "chat": chat})
+
+    async def is_snip(self, client: int, chat: int, keyword: str) -> bool:
+        data = await self.get_snip(client, chat, keyword)
+        return True if data else False
+
+    async def get_snip(self, client: int, chat: int, keyword: str):
+        data = await self.snips.find_one(
+            {
+                "client": client,
+                "chat": chat,
+                "snips": {"$elemMatch": {"keyword": keyword}},
+            }
+        )
+        return data
+
+    async def get_all_snips(self, client: int, chat: int) -> list:
+        data = await self.snips.find_one({"client": client, "chat": chat})
+
+        if not data:
+            return []
+
+        return data["snips"]
 
     async def add_pmpermit(self, client: int, user: int, reason: str):
         await self.pmpermit.update_one(

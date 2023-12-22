@@ -80,6 +80,7 @@ class ENV:
     pm_logger = "PM_LOGGER"
     pm_max_spam = "PM_MAX_SPAM"
     pmpermit_pic = "PMPERMIT_PIC"
+    remove_bg_api = "REMOVE_BG_API"
     statistics_template = "STATISTICS_TEMPLATE"
     time_zone = "TIME_ZONE"
     unload_plugins = "UNLOAD_PLUGINS"

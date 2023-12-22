@@ -188,7 +188,9 @@ async def make_logo(background: str, text: str, font_path: str) -> str:
     return output_img
 
 
-async def draw_meme(image_path: str, upper_text: str = "", lower_text: str = "") -> list[str]:
+async def draw_meme(
+    image_path: str, upper_text: str = "", lower_text: str = ""
+) -> list[str]:
     image = Image.open(image_path)
     width, height = image.size
 
@@ -228,3 +230,24 @@ async def draw_meme(image_path: str, upper_text: str = "", lower_text: str = "")
     image.close()
 
     return [f"{filename}.png", f"{filename}.webp"]
+
+
+async def remove_bg(api_key: str, image: str) -> str:
+    response = httpx.post(
+        "https://api.remove.bg/v1.0/removebg",
+        files={"image_file": open(image, "rb")},
+        data={"size": "auto"},
+        headers={"X-Api-Key": api_key},
+    )
+    filename = f"removedbg_{int(time.time())}.png"
+
+    if response.is_success:
+        with open(filename, "wb") as f:
+            f.write(response.content)
+    else:
+        raise Exception(
+            f"RemoveBGError: [{response.status_code}] {response.content.decode('utf-8')}"
+        )
+
+    return filename
+

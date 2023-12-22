@@ -6,6 +6,7 @@ from pyrogram.enums import MessageMediaType
 from pyrogram.types import Message
 
 from Hellbot.functions.convert import tgs_to_png, video_to_png
+from Hellbot.functions.formatter import readable_time
 from Hellbot.functions.images import draw_meme
 from Hellbot.functions.media import get_metedata
 from Hellbot.functions.paste import post_to_telegraph
@@ -50,7 +51,7 @@ async def mediaInfo(_, message: Message):
             progress=progress,
             progress_args=(hell, start_time, "⬇️ Downloading"),
         )
-    except Exception as e:
+    except Exception:
         return await hell.edit(
             f"**Failed to download media check the metadata instead!**\n\n{metadata}"
         )
@@ -121,6 +122,57 @@ async def memify(_, message: Message):
     os.remove(memes[1])
 
 
+@on_message("rename", allow_stan=True)
+async def renameMedia(_, message: Message):
+    if not message.reply_to_message or not message.reply_to_message.media:
+        return await hellbot.delete(message, "Reply to a media file to rename it!")
+
+    media = message.reply_to_message.media
+    if media not in [
+        MessageMediaType.AUDIO,
+        MessageMediaType.DOCUMENT,
+        MessageMediaType.PHOTO,
+        MessageMediaType.VIDEO,
+        MessageMediaType.VOICE,
+    ]:
+        return await hellbot.delete(message, "Unsupported media type!")
+
+    if len(message.command) < 2:
+        return await hellbot.delete(
+            message, "You need to provide a new filename with extention!"
+        )
+
+    new_name = await hellbot.input(message)
+    hell = await hellbot.edit(message, f"Renaming to `{new_name}` ...")
+
+    strart_time = time.time()
+    renamed_file = await message.reply_to_message.download(
+        Config.DWL_DIR + new_name,
+        progress=progress,
+        progress_args=(hell, strart_time, "⬇️ Downloading"),
+    )
+
+    dwl_time = readable_time(int(strart_time - time.time()))
+    await hell.edit(f"**Downloaded and Renamed in** `{dwl_time}`**,** __uploading...__")
+
+    start2 = time.time()
+    await message.reply_document(
+        renamed_file,
+        caption=f"**📁 File Name:** `{new_name}`",
+        file_name=new_name,
+        force_document=True,
+        progress=progress,
+        progress_args=(hell, start2, "⬆️ Uploading"),
+    )
+
+    end_time = readable_time(int(start2 - time.time()))
+    total_time = readable_time(int(strart_time - time.time()))
+    await hell.edit(
+        f"**📁 File Name:** `{new_name}`\n\n**⬇️ Downloaded in:** `{dwl_time}`\n**⬆️ Uploaded in:** `{end_time}`\n**💫 Total time taken:** `{total_time}`"
+    )
+    os.remove(renamed_file)
+
+
 HelpMenu("media").add(
     "mediainfo",
     "<reply to media message>",
@@ -132,6 +184,12 @@ HelpMenu("media").add(
     "Add text to a media file and make it a meme.",
     "memify Hello World",
     "When ';' is used, the text before it will be the upper text and the text after it will be the lower text.",
+).add(
+    "rename",
+    "<reply to media message> <new file name>",
+    "Rename a media file with the provided name.",
+    "rename HellBot.jpg",
+    "The file name must have an extention.",
 ).info(
-    "Mediainfo & Media Edits"
+    "Media utils"
 ).done()

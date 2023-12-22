@@ -10,7 +10,7 @@ from . import HelpMenu, custom_handler, db, handler, hellbot, on_message
 
 @on_message("filter", allow_stan=True)
 async def set_filter(client: Client, message: Message):
-    if len(message.command) < 2 or not message.reply_to_message:
+    if len(message.command) < 2 and not message.reply_to_message:
         return await hellbot.delete(
             message, f"Reply to a message with {handler}filter <keyword> to save it as a filter."
         )
@@ -54,15 +54,15 @@ async def set_filter(client: Client, message: Message):
     await db.set_filter(
         client.me.id, message.chat.id, keyword.lower(), file_id, caption
     )
-    await hell.edit(f"**  🍀𝖭𝖾𝗐 𝖥𝗂𝗅𝗍𝖾𝗋 𝖲𝖺𝗏𝖾𝖽:** `{keyword}`")
+    await hellbot.delete(hell, f"**🍀 𝖭𝖾𝗐 𝖥𝗂𝗅𝗍𝖾𝗋 𝖲𝖺𝗏𝖾𝖽:** `{keyword}`")
 
 
 @on_message(["rmfilter", "rmallfilter"], allow_stan=True)
 async def rmfilter(client: Client, message: Message):
-    if len(message.command) < 2:
-        return await hellbot.delete(message, "Give a filter name to remove.")
-
     if len(message.command[0]) < 9:
+        if len(message.command) < 2:
+            return await hellbot.delete(message, "Give a filter name to remove.")
+
         keyword = await hellbot.input(message)
         hell = await hellbot.edit(message, f"Removing filter `{keyword}`")
 

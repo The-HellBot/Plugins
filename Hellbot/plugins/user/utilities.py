@@ -1,9 +1,10 @@
 import os
 
-from pyrogram import Client
+import requests
 from pyrogram.types import Message
 
 from Hellbot.core import ENV
+from Hellbot.functions.images import remove_bg
 from Hellbot.functions.media import get_media_text_ocr
 from Hellbot.functions.paste import spaceBin
 
@@ -36,6 +37,51 @@ async def readImage(_, message: Message):
         await hellbot.error(hell, f"`{e}`")
 
     os.remove(filename)
+
+
+@on_message(["removebg", "rmbg"], allow_stan=True)
+async def removeBg(_, message: Message):
+    api_key = await db.get_env(ENV.remove_bg_api)
+    if not api_key:
+        return await hellbot.delete(
+            message, "To remove background you need to setup Remove BG Api key."
+        )
+
+    if message.reply_to_message:
+        if (
+            message.reply_to_message.document
+            and message.reply_to_message.document.mime_type.lower().startswith("image")
+        ):
+            filename = await message.reply_to_message.download(Config.TEMP_DIR)
+        elif message.reply_to_message.photo:
+            filename = await message.reply_to_message.download(Config.TEMP_DIR)
+        else:
+            return await hellbot.delete(
+                message, "Reply to an image or give the url to remove background."
+            )
+    elif len(message.command) >= 2:
+        resp = requests.get(await hellbot.input(message))
+        filename = f"{Config.TEMP_DIR}/{message.id}.png"
+
+        with open(filename, "wb") as f:
+            f.write(resp.content)
+    else:
+        return await hellbot.delete(
+            message, "Reply to an image or give the url to remove background."
+        )
+
+    hell = await hellbot.edit(message, "Removing background...")
+
+    try:
+        removed_img = await remove_bg(api_key, filename)
+        doc_file = await message.reply_document(
+            removed_img, caption="💫 **Removed Background!**", force_document=True,
+        )
+        await doc_file.reply_photo(removed_img, caption="🖼️ **Preview!**")
+        os.remove(filename)
+        os.remove(removed_img)
+    except Exception as e:
+        await hellbot.error(hell, f"`{e}`")
 
 
 @on_message("paste", allow_stan=True)
@@ -81,6 +127,12 @@ HelpMenu("utilities").add(
     "<reply to message> <language code (optional)>",
     "Read the texts on the image and send it as a message.",
     "read eng",
+).add(
+    "removebg",
+    "<reply to image> or <image url>",
+    "Remove the background of the image and send it as a document. You will need to setup Remove BG Api key.",
+    "removebg https://example.com/image.png",
+    "An alias of 'rmbg' is also available.",
 ).add(
     "paste",
     "<reply to message> or <text>",
