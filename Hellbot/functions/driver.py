@@ -1,9 +1,12 @@
 import datetime
+import json
 import random
 import time
+import urllib.parse
 from urllib.parse import quote_plus
 
 import httpx
+import requests
 from pytz import country_names, country_timezones, timezone
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -117,7 +120,9 @@ class ChromeDriver:
 class ClimateDriver:
     def __init__(self) -> None:
         self.weather_api = "https://api.openweathermap.org/data/2.5/weather?lat={0}&lon={1}&appid={2}&units=metric"
-        self.location_api = "https://api.openweathermap.org/geo/1.0/direct?q={0}&limit=1&appid={1}"
+        self.location_api = (
+            "https://api.openweathermap.org/geo/1.0/direct?q={0}&limit=1&appid={1}"
+        )
         self.pollution_api = "http://api.openweathermap.org/data/2.5/air_pollution?lat={0}&lon={1}&appid={2}"
         self.AQI_DICT = {
             1: "Good",
@@ -174,6 +179,121 @@ class ClimateDriver:
         ix = round(windDegree / (360.00 / len(dirs)))
         kmph = str(float(windSpeed) * 3.6) + " km/h"
         return f"[{dirs[ix % len(dirs)]}] {kmph}"
+
+
+class YoutubeDriver:
+    def __init__(self, search_terms: str, max_results: int = 5):
+        self.base_url = "https://youtube.com/results?search_query={0}"
+        self.search_terms = search_terms
+        self.max_results = max_results
+        self.videos = self._search()
+
+    def _search(self):
+        encoded_search = urllib.parse.quote_plus(self.search_terms)
+        response = requests.get(self.base_url.format(encoded_search)).text
+
+        while "ytInitialData" not in response:
+            response = requests.get(self.base_url.format(encoded_search)).text
+
+        results = self._parse_html(response)
+
+        if self.max_results is not None and len(results) > self.max_results:
+            return results[: self.max_results]
+
+        return results
+
+    def _parse_html(self, response: str):
+        results = []
+        start = response.index("ytInitialData") + len("ytInitialData") + 3
+        end = response.index("};", start) + 1
+        json_str = response[start:end]
+        data = json.loads(json_str)
+
+        videos = data["contents"]["twoColumnSearchResultsRenderer"]["primaryContents"][
+            "sectionListRenderer"
+        ]["contents"][0]["itemSectionRenderer"]["contents"]
+
+        for video in videos:
+            res = {}
+            if "videoRenderer" in video.keys():
+                video_data = video.get("videoRenderer", {})
+                _id = video_data.get("videoId", None)
+
+                res["id"] = _id
+                res["thumbnail"] = f"https://i.ytimg.com/vi/{_id}/hqdefault.jpg"
+                res["title"] = (
+                    video_data.get("title", {}).get("runs", [[{}]])[0].get("text", None)
+                )
+                res["channel"] = (
+                    video_data.get("longBylineText", {})
+                    .get("runs", [[{}]])[0]
+                    .get("text", None)
+                )
+                res["duration"] = video_data.get("lengthText", {}).get("simpleText", 0)
+                res["views"] = video_data.get("viewCountText", {}).get(
+                    "simpleText", "Unknown"
+                )
+                res["publish_time"] = video_data.get("publishedTimeText", {}).get(
+                    "simpleText", "Unknown"
+                )
+                res["url_suffix"] = (
+                    video_data.get("navigationEndpoint", {})
+                    .get("commandMetadata", {})
+                    .get("webCommandMetadata", {})
+                    .get("url", None)
+                )
+
+                results.append(res)
+        return results
+
+    def to_dict(self, clear_cache=True) -> list[dict]:
+        result = self.videos
+        if clear_cache:
+            self.videos = []
+        return result
+
+    @property
+    @staticmethod
+    def song_options():
+        return {
+            "format": "bestaudio",
+            "addmetadata": True,
+            "key": "FFmpegMetadata",
+            "prefer_ffmpeg": True,
+            "geo_bypass": True,
+            "nocheckcertificate": True,
+            "postprocessors": [
+                {
+                    "key": "FFmpegExtractAudio",
+                    "preferredcodec": "mp3",
+                    "preferredquality": "480",
+                }
+            ],
+            "outtmpl": "%(id)s.mp3",
+            "quiet": True,
+            "logtostderr": False,
+        }
+
+    @property
+    @staticmethod
+    def video_options():
+        return {
+            "format": "best",
+            "addmetadata": True,
+            "key": "FFmpegMetadata",
+            "prefer_ffmpeg": True,
+            "geo_bypass": True,
+            "nocheckcertificate": True,
+            "postprocessors": [
+                {
+                    "key": "FFmpegVideoConvertor",
+                    "preferedformat": "mp4",
+                }
+            ],
+            "outtmpl": "%(id)s.mp4",
+            "quiet": True,
+            "logtostderr": False,
+        }
 
 
 Driver = ChromeDriver()

@@ -10,6 +10,7 @@ heroku3
 html_telegraph_poster
 httpx
 lottie
+lyricsgenius
 motor
 pillow
 psutil
@@ -23,3 +24,4 @@ selenium
 speedtest-cli
 tgcrypto
 wikipedia
+yt-dlp @ git+https://github.com/HellBoy-OP/yt-dp-fork
