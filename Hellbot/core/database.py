@@ -62,26 +62,29 @@ class Database:
     async def get_all_env(self) -> list:
         return [i async for i in self.env.find({})]
 
-    async def is_stan(self, user_id: int) -> bool:
-        if await self.stan_users.find_one({"user_id": user_id}):
+    async def is_stan(self, client: int, user_id: int) -> bool:
+        if await self.stan_users.find_one({"client": client, "user_id": user_id}):
             return True
         return False
 
-    async def add_stan(self, user_id: int) -> bool:
-        if await self.is_stan(user_id):
+    async def add_stan(self, client: int, user_id: int) -> bool:
+        if await self.is_stan(client, user_id):
             return False
         await self.stan_users.insert_one(
-            {"user_id": user_id, "date": self.get_datetime()}
+            {"client": client, "user_id": user_id, "date": self.get_datetime()}
         )
         return True
 
-    async def rm_stan(self, user_id: int) -> bool:
-        if not await self.is_stan(user_id):
+    async def rm_stan(self, client: int, user_id: int) -> bool:
+        if not await self.is_stan(client, user_id):
             return False
-        await self.stan_users.delete_one({"user_id": user_id})
+        await self.stan_users.delete_one({"client": client, "user_id": user_id})
         return True
 
-    async def get_stans(self) -> list:
+    async def get_stans(self, client: int) -> list:
+        return [i async for i in self.stan_users.find({"client": client})]
+
+    async def get_all_stans(self) -> list:
         return [i async for i in self.stan_users.find({})]
 
     async def is_session(self, user_id: int) -> bool:

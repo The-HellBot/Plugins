@@ -1,7 +1,7 @@
 import datetime
 
 from pyrogram import Client, filters
-from pyrogram.types import Message
+from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 
 from Hellbot.core import ENV, LOGS
 
@@ -25,6 +25,28 @@ async def save_message(client: Client, message: Message):
             to_save,
         )
     await message.delete()
+
+
+@custom_handler(filters.incoming & filters.group & filters.mentioned)
+async def tag_logger(client: Client, message: Message):
+    tag_gc = await db.get_env(ENV.tag_logger)
+    if not tag_gc:
+        return
+
+    if message.from_user.is_bot:
+        return
+
+    if not message.mentioned:
+        return
+
+    msg = await message.forward(int(tag_gc), True)
+    await hellbot.bot.send_message(
+        int(tag_gc),
+        f"{message.from_user.mention} **tagged** {client.me.mention} **in** {message.chat.title} (`{message.chat.id}`)",
+        disable_web_page_preview=True,
+        reply_to_message_id=msg.id,
+        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Go to Tag 📨", url=message.link)]]),
+    )
 
 
 @custom_handler(filters.incoming & filters.private & ~filters.bot)

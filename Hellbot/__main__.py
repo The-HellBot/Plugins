@@ -1,7 +1,7 @@
 from pyrogram import idle
 
 from Hellbot.core import Users, db, hellbot
-from Hellbot.functions.utility import BList, Flood
+from Hellbot.functions.utility import BList, Flood, TGraph
 
 
 async def main():
@@ -10,6 +10,7 @@ async def main():
     await Users().setup()
     await Flood.updateFromDB()
     await BList.updateBlacklists()
+    await TGraph.setup()
     await idle()
 
 

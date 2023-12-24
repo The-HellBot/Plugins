@@ -1,3 +1,4 @@
+import calendar
 import os
 import random
 import textwrap
@@ -10,9 +11,12 @@ from .formatter import format_text, limit_per_page
 
 
 def convert_to_png(image: str) -> str:
-    img = Image.open(image)
     output_img = f"png_{round(time.time())}.png"
+
+    img = Image.open(image)
     img.save(output_img, "PNG")
+    img.close()
+
     os.remove(image)
     return output_img
 
@@ -81,6 +85,7 @@ def generate_alive_image(
 
     output_img = f"alive_{round(time.time())}.png"
     background.save(output_img, "PNG")
+    background.close()
 
     if del_img:
         os.remove(profile_pic)
@@ -184,6 +189,7 @@ async def make_logo(background: str, text: str, font_path: str) -> str:
 
     output_img = f"logo_{int(time.time())}.png"
     bg.save(output_img, "PNG")
+    bg.close()
 
     return output_img
 
@@ -251,3 +257,92 @@ async def remove_bg(api_key: str, image: str) -> str:
 
     return filename
 
+
+def create_gradient(
+    size: tuple[int, int],
+    color_start: tuple[int, int, int],
+    color_end: tuple[int, int, int],
+) -> Image.Image:
+    gradient = Image.new("RGB", (size))
+    draw = ImageDraw.Draw(gradient)
+
+    for x in range(size[0]):
+        r = int(color_start[0] + (color_end[0] - color_start[0]) * (x / size[0]))
+        g = int(color_start[1] + (color_end[1] - color_start[1]) * (x / size[0]))
+        b = int(color_start[2] + (color_end[2] - color_start[2]) * (x / size[0]))
+
+        draw.line([(x, 0), (x, size[1])], fill=(r, g, b))
+
+    return gradient
+
+
+async def create_calendar(year: int, month: int) -> str:
+    cal = calendar.monthcalendar(year, month)
+    month_name = calendar.month_name[month]
+
+    calendar_image = create_gradient((500, 500), (140, 200, 250), (0, 150, 200))
+    draw = ImageDraw.Draw(calendar_image)
+
+    month_font = ImageFont.truetype("./Hellbot/resources/fonts/Montserrat.ttf", 40)
+    month_x = (
+        calendar_image.width - draw.textlength(f"{month_name} {year}", month_font)
+    ) // 2
+    month_y = 30
+    draw.text(
+        (month_x, month_y),
+        f"{month_name} {year}",
+        (43, 255, 136),
+        month_font,
+        stroke_width=2,
+        stroke_fill=(255, 40, 40),
+    )
+
+    week_font = ImageFont.truetype("./Hellbot/resources/fonts/Montserrat.ttf", 23)
+    weekdays_text = "   ".join([day[:3] for day in calendar.day_name])
+    textsize = draw.textlength(weekdays_text, week_font)
+    draw.text(
+        ((calendar_image.width - textsize) // 2, month_y + 80),
+        weekdays_text,
+        (150, 190, 200),
+        week_font,
+        stroke_width=2,
+        stroke_fill=(200, 150, 250),
+    )
+
+    scale_factor = 1.5
+    cell_size = 30
+    padding = 15
+
+    font = ImageFont.truetype("./Hellbot/resources/fonts/Montserrat.ttf", 30)
+
+    for week_num, week in enumerate(cal):
+        for day_num, day in enumerate(week):
+            x = int(day_num * (cell_size + padding) * scale_factor)
+            y = int((week_num + 3) * (cell_size + padding) * scale_factor)
+
+            cell_width = int(cell_size * scale_factor)
+            cell_height = int(cell_size * scale_factor)
+
+            text_x = (
+                int(x + (cell_width - draw.textlength(str(day), font=font)) // 2)
+                + cell_size
+            )
+            text_y = (
+                int(y + (cell_height - draw.textlength(str(day), font=font)) // 2) - 55
+            )
+
+            if day != 0:
+                draw.text(
+                    (text_x, text_y),
+                    str(day),
+                    (240, 200, 100),
+                    font,
+                    stroke_width=1,
+                    stroke_fill=(0, 0, 0),
+                )
+
+    filename = f"calendar_{int(time.time())}.png"
+    calendar_image.save(filename, "PNG")
+    calendar_image.close()
+
+    return filename

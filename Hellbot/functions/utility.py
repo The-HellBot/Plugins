@@ -6,10 +6,25 @@ from pyrogram import Client
 from pyrogram.enums import ChatType
 from pyrogram.errors import FloodWait
 from pyrogram.types import Message
+from telegraph import Telegraph
 
-from Hellbot.core import db
+from Hellbot.core import ENV, db, LOGS
 
 from .formatter import readable_time
+
+
+class TelegraphAPI:
+    def __init__(self) -> None:
+        self.shortname: str = "TheHellbot"
+        self.telegraph: Telegraph = None
+
+    async def setup(self):
+        shortname = await db.get_env(ENV.telegraph_account) or self.shortname
+
+        self.telegraph = Telegraph()
+        self.telegraph.create_account(shortname)
+
+        LOGS.info(f"Telegraph Account created: '{shortname}'")
 
 
 class Gcast:
@@ -45,7 +60,9 @@ class Gcast:
             return None
 
         end = time.time()
-        outStr = self.complete_msg.format(link, count, mode, status, readable_time(int(end - start)))
+        outStr = self.complete_msg.format(
+            link, count, mode, status, readable_time(int(end - start))
+        )
 
         return fileName, outStr
 
@@ -220,3 +237,4 @@ class Blacklists:
 
 Flood = AntiFlood()
 BList = Blacklists()
+TGraph = TelegraphAPI()

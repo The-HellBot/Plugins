@@ -1,4 +1,5 @@
 import base64
+import datetime
 import math
 import os
 import time
@@ -6,7 +7,7 @@ import time
 from pyrogram.types import Message
 
 from Hellbot.core import Limits
-
+from Hellbot.functions.images import create_calendar
 from . import Config, HelpMenu, Symbols, hellbot, on_message
 
 math_cmds = ["sin", "cos", "tan", "square", "cube", "sqroot", "factorial", "power"]
@@ -148,6 +149,32 @@ async def pack(_, message: Message):
     os.remove(filename)
 
 
+@on_message("calendar", allow_stan=True)
+async def getcalendar(_, message: Message):
+    if len(message.command) < 2:
+        year = datetime.datetime.now().year
+        month = datetime.datetime.now().month
+    else:
+        query = await hellbot.input(message)
+        if "/" in query:
+            month, year = query.split("/")
+            month = int(month)
+            year = int(year)
+        else:
+            return await hellbot.delete(
+                message,
+                "Invalid query!\n\nExample: `calendar 1/2021`",
+            )
+
+    hell = await hellbot.edit(message, "Generating calendar...")
+    image = await create_calendar(year, month)
+
+    await hell.reply_photo(image, caption=f"**📅 Calendar for {month}/{year}**")
+    await hell.delete()
+
+    os.remove(image)
+
+
 HelpMenu("tools").add(
     "base64enc",
     "<reply> or <text>",
@@ -180,6 +207,12 @@ HelpMenu("tools").add(
     "<reply to a text> <filename (optional)>",
     "Pack the text into a file.",
     "pack script.js",
+).add(
+    "calendar",
+    "<month/year (optional)>",
+    "Generate a calendar image.",
+    "calendar 1/2024",
+    "If no query is given, current month's calendar will be generated.",
 ).info(
     "Basic Tools"
 ).done()
