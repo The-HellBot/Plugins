@@ -1,6 +1,7 @@
 bs4
 cinemagoer
 edge-tts
+emoji
 geopy
 git-python
 glitch_this
