@@ -77,7 +77,7 @@ async def telegraph_media(_, message: Message):
 
     try:
         media_url = TGraph.telegraph.upload_file(path)
-        url = f"https://te.legra.ph{media_url[0]}"
+        url = f"https://te.legra.ph{media_url[0]['src']}"
     except Exception as e:
         await hellbot.error(hell, str(e))
     else:

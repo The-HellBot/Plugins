@@ -133,7 +133,7 @@ async def packKang(client: Client, message: Message):
     for sticker in replied_set.documents:
         stickers.append(
             await create_sticker(
-                hellbot.bot, message.chat.id, sticker.document.id, "🍀", True
+                hellbot.bot, message.chat.id, sticker.id, "🍀", True
             )
         )
     try:

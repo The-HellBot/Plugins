@@ -7,7 +7,7 @@ from pyrogram.types import Message
 from Hellbot.functions.formatter import readable_time
 from Hellbot.functions.tools import get_files_from_directory, progress
 
-from . import HelpMenu, hellbot, on_message
+from . import HelpMenu, hellbot, on_message, Config
 
 
 @on_message("zip", allow_stan=True)
@@ -22,7 +22,7 @@ async def zip_files(_, message: Message):
     hell = await hellbot.edit(message, "`Zipping...`")
     start = time.time()
     download_path = await message.reply_to_message.download(
-        f"temp_{round(time.time())}",
+        f"{Config.TEMP_DIR}temp_{round(time.time())}",
         progress=progress,
         progress_args=(hell, start, "📦 Zipping"),
     )
@@ -54,7 +54,7 @@ async def unzip_file(_, message: Message):
     hell = await hellbot.edit(message, "`Unzipping...`")
     start = time.time()
     download_path = await message.reply_to_message.download(
-        f"temp_{round(time.time())}",
+        f"{Config.TEMP_DIR}temp_{round(time.time())}",
         progress=progress,
         progress_args=(hell, start, "📦 Unzipping"),
     )

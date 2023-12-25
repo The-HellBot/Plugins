@@ -1,12 +1,12 @@
-import asyncio
 import os
 import time
 
 from pyrogram.types import Message
 
 from Hellbot.functions.convert import convert_to_gif
+from Hellbot.functions.tools import runcmd
 
-from . import HelpMenu, hellbot, on_message
+from . import HelpMenu, hellbot, on_message, Config
 
 
 @on_message("stog", allow_stan=True)
@@ -27,7 +27,7 @@ async def sticker_to_gif(_, message: Message):
     else:
         return await hellbot.delete(hell, "Reply to an animated/video sticker.")
 
-    dwl_path = await message.reply_to_message.download()
+    dwl_path = await message.reply_to_message.download(Config.TEMP_DIR)
     gif_path = await convert_to_gif(dwl_path, is_video)
 
     await message.reply_animation(gif_path)
@@ -46,7 +46,7 @@ async def sticker_to_image(_, message: Message):
 
     hell = await hellbot.edit(message, "Converting ...")
     fileName = f"image_{round(time.time())}.png"
-    dwl_path = await message.reply_to_message.download(fileName)
+    dwl_path = await message.reply_to_message.download(f"{Config.TEMP_DIR}{fileName}")
 
     await message.reply_photo(dwl_path)
     await hellbot.delete(hell, "Converted to image successfully!")
@@ -63,7 +63,7 @@ async def image_to_sticker(_, message: Message):
 
     hell = await hellbot.edit(message, "Converting ...")
     fileName = f"sticker_{round(time.time())}.webp"
-    dwl_path = await message.reply_to_message.download(fileName)
+    dwl_path = await message.reply_to_message.download(f"{Config.TEMP_DIR}{fileName}")
 
     await message.reply_sticker(dwl_path)
     await hellbot.delete(hell, "Converted to sticker successfully!")
@@ -81,7 +81,7 @@ async def file_to_image(_, message: Message):
 
     hell = await hellbot.edit(message, "Converting ...")
     fileName = f"image_{round(time.time())}.png"
-    dwl_path = await message.reply_to_message.download(fileName)
+    dwl_path = await message.reply_to_message.download(f"{Config.TEMP_DIR}{fileName}")
 
     await message.reply_photo(dwl_path)
     await hellbot.delete(hell, "Converted to image successfully!")
@@ -96,7 +96,7 @@ async def image_to_file(_, message: Message):
 
     hell = await hellbot.edit(message, "Converting ...")
     fileName = f"file_{round(time.time())}.png"
-    dwl_path = await message.reply_to_message.download(fileName)
+    dwl_path = await message.reply_to_message.download(f"{Config.TEMP_DIR}{fileName}")
 
     await message.reply_document(dwl_path)
     await hellbot.delete(hell, "Converted to file successfully!")
@@ -110,7 +110,7 @@ async def media_to_voice(_, message: Message):
         return await hellbot.delete(message, "Reply to a media to convert it to voice.")
 
     hell = await hellbot.edit(message, "Converting ...")
-    dwl_path = await message.reply_to_message.download()
+    dwl_path = await message.reply_to_message.download(f"{Config.TEMP_DIR}")
     voice_path = f"{round(time.time())}.ogg"
 
     cmd_list = [
@@ -128,20 +128,14 @@ async def media_to_voice(_, message: Message):
         voice_path,
     ]
 
-    process = await asyncio.create_subprocess_exec(
-        *cmd_list,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-
-    _, stderr = await process.communicate()
+    _, err, _, _ = await runcmd(" ".join(cmd_list))
 
     if os.path.exists(voice_path):
         await message.reply_voice(voice_path)
         await hellbot.delete(hell, "Converted to voice successfully!")
         os.remove(voice_path)
     else:
-        await hellbot.error(hell, f"`{stderr.decode().strip()}`")
+        await hellbot.error(hell, f"`{err}`")
 
     os.remove(dwl_path)
 
@@ -152,7 +146,7 @@ async def media_to_mp3(_, message: Message):
         return await hellbot.delete(message, "Reply to a media to convert it to mp3.")
 
     hell = await hellbot.edit(message, "Converting ...")
-    dwl_path = await message.reply_to_message.download()
+    dwl_path = await message.reply_to_message.download(f"{Config.TEMP_DIR}")
     mp3_path = f"{round(time.time())}.mp3"
 
     cmd_list = [
@@ -163,20 +157,14 @@ async def media_to_mp3(_, message: Message):
         mp3_path,
     ]
 
-    process = await asyncio.create_subprocess_exec(
-        *cmd_list,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-
-    _, stderr = await process.communicate()
+    _, stderr, _, _ = await runcmd(" ".join(cmd_list))
 
     if os.path.exists(mp3_path):
         await message.reply_audio(mp3_path)
         await hellbot.delete(hell, "Converted to mp3 successfully!")
         os.remove(mp3_path)
     else:
-        await hellbot.error(hell, f"`{stderr.decode().strip()}`")
+        await hellbot.error(hell, f"`{stderr}`")
 
     os.remove(dwl_path)
 

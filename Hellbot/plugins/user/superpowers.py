@@ -500,12 +500,18 @@ async def gmutelist(_, message: Message):
 
 @custom_handler(filters.incoming)
 async def globalmutewatcher(_, message: Message):
+    if not message.from_user:
+        return
+
     if await db.is_gmuted(message.from_user.id):
         await message.delete()
 
 
 @custom_handler(filters.new_chat_members)
 async def globalbanwatcher(_, message: Message):
+    if not message.from_user:
+        return
+
     if await db.is_gbanned(message.from_user.id):
         gban_data = await db.get_gban_user(message.from_user.id)
         watchertext = f"**𝖦𝖻𝖺𝗇𝗇𝖾𝖽 𝖴𝗌𝖾𝗋 𝗃𝗈𝗂𝗇𝖾𝖽 𝗍𝗁𝖾 𝖼𝗁𝖺𝗍! \n\n{Symbols.bullet} 𝖦𝖻𝖺𝗇 𝖱𝖾𝖺𝗌𝗈𝗇 𝗐𝖺𝗌:** __{gban_data['reason']}__\n**{Symbols.bullet} 𝖦𝖻𝖺𝗇 𝖣𝖺𝗍𝖾:** __{gban_data['date']}__\n\n"

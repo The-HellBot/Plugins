@@ -48,19 +48,19 @@ async def afk(_, message: Message):
             media = message.reply_to_message.animation.file_id
         elif message.reply_to_message.media == MessageMediaType.AUDIO:
             media_type = "audio"
-            media = await message.reply_to_message.download()
+            media = message.reply_to_message.audio.file_id
         elif message.reply_to_message.media == MessageMediaType.PHOTO:
             media_type = "photo"
-            media = await message.reply_to_message.download()
+            media = message.reply_to_message.photo.file_id
         elif message.reply_to_message.media == MessageMediaType.STICKER:
             media_type = "sticker"
-            media = await message.reply_to_message.download("afk_sticker.png")
+            media = message.reply_to_message.sticker.file_id
         elif message.reply_to_message.media == MessageMediaType.VIDEO:
             media_type = "video"
-            media = await message.reply_to_message.download()
+            media = message.reply_to_message.video.file_id
         elif message.reply_to_message.media == MessageMediaType.VOICE:
             media_type = "voice"
-            media = await message.reply_to_message.download()
+            media = message.reply_to_message.voice.file_id
 
     reason = await hellbot.input(message)
     reason = reason if reason else "Not specified"
@@ -93,7 +93,8 @@ async def afk_watch(client: Client, message: Message):
     elif afk_data["media_type"] == "photo":
         sent = await message.reply_photo(afk_data["media"], caption=caption)
     elif afk_data["media_type"] == "sticker":
-        sent = await message.reply_photo(afk_data["media"], caption=caption)
+        sticker = await client.download_media(afk_data["media"], "afk.png")
+        sent = await message.reply_photo("afk.png", caption=caption)
     elif afk_data["media_type"] == "video":
         sent = await message.reply_video(afk_data["media"], caption=caption)
     elif afk_data["media_type"] == "voice":

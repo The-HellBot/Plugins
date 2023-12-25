@@ -90,9 +90,17 @@ async def revert(client: Client, message: Message):
 
 
 HelpMenu("clone").add(
-    "clone", "<reply to user's message>", "Clone the profile of replied user.", "clone", "You can revert back to last profile only. Clone with precaution."
+    "clone",
+    "<reply to user's message>",
+    "Clone the profile of replied user.",
+    "clone",
+    "You can revert back to last profile only. Clone with precaution.",
 ).add(
-    "revert", None, "Revert back to original profile.", "revert", "You can revert back to last profile only. Clone with precaution."
+    "revert",
+    None,
+    "Revert back to original profile.",
+    "revert",
+    "You can revert back to last profile only. Clone with precaution.",
 ).info(
     "Clone Menu"
 ).done()

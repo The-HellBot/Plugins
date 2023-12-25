@@ -5,7 +5,7 @@ from pyrogram.types import Message
 
 from Hellbot.functions.driver import Driver
 
-from . import hellbot, on_message, HelpMenu
+from . import HelpMenu, hellbot, on_message
 
 
 @on_message("carbon", allow_stan=True)
@@ -57,9 +57,17 @@ async def karbon(_, message: Message):
 
 
 HelpMenu("carbon").add(
-    "carbon", "<code snippet>", "Makes carbon of given code snippet.", "carbon print('Hello World!')", "The style is fixed and cannot be changed."
+    "carbon",
+    "<code snippet>",
+    "Makes carbon of given code snippet.",
+    "carbon print('Hello World!')",
+    "The style is fixed and cannot be changed.",
 ).add(
-    "karbon", "<code snippet>", "Makes carbon of given code snippet.", "karbon print('Hello World!')", "The style is randomly choosed."
+    "karbon",
+    "<code snippet>",
+    "Makes carbon of given code snippet.",
+    "karbon print('Hello World!')",
+    "The style is randomly choosed.",
 ).info(
     "Carbon is a code snippet sharing service. You can make carbon of your code and share it with others."
 ).done()

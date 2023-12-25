@@ -41,10 +41,10 @@ async def getvar(_, message: Message):
 
 @on_message("getallvar", allow_stan=True)
 async def getallvar(_, message: Message):
-    envVars = os_configs.extend(all_env)
+    os_configs.extend(all_env)
 
     text = "**📃 𝖫𝗂𝗌𝗍 𝗈𝖿 𝖺𝗅𝗅 𝗏𝖺𝗋𝗂𝖺𝖻𝗅𝖾 𝖺𝗋𝖾:**\n\n"
-    for env in envVars:
+    for env in os_configs:
         text += f"   {Symbols.anchor} `{env}`\n"
 
     await hellbot.edit(message, text)

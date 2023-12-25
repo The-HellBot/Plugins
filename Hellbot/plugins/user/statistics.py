@@ -65,8 +65,8 @@ async def mystats(client: Client, message: Message):
     start = time.time()
     dialog: Dialog
     async for dialog in client.get_dialogs():
-        meInChat = await dialog.chat.get_member(client.me.id)
         if dialog.chat.type == ChatType.CHANNEL:
+            meInChat = await dialog.chat.get_member(client.me.id)
             channels += 1
             if meInChat.status == ChatMemberStatus.OWNER:
                 ch_owner += 1
@@ -74,6 +74,7 @@ async def mystats(client: Client, message: Message):
                 ch_admin += 1
 
         elif dialog.chat.type == ChatType.GROUP:
+            meInChat = await dialog.chat.get_member(client.me.id)
             groups += 1
             if meInChat.status == ChatMemberStatus.OWNER:
                 gc_owner += 1
@@ -81,6 +82,7 @@ async def mystats(client: Client, message: Message):
                 gc_admin += 1
 
         elif dialog.chat.type == ChatType.SUPERGROUP:
+            meInChat = await dialog.chat.get_member(client.me.id)
             groups += 1
             if meInChat.status == ChatMemberStatus.OWNER:
                 gc_owner += 1

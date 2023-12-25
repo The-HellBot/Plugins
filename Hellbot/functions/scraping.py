@@ -248,7 +248,7 @@ async def get_filler_info(search_term: str) -> str:
                 f"<h3>{Symbols.bullet} {data[0]}:</h3> \n<code>{data[1]}</code>\n\n"
             )
 
-        paste = await post_to_telegraph(anime[0] + " Filler Guide", html_message)
+        paste = post_to_telegraph(anime[0] + " Filler Guide", html_message)
         message += f"{Symbols.anchor} [{anime[0]}]({paste})\n"
 
     return message
@@ -325,18 +325,18 @@ async def get_anime_info(search_term: str) -> tuple[str, str]:
         f.write(response)
 
     message = await anime_template(
-        name,
-        score,
-        source,
-        mtype,
-        episodes,
-        duration,
-        status,
-        format,
-        genre,
-        studio,
-        trailer,
-        siteurl,
+        name=name,
+        score=score,
+        source=source,
+        mtype=mtype,
+        episodes=episodes,
+        duration=duration,
+        status=status,
+        format=format,
+        genre=genre,
+        studio=studio,
+        trailer=trailer,
+        siteurl=siteurl,
     )
 
     return message, banner
@@ -373,7 +373,16 @@ async def get_manga_info(search_term: str) -> tuple[str, str]:
         f.write(response)
 
     message = await manga_templates(
-        name, score, source, mtype, chapters, volumes, status, format, genre, siteurl
+        name=name,
+        score=score,
+        source=source,
+        mtype=mtype,
+        chapters=chapters,
+        volumes=volumes,
+        status=status,
+        format=format,
+        genre=genre,
+        siteurl=siteurl
     )
 
     return message, banner
@@ -408,15 +417,15 @@ async def get_character_info(search_term: str) -> tuple[str, str]:
         f.write(response)
 
     message = await character_templates(
-        name,
-        gender,
-        date_of_birth,
-        age,
-        blood_type,
-        favorites,
-        siteurl,
-        role_in,
-        description,
+        name=name,
+        gender=gender,
+        date_of_birth=date_of_birth,
+        age=age,
+        blood_type=blood_type,
+        favorites=favorites,
+        siteurl=siteurl,
+        role_in=role_in,
+        description=description,
     )
 
     return message, banner
@@ -454,7 +463,12 @@ async def get_airing_info(search_term: str) -> tuple[str, str]:
     if next_date:
         airing_info = f"\n**🗓️ {time.ctime(next_date)}**"
 
-    message = await airing_templates(name, status, episode, airing_info)
+    message = await airing_templates(
+        name=name,
+        status=status,
+        episode=episode,
+        airing_info=airing_info,
+    )
 
     return message, banner
 

@@ -2,8 +2,8 @@ from pyrogram.types import Message
 
 from Hellbot.core import ENV
 from Hellbot.functions.driver import Climate
-from Hellbot.functions.templates import climate_templates, airpollution_templates
 from Hellbot.functions.formatter import subscript, superscript
+from Hellbot.functions.templates import airpollution_templates, climate_templates
 
 from . import HelpMenu, db, hellbot, on_message
 
@@ -124,9 +124,17 @@ async def airpollution(_, message: Message):
 
 
 HelpMenu("climate").add(
-    "climate", "<city name>", "Get climate data of a city.", "climate Delhi", "City name is optional. Bydefault Delhi's climate data will be fetched."
+    "climate",
+    "<city name>",
+    "Get climate data of a city.",
+    "climate Delhi",
+    "City name is optional. Bydefault Delhi's climate data will be fetched.",
 ).add(
-    "airpollution", "<city name>", "Get air pollution data of a city.", "airpollution Delhi", "City name is optional. Bydefault Delhi's air pollution data will be fetched."
+    "airpollution",
+    "<city name>",
+    "Get air pollution data of a city.",
+    "airpollution Delhi",
+    "City name is optional. Bydefault Delhi's air pollution data will be fetched.",
 ).info(
     "Get the API Key from [here](https://openweathermap.org/price)"
 ).done()

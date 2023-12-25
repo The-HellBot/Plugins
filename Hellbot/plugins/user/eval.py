@@ -117,7 +117,7 @@ async def runterm(client: Client, message: Message):
     else:
         try:
             await reply_to.reply_text(
-                f"**{client.me.id}@hellbot:~$** `{cmd}`\n\n**𝖮𝗎𝗍𝗉𝗎𝗍:**\n```{output}```"
+                f"**{client.me.id}@hellbot:~$** `{cmd}`\n\n**𝖮𝗎𝗍𝗉𝗎𝗍:**\n```\n{output}```"
             )
         except MessageTooLong:
             with io.BytesIO(str.encode(output)) as out_file:
@@ -131,7 +131,7 @@ async def runterm(client: Client, message: Message):
 
 
 @on_message(["sh", "shell"], allow_stan=True)
-async def runshell(client: Client, message: Message):
+async def runshell(_, message: Message):
     if len(message.command) < 2:
         return await hellbot.delete(message, "No shell code provided!")
 
