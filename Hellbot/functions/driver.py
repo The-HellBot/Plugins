@@ -1,6 +1,7 @@
 import datetime
 import json
 import random
+import re
 import time
 import urllib.parse
 from urllib.parse import quote_plus
@@ -252,6 +253,25 @@ class YoutubeDriver:
             self.videos = []
         return result
 
+    @staticmethod
+    def check_url(url: str) -> tuple[bool, str]:
+        if "&" in url:
+            url = url[: url.index("&")]
+
+        if "?si=" in url:
+            url = url[: url.index("?si=")]
+
+        youtube_regex = (
+            r"(https?://)?(www\.)?"
+            "(youtube|youtu|youtube-nocookie)\.(com|be)/"
+            '(video|embed|shorts/|watch\?v=|v/|e/|u/\\w+/|\\w+/)?([^"&?\\s]{11})'
+        )
+        match = re.match(youtube_regex, url)
+        if match:
+            return True, match.group(6)
+        else:
+            return False, "Invalid YouTube URL!"
+
     @property
     @staticmethod
     def song_options():
@@ -269,7 +289,7 @@ class YoutubeDriver:
                     "preferredquality": "480",
                 }
             ],
-            "outtmpl": "%(id)s.mp3",
+            "outtmpl": "%(id)s",
             "quiet": True,
             "logtostderr": False,
         }
@@ -290,7 +310,7 @@ class YoutubeDriver:
                     "preferedformat": "mp4",
                 }
             ],
-            "outtmpl": "%(id)s.mp4",
+            "outtmpl": "%(id)s",
             "quiet": True,
             "logtostderr": False,
         }

@@ -87,3 +87,8 @@ def get_from_dict(data: dict, key: list):
 
 def limit_per_page(limit: int) -> int:
     return math.ceil(limit / 10)
+
+
+def secs_to_mins(secs: int) -> str:
+    mins, secs = divmod(secs, 60)
+    return f"{mins}:{secs}"
