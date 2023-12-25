@@ -22,6 +22,7 @@ class Database:
         self.filter = self.db["filter"]
         self.gban = self.db["gban"]
         self.gmute = self.db["gmute"]
+        self.greetings = self.db["greetings"]
         self.pmpermit = self.db["pmpermit"]
         self.session = self.db["session"]
         self.snips = self.db["snips"]
@@ -438,6 +439,53 @@ class Database:
 
     async def get_all_pmpermits(self, client: int) -> list:
         return [i async for i in self.pmpermit.find({"client": client})]
+
+    async def set_welcome(self, client: int, chat: int, message: int):
+        await self.greetings.update_one(
+            {"client": client, "chat": chat, "welcome": True},
+            {"$set": {"message": message}},
+            upsert=True,
+        )
+
+    async def rm_welcome(self, client: int, chat: int):
+        await self.greetings.delete_one(
+            {"client": client, "chat": chat, "welcome": True}
+        )
+
+    async def is_welcome(self, client: int, chat: int) -> bool:
+        data = await self.get_welcome(client, chat)
+        return True if data else False
+
+    async def get_welcome(self, client: int, chat: int):
+        data = await self.greetings.find_one(
+            {"client": client, "chat": chat, "welcome": True}
+        )
+        return data
+
+    async def set_goodbye(self, client: int, chat: int, message: int):
+        await self.greetings.update_one(
+            {"client": client, "chat": chat, "welcome": False},
+            {"$set": {"message": message}},
+            upsert=True,
+        )
+
+    async def rm_goodbye(self, client: int, chat: int):
+        await self.greetings.delete_one(
+            {"client": client, "chat": chat, "welcome": False}
+        )
+
+    async def is_goodbye(self, client: int, chat: int) -> bool:
+        data = await self.get_goodbye(client, chat)
+        return True if data else False
+
+    async def get_goodbye(self, client: int, chat: int):
+        data = await self.greetings.find_one(
+            {"client": client, "chat": chat, "welcome": False}
+        )
+        return data
+
+    async def get_all_greetings(self, client: int) -> list:
+        return [i async for i in self.greetings.find({"client": client})]
 
 
 db = Database(Config.DATABASE_URL)
