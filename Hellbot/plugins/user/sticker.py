@@ -2,10 +2,10 @@ import os
 
 from pyrogram import Client
 from pyrogram.errors import PeerIdInvalid, UserIsBlocked
+from pyrogram.raw.types import InputDocument, InputStickerSetItem
 from pyrogram.types import Message
 
 from Hellbot.core import ENV
-from pyrogram.raw.types import InputDocument, InputStickerSetItem
 from Hellbot.functions.convert import image_to_sticker, video_to_sticker
 from Hellbot.functions.sticker import (
     add_sticker,
@@ -45,10 +45,18 @@ async def kangSticker(client: Client, message: Message):
     )
 
     if message.reply_to_message.sticker:
-        is_sticker = True
-        path = message.reply_to_message.sticker.file_id
+        repliedsticker = await get_sticker_set(
+            hellbot.bot, message.reply_to_message.sticker.set_name
+        )
+        sticker = InputStickerSetItem(
+            document=InputDocument(
+                id=repliedsticker.documents[0].id,
+                access_hash=repliedsticker.documents[0].access_hash,
+                file_reference=repliedsticker.documents[0].file_reference,
+            ),
+            emoji=pack_emoji,
+        )
     else:
-        is_sticker = False
         if is_video:
             await hell.edit("Converting to video sticker...")
             path, status = await video_to_sticker(message.reply_to_message)
@@ -64,10 +72,7 @@ async def kangSticker(client: Client, message: Message):
             if not status:
                 return await hellbot.error(hell, path)
 
-    sticker = await create_sticker(
-        hellbot.bot, message.chat.id, path, pack_emoji, is_sticker
-    )
-    if not is_sticker:
+        sticker = await create_sticker(hellbot.bot, message.chat.id, path, pack_emoji)
         os.remove(path)
 
     try:
@@ -221,7 +226,9 @@ async def removeSticker(_, message: Message):
 
     try:
         await remove_sticker(hellbot.bot, sticker.file_id)
-        await hellbot.delete(hell, f"**𝖣𝖾𝗅𝖾𝗍𝖾𝖽 𝗍𝗁𝖾 𝗌𝗍𝗂𝖼𝗄𝖾𝗋 𝖿𝗋𝗈𝗆 𝗉𝖺𝖼𝗄:** {sticker_set.set.title}")
+        await hellbot.delete(
+            hell, f"**𝖣𝖾𝗅𝖾𝗍𝖾𝖽 𝗍𝗁𝖾 𝗌𝗍𝗂𝖼𝗄𝖾𝗋 𝖿𝗋𝗈𝗆 𝗉𝖺𝖼𝗄:**
+         {sticker_set.set.title}")
     except Exception as e:
         await hellbot.error(hell, str(e))
 
@@ -230,8 +237,8 @@ HelpMenu("sticker").add(
     "kang", #Bugged: to-be-fixed - video/animated sticker
     "<reply> <packid (optional)> <emoji (optional)>",
     "Add the replied image/gif/video/sticker into your own sticker pack.",
-    "kang 2 👀"
-   , "If no emoji is given by default 🍀 will be used,."
+    "kang 2 👀",
+    "If no emoji is given by default 🍀 will be used,.,"
 ).add(
     "packkang",
     "<reply> <packname>",

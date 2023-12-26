@@ -84,7 +84,7 @@ async def video_to_sticker(file: Message) -> tuple[str, bool]:
             scale_params = f"scale=-1:512"
 
         cmd = (
-            f"ffmpeg -i {file.file_path} "
+            f"ffmpeg -i {file_path} "
             f"-vf fps=30,{scale_params} -t 3 -c:v libvpx-vp9 -b:v 256k -an -pix_fmt yuv420p -auto-alt-ref 0 -loop 0 "
             f"-f webm {output_path}"
         )

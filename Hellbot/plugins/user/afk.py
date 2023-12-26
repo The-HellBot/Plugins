@@ -95,6 +95,7 @@ async def afk_watch(client: Client, message: Message):
     elif afk_data["media_type"] == "sticker":
         await client.download_media(afk_data["media"], "afk.png")
         sent = await message.reply_photo("afk.png", caption=caption)
+        os.remove("afk.png")
     elif afk_data["media_type"] == "video":
         sent = await message.reply_video(afk_data["media"], caption=caption)
     elif afk_data["media_type"] == "voice":

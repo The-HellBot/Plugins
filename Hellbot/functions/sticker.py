@@ -75,12 +75,8 @@ async def create_sticker(
     chat_id: int,
     file: str,
     emoji: str,
-    is_sticker: bool,
-) -> base.InputStickerSetItem:
-    if is_sticker:
-        sticker = await get_media_from_id(file)
-    else:
-        sticker = await upload_media(client, chat_id, file)
+) -> types.InputStickerSetItem:
+    sticker = await upload_media(client, chat_id, file)
 
     return types.InputStickerSetItem(
         document=sticker,

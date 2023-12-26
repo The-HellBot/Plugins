@@ -340,11 +340,11 @@ class Database:
         return data["echo"]
 
     async def set_filter(
-        self, client: int, chat: int, keyword: str, fileId: str = None, text: str = None
+        self, client: int, chat: int, keyword: str, msgid: int
     ):
         await self.filter.update_one(
             {"client": client, "chat": chat},
-            {"$push": {"filter": {"keyword": keyword, "fileId": fileId, "text": text}}},
+            {"$push": {"filter": {"keyword": keyword, "msgid": msgid}}},
             upsert=True,
         )
 
@@ -380,11 +380,11 @@ class Database:
         return data["filter"]
 
     async def set_snip(
-        self, client: int, chat: int, keyword: str, fileId: str = None, text: str = None
+        self, client: int, chat: int, keyword: str, msgid: int
     ):
         await self.snips.update_one(
             {"client": client, "chat": chat},
-            {"$push": {"snips": {"keyword": keyword, "fileId": fileId, "text": text}}},
+            {"$push": {"snips": {"keyword": keyword, "msgid": msgid}}},
             upsert=True,
         )
 
