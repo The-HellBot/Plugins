@@ -11,6 +11,7 @@ async def main():
     await Flood.updateFromDB()
     await BList.updateBlacklists()
     await TGraph.setup()
+    await hellbot.start_message()
     await idle()
 
 
