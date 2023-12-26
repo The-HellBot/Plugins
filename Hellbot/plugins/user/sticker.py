@@ -227,8 +227,8 @@ async def removeSticker(_, message: Message):
     try:
         await remove_sticker(hellbot.bot, sticker.file_id)
         await hellbot.delete(
-            hell, f"**𝖣𝖾𝗅𝖾𝗍𝖾𝖽 𝗍𝗁𝖾 𝗌𝗍𝗂𝖼𝗄𝖾𝗋 𝖿𝗋𝗈𝗆 𝗉𝖺𝖼𝗄:**
-         {sticker_set.set.title}")
+            hell, f"**𝖣𝖾𝗅𝖾𝗍𝖾𝖽 𝗍𝗁𝖾 𝗌𝗍𝗂𝖼𝗄𝖾𝗋 𝖿𝗋𝗈𝗆 𝗉𝖺𝖼𝗄:** {sticker_set.set.title}",
+        )
     except Exception as e:
         await hellbot.error(hell, str(e))
 
