@@ -87,7 +87,7 @@ async def afk_watch(client: Client, message: Message):
     caption = f"**{random.choice(afk_quotes)}**\n\n**💫 𝖱𝖾𝖺𝗌𝗈𝗇:** {afk_data['reason']}\n**⏰ 𝖠𝖥𝖪 𝖥𝗋𝗈𝗆:** `{afk_time}`"
 
     if afk_data["media_type"] == "animation":
-        sent = await message.reply_animation(afk_data["media"], caption=caption)
+        sent = await client.send_animation(message.chat.id, afk_data["media"], caption, True)
     elif afk_data["media_type"] == "audio":
         sent = await message.reply_audio(afk_data["media"], caption=caption)
     elif afk_data["media_type"] == "photo":
