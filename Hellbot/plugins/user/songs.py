@@ -54,6 +54,7 @@ async def dwlSong(_, message: Message):
                 upload_text,
             ),
         )
+        await hell.delete()
     except Exception as e:
         return await hellbot.delete(hell, f"**🍀 𝖲𝗈𝗇𝗀 𝖭𝗈𝗍 𝖣𝗈𝗐𝗇𝗅𝗈𝖺𝖽𝖾𝖽:** `{e}`")
 
@@ -99,6 +100,7 @@ async def dwlSong(_, message: Message):
                 upload_text,
             ),
         )
+        await hell.delete()
     except Exception as e:
         return await hellbot.delete(hell, f"**🍀 𝖵𝗂𝖽𝖾𝗈 𝖲𝗈𝗇𝗀 𝖭𝗈𝗍 𝖣𝗈𝗐𝗇𝗅𝗈𝖺𝖽𝖾𝖽:** `{e}`")
 

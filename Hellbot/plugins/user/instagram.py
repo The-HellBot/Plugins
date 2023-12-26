@@ -90,13 +90,13 @@ async def instagramPost(_, message: Message):
         element = wait.until(presence_of_element_located((By.TAG_NAME, "video")))
         reels.append(element.get_attribute("src"))
 
-        for _ in range(10):
-            try:
-                driver.find_element(By.XPATH, "//button[@aria-label='Next']").click()
-                element = wait.until(presence_of_element_located((By.TAG_NAME, "video")))
-                reels.append(element.get_attribute("src"))
-            except:
-                break
+        try:
+            driver.find_element(By.XPATH, "//button[@aria-label='Next']").click()
+            element = wait.until(presence_of_element_located((By.TAG_NAME, "video")))
+            reels.append(element.get_attribute("src"))
+        except Exception as e:
+            driver.quit()
+            return await hellbot.error(hell, f"`{e}`")
 
         driver.quit()
 
@@ -172,7 +172,7 @@ HelpMenu("instagram").add(
     "Download instagram reels.",
     "reels https://www.instagram.com/reel/Cr24EiKNTL7/",
 ).add(
-    "igpost",
+    "igpost", #Bugged: to-be-fixed : only downloads a single post
     "<instagram post link>",
     "Download instagram post.",
     "igpost https://www.instagram.com/p/C06rAjDJlJs/",

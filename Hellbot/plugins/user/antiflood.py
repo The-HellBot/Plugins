@@ -73,6 +73,7 @@ async def setflood(client: Client, message: Message):
     & ~filters.bot
     & ~Config.AUTH_USERS
     & ~filters.me
+    & ~filters.service
 )
 async def antiflood(client: Client, message: Message):
     mode, mtime, limit = Flood.getSettings(client.me.id, message.chat.id)

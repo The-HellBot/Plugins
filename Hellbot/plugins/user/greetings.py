@@ -109,6 +109,9 @@ async def delgoodbye(client: Client, message: Message):
 
 @custom_handler(filters.new_chat_members & filters.group)
 async def welcomehandler(client: Client, message: Message):
+    if not message.from_user:
+        return
+
     welcome = await db.get_welcome(client.me.id, message.chat.id)
     if not welcome:
         return
@@ -160,6 +163,9 @@ async def welcomehandler(client: Client, message: Message):
 
 @custom_handler(filters.left_chat_member & filters.group)
 async def goodbyehandler(client: Client, message: Message):
+    if not message.from_user:
+        return
+
     goodbye = await db.get_goodbye(client.me.id, message.chat.id)
     if not goodbye:
         return

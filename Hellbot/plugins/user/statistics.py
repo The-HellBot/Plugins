@@ -166,16 +166,17 @@ async def userInfo(client: Client, message: Message):
         commonGroups=common_chats,
     )
 
-    async for photo in client.get_chat_photos(user.id, 1):
-        await hell.delete()
-        await client.send_photo(
-            message.chat.id,
-            photo.file_id,
-            caption=user_info,
-            reply_to_message_id=message.id,
-            disable_notification=True,
-        )
-        return
+    if user.photo:
+        async for photo in client.get_chat_photos(user.id, 1):
+            await hell.delete()
+            await client.send_photo(
+                message.chat.id,
+                photo.file_id,
+                caption=user_info,
+                reply_to_message_id=message.id,
+                disable_notification=True,
+            )
+            return
     else:
         await hell.edit(user_info, disable_web_page_preview=True)
 

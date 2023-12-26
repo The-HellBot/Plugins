@@ -214,11 +214,11 @@ async def removeSticker(_, message: Message):
 
     hell = await hellbot.edit(message, "__Removing sticker from pack...__")
 
+    sticker = message.reply_to_message.sticker
     sticker_set = await get_sticker_set(hellbot.bot, sticker.set_name)
     if not sticker_set:
         return await hellbot.delete(hell, "This sticker is not part of a pack.")
 
-    sticker = message.reply_to_message.sticker
     try:
         await remove_sticker(hellbot.bot, sticker.file_id)
         await hellbot.delete(hell, f"**𝖣𝖾𝗅𝖾𝗍𝖾𝖽 𝗍𝗁𝖾 𝗌𝗍𝗂𝖼𝗄𝖾𝗋 𝖿𝗋𝗈𝗆 𝗉𝖺𝖼𝗄:** {sticker_set.set.title}")

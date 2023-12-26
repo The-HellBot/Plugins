@@ -45,7 +45,7 @@ async def makeLogo(_, message: Message):
         with open(Config.TEMP_DIR + "temp_bg.jpg", "wb") as f:
             f.write(binary)
 
-    logo_path = await make_logo(Config.TEMP_DIR + "temp_bg.jpg", text, Config.FONT_PATH)
+    logo_path = await make_logo(Config.TEMP_DIR + "temp_bg.jpg", text.strip(), Config.FONT_PATH)
     time_taken = readable_time(int(time.time() - start_time))
 
     await message.reply_photo(

@@ -27,7 +27,7 @@ async def save_message(client: Client, message: Message):
     await message.delete()
 
 
-@custom_handler(filters.incoming & filters.group & filters.mentioned)
+@custom_handler(filters.incoming & filters.group & filters.mentioned & ~filters.service)
 async def tag_logger(client: Client, message: Message):
     tag_gc = await db.get_env(ENV.tag_logger)
     if not tag_gc:
@@ -49,7 +49,7 @@ async def tag_logger(client: Client, message: Message):
     )
 
 
-@custom_handler(filters.incoming & filters.private & ~filters.bot)
+@custom_handler(filters.incoming & filters.private & ~filters.bot & ~filters.service)
 async def pm_logger(client: Client, message: Message):
     if message.from_user.id == 777000:
         return

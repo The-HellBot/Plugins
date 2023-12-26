@@ -106,7 +106,7 @@ async def autoposts(client: Client, message: Message):
     await hellbot.edit(hell, text)
 
 
-@custom_handler(filters.incoming & filters.group & filters.channel)
+@custom_handler(filters.incoming & filters.group & filters.channel & ~filters.service)
 async def handle_autopost(client: Client, message: Message):
     if not await db.is_autopost(client.me.id, message.chat.id):
         return

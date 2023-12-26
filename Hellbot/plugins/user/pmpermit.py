@@ -162,7 +162,7 @@ async def allowlist(client: Client, message: Message):
     await hell.edit(text)
 
 
-@custom_handler(filters.incoming & filters.private & ~filters.bot)
+@custom_handler(filters.incoming & filters.private & ~filters.bot & ~filters.service)
 async def handle_incoming_pm(client: Client, message: Message):
     if message.from_user.id in Config.DEVS:
         return

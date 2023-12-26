@@ -75,7 +75,7 @@ async def afk(_, message: Message):
     add_to_dict(Config.AFK_CACHE, [message.from_user.id, message.chat.id])
 
 
-@custom_handler(filters.incoming & filters.mentioned & ~filters.bot & ~filters.me)
+@custom_handler(filters.incoming & filters.mentioned & ~filters.bot & ~filters.me & ~filters.service)
 async def afk_watch(client: Client, message: Message):
     afk_data = await db.get_afk(client.me.id)
     if not afk_data:
@@ -93,7 +93,7 @@ async def afk_watch(client: Client, message: Message):
     elif afk_data["media_type"] == "photo":
         sent = await message.reply_photo(afk_data["media"], caption=caption)
     elif afk_data["media_type"] == "sticker":
-        sticker = await client.download_media(afk_data["media"], "afk.png")
+        await client.download_media(afk_data["media"], "afk.png")
         sent = await message.reply_photo("afk.png", caption=caption)
     elif afk_data["media_type"] == "video":
         sent = await message.reply_video(afk_data["media"], caption=caption)

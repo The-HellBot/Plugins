@@ -1,3 +1,4 @@
+import os
 import time
 from platform import python_version
 
@@ -51,3 +52,9 @@ if Config.LOGGER_ID == 0:
 if Config.OWNER_ID == 0:
     LOGS.error("Please set your OWNER_ID !")
     quit(1)
+
+if not os.path.isdir(Config.DWL_DIR):
+    os.makedirs(Config.DWL_DIR)
+
+if not os.path.isdir(Config.TEMP_DIR):
+    os.makedirs(Config.TEMP_DIR)

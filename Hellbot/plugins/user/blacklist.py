@@ -51,7 +51,7 @@ async def blacklists(client: Client, message: Message):
     await hellbot.edit(message, text)
 
 
-@custom_handler(filters.text & filters.incoming & ~Config.AUTH_USERS)
+@custom_handler(filters.text & filters.incoming & ~Config.AUTH_USERS & ~filters.service)
 async def handle_blacklists(client: Client, message: Message):
     if not BList.check_client_chat(client.me.id, message.chat.id):
         return

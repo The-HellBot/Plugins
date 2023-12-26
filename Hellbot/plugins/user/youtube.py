@@ -53,6 +53,7 @@ async def youtube_audio(_, message: Message):
                 upload_text,
             ),
         )
+        await hell.delete()
     except Exception as e:
         return await hellbot.delete(hell, f"**🍀 Audio not Downloaded:** `{e}`")
 
@@ -101,6 +102,7 @@ async def ytvideo(_, message: Message):
                 upload_text,
             ),
         )
+        await hell.delete()
     except Exception as e:
         return await hellbot.delete(hell, f"**🍀 Video not Downloaded:** `{e}`")
 

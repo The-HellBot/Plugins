@@ -118,7 +118,7 @@ async def allfilters(client: Client, message: Message):
             await hellbot.delete(hell, "No filters in this chat.")
 
 
-@custom_handler(filters.incoming)
+@custom_handler(filters.incoming & ~filters.service)
 async def handle_filters(client: Client, message: Message):
     data = await db.get_all_filters(client.me.id, message.chat.id)
     if not data:

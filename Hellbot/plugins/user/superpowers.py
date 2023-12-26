@@ -515,7 +515,7 @@ async def gmutelist(_, message: Message):
     await hell.edit(text)
 
 
-@custom_handler(filters.incoming)
+@custom_handler(filters.incoming & ~filters.service)
 async def globalmutewatcher(_, message: Message):
     if not message.from_user:
         return

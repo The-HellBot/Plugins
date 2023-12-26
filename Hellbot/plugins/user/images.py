@@ -216,7 +216,7 @@ HelpMenu("images").add(
     "image hellbot ; 5",
     "An alias of 'img' can also be used.",
 ).add(
-    "wallpaper",
+    "wallpaper", #Bugged: to-be-fixed
     "<query> ; <limit>",
     "Search for x wallpapers on unsplash and upload them to current chat. If no query is given, random wallpapers will be uploaded.",
     "wallpaper supra ; 5",

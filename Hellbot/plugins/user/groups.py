@@ -238,11 +238,16 @@ async def chatInfo(client: Client, message: Message):
     )
 
     if chat.photo:
-        await hell.reply_photo(
-            chat.photo.big_file_id,
-            caption=chat_info,
-        )
-        await hell.delete()
+        async for photo in client.get_chat_photos(chat.id, 1):
+            await hell.delete()
+            await client.send_photo(
+                message.chat.id,
+                photo.file_id,
+                caption=chat_info,
+                reply_to_message_id=message.id,
+                disable_notification=True,
+            )
+            return
     else:
         await hell.edit(chat_info, disable_web_page_preview=True)
 

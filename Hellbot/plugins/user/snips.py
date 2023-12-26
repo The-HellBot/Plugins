@@ -114,7 +114,7 @@ async def snips(client: Client, message: Message):
             await hellbot.delete(hell, "No snip note saved in this chat.")
 
 
-@custom_handler(filters.incoming & filters.regex(r"^#\s*(.*)$") & filters.text)
+@custom_handler(filters.incoming & filters.regex(r"^#\s*(.*)$") & filters.text & ~filters.service)
 async def snipHandler(client: Client, message: Message):
     keyword = message.text.split("#", 1)[1].lower()
     if await db.is_snip(client.me.id, message.chat.id, keyword):
@@ -141,7 +141,7 @@ async def snipHandler(client: Client, message: Message):
 
 
 HelpMenu("snips").add(
-    "snip",
+    "snip", #Bugged: to-be-fixed : dont use fileid
     "<keyword> <reply to message>",
     "Save the replied message as a snip note.",
     "snip hello",

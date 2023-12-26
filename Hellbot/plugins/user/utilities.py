@@ -94,17 +94,10 @@ async def removeBg(_, message: Message):
 
 @on_message("paste", allow_stan=True)
 async def paste_text(_, message: Message):
-    if len(message.command) < 2:
-        if not message.reply_to_message:
-            return await hellbot.delete(message, "Reply to a text to paste it.")
-
-    if not message.reply_to_message.text or not message.reply_to_message.document:
-        return await hellbot.delete(message, "Reply to a text to paste it.")
-
     hell = await hellbot.edit(message, "Pasting text...")
-
     text_to_paste = ""
     extention = "none"
+
     if len(message.command) >= 2:
         text_to_paste = await hellbot.input(message)
     elif message.reply_to_message.text:
@@ -119,10 +112,8 @@ async def paste_text(_, message: Message):
         return await hellbot.delete(message, "Reply to a text to paste it.")
 
     try:
-        paste_link = spaceBin(text_to_paste, extention)
-
         await hell.edit(
-            f"**📝 Pasted to:** {paste_link}",
+            f"**📝 Pasted to:** {spaceBin(text_to_paste, extention)}",
             disable_web_page_preview=True,
         )
     except Exception as e:

@@ -57,7 +57,7 @@ async def listecho(client: Client, message: Message):
     await hellbot.send_message(message.chat.id, text)
 
 
-@custom_handler(filters.incoming & filters.text & filters.sticker)
+@custom_handler(filters.incoming & filters.text & filters.sticker & ~filters.service)
 async def echo_handler(client: Client, message: Message):
     if not await db.is_echo(client.me.id, message.chat.id, message.from_user.id):
         return

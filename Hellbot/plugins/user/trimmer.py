@@ -24,12 +24,10 @@ async def videotrim(_, message: Message):
         ]:
             return await hellbot.delete(message, "Reply to a video file")
 
-    query = await hellbot.input(message)
-    if ":" in query:
-        start, end = query.split(":")
-    else:
-        start = query
-        end = None
+    start = message.command[1].strip()
+    end = None
+    if len(message.command) > 2:
+        end = message.command[2].strip()
 
     dl_start = time.time()
     hell = await hellbot.edit(message, "Downloading...")
@@ -79,7 +77,7 @@ async def audiotrim(_, message: Message):
         if not (message.reply_to_message.video or message.reply_to_message.document or message.reply_to_message.audio):
             return await hellbot.delete(message, "Reply to a video/audio file")
 
-    if len(message.command) < 2:
+    if len(message.command) < 3:
         return await hellbot.delete(message, "Provide a valid timestamp.")
 
     if message.reply_to_message.document:
@@ -89,11 +87,8 @@ async def audiotrim(_, message: Message):
         ]:
             return await hellbot.delete(message, "Reply to a video/audio file")
 
-    query = await hellbot.input(message)
-    if ":" in query:
-        start, end = query.split(":")
-    else:
-        return await hellbot.delete(message, "Provide a valid timestamp.")
+    start = message.command[1].strip()
+    end = message.command[2].strip()
 
     dl_start = time.time()
     hell = await hellbot.edit(message, "Downloading...")
