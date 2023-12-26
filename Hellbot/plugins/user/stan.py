@@ -14,7 +14,14 @@ async def stanUsers(client: Client, message: Message):
 
     text = f"**Total stans:** `{len(users)}`\n\n"
     for user in users:
-        text += f"• `{user['user_id']}`\n"
+        try:
+            user = await client.get_users(user["user_id"])
+            mention = user.mention
+            userid = user.id
+        except Exception:
+            userid = user["user_id"]
+            mention = "Unknown Peer"
+        text += f"• {mention} (`{userid}`)\n"
 
     await hell.edit(text)
 

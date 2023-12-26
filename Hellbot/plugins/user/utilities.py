@@ -29,7 +29,7 @@ async def readImage(_, message: Message):
     hell = await hellbot.edit(message, "Reading image...")
 
     filename = await message.reply_to_message.download(Config.TEMP_DIR)
-    text = await get_media_text_ocr(filename, api_key, language)
+    text = get_media_text_ocr(filename, api_key, language)
 
     try:
         await hellbot.edit(hell, text["ParsedResults"][0]["ParsedText"])
@@ -55,6 +55,12 @@ async def removeBg(_, message: Message):
             filename = await message.reply_to_message.download(Config.TEMP_DIR)
         elif message.reply_to_message.photo:
             filename = await message.reply_to_message.download(Config.TEMP_DIR)
+        elif (
+            message.reply_to_message.sticker
+            and not message.reply_to_message.sticker.is_animated
+            and not message.reply_to_message.sticker.is_video
+        ):
+            filename = await message.reply_to_message.download(Config.TEMP_DIR + "sticker.png")
         else:
             return await hellbot.delete(
                 message, "Reply to an image or give the url to remove background."
@@ -88,12 +94,11 @@ async def removeBg(_, message: Message):
 
 @on_message("paste", allow_stan=True)
 async def paste_text(_, message: Message):
-    if (
-        len(message.command) < 2
-        or not message.reply_to_message
-        or not message.reply_to_message.text
-        or not message.reply_to_message.document
-    ):
+    if len(message.command) < 2:
+        if not message.reply_to_message:
+            return await hellbot.delete(message, "Reply to a text to paste it.")
+
+    if not message.reply_to_message.text or not message.reply_to_message.document:
         return await hellbot.delete(message, "Reply to a text to paste it.")
 
     hell = await hellbot.edit(message, "Pasting text...")
@@ -204,7 +209,6 @@ async def currencyCodes(_, message: Message):
 
     paste_link = spaceBin(outStr)
     await hell.edit(
-        message,
         f"**💫 Supported Currency Codes:** `{len(supported_codes)}` \n\n**📝 Paste Link:** {paste_link}",
         disable_web_page_preview=True,
     )

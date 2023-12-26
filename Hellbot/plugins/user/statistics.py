@@ -4,7 +4,7 @@ from pyrogram import Client
 from pyrogram.enums import ChatMemberStatus, ChatType
 from pyrogram.raw.functions.channels import GetAdminedPublicChannels
 from pyrogram.raw.functions.users import GetFullUser
-from pyrogram.types import Dialog, Message
+from pyrogram.types import Message
 
 from Hellbot.functions.formatter import readable_time
 from Hellbot.functions.templates import statistics_templates, user_info_templates
@@ -21,7 +21,6 @@ async def count_stats(client: Client, message: Message):
     channels = 0
     super_groups = 0
 
-    dialog: Dialog
     async for dialog in client.get_dialogs():
         if dialog.chat.type == ChatType.BOT:
             bots += 1
@@ -63,7 +62,6 @@ async def mystats(client: Client, message: Message):
     users = 0
 
     start = time.time()
-    dialog: Dialog
     async for dialog in client.get_dialogs():
         if dialog.chat.type == ChatType.CHANNEL:
             meInChat = await dialog.chat.get_member(client.me.id)
@@ -98,7 +96,7 @@ async def mystats(client: Client, message: Message):
         unread_mention += dialog.unread_mentions_count
         unread_msg += dialog.unread_messages_count
 
-    time_taken = readable_time(int(time.time() - start))
+    time_taken = readable_time(int(time.time() - start)) or "0 seconds"
 
     await hell.edit(
         await statistics_templates(
@@ -168,12 +166,16 @@ async def userInfo(client: Client, message: Message):
         commonGroups=common_chats,
     )
 
-    if user.photo:
-        await hell.reply_photo(
-            user.photo.big_file_id,
-            caption=user_info,
-        )
+    async for photo in client.get_chat_photos(user.id, 1):
         await hell.delete()
+        await client.send_photo(
+            message.chat.id,
+            photo.file_id,
+            caption=user_info,
+            reply_to_message_id=message.id,
+            disable_notification=True,
+        )
+        return
     else:
         await hell.edit(user_info, disable_web_page_preview=True)
 

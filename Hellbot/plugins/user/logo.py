@@ -24,7 +24,7 @@ async def makeLogo(_, message: Message):
         photo = await message.reply_to_message.download(Config.TEMP_DIR + "temp_bg.jpg")
         text = query
     else:
-        if "--" in text:
+        if "--" in query:
             text, theme = query.split("--", 1)
             isRandom = False
         else:
@@ -37,7 +37,7 @@ async def makeLogo(_, message: Message):
                 hell, "Unsplash API not found. Either set it or reply to an image."
             )
 
-        photo = await get_wallpapers(access, 1, theme, isRandom)
+        photo = await get_wallpapers(access, 1, theme.strip(), isRandom)
         if not photo:
             return await hellbot.delete(hell, "No wallpapers found.")
 

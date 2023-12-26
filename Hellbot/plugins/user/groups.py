@@ -4,6 +4,7 @@ from pyrogram import Client
 from pyrogram.enums import ChatMembersFilter, ChatMemberStatus
 from pyrogram.types import Message
 
+from Hellbot.functions.media import get_media_fileid
 from Hellbot.functions.templates import chat_info_templates
 
 from . import HelpMenu, group_n_channel, hellbot, on_message
@@ -157,7 +158,7 @@ async def kickme(client: Client, message: Message):
         )
 
 
-@on_message("newgrroup", allow_stan=True)
+@on_message("newgroup", allow_stan=True)
 async def new_group(client: Client, message: Message):
     if len(message.command) < 2:
         return await hellbot.delete(message, "𝖨 𝗇𝖾𝖾𝖽 𝗌𝗈𝗆𝖾𝗍𝗁𝗂𝗇𝗀 𝗍𝗈 𝗌𝖾𝗍 𝖺𝗌 𝗀𝗋𝗈𝗎𝗉 𝗍𝗂𝗍𝗅𝖾.")
@@ -221,7 +222,7 @@ async def chatInfo(client: Client, message: Message):
         if admin.status == ChatMemberStatus.OWNER:
             chat_owner = admin.user.mention
 
-    async for _ in client.get_chat_members(chat.id, ChatMembersFilter.BOTS):
+    async for _ in client.get_chat_members(chat.id, filter=ChatMembersFilter.BOTS):
         bots_count += 1
 
     chat_info = await chat_info_templates(
@@ -283,7 +284,7 @@ async def chatBots(client: Client, message: Message):
 
     bot_count = 0
     bots = "**🤖 𝖡𝗈𝗍𝗌 𝗂𝗇 𝗍𝗁𝗂𝗌 𝖼𝗁𝖺𝗍:**\n\n"
-    async for bot in client.get_chat_members(chat.id, ChatMembersFilter.BOTS):
+    async for bot in client.get_chat_members(chat.id, filter=ChatMembersFilter.BOTS):
         bot_count += 1
         bots += (
             f"**{'0' if bot_count < 10 else ''}{bot_count}:** @{bot.user.username}\n"
@@ -301,8 +302,8 @@ async def chatId(_, message: Message):
 
     hell = await hellbot.edit(message, "Fetching message info...")
 
-    info = f"**💫 ChatID:** {msg.chat.id}\n"
-    info += f"**🪪 MessageID:** {msg.id}\n\n"
+    info = f"**💫 ChatID:** `{msg.chat.id}`\n"
+    info += f"**🪪 MessageID:** `{msg.id}`\n\n"
 
     if msg.from_user:
         info += f"**👤 UserID:** `{msg.from_user.id}`\n\n"
@@ -312,6 +313,10 @@ async def chatId(_, message: Message):
 
     if msg.forward_from_chat:
         info += f"**💫 Forwarded ChatID:** `{msg.forward_from_chat.id}`\n\n"
+
+    file_id = await get_media_fileid(msg)
+    if file_id:
+        info += f"**📁 FileID:** `{file_id}`\n\n"
 
     await hell.edit(info, disable_web_page_preview=True)
 

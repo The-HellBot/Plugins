@@ -105,7 +105,7 @@ async def fedinfo(client: Client, message: Message):
         await hell.edit(
             f"**{Symbols.anchor} 𝖥𝖾𝖽𝖨𝖽:** `{fedid}`\n"
             f"**{Symbols.anchor} 𝖭𝖺𝗆𝖾:** `{name}`\n"
-            f"**{Symbols.anchor} 𝖢𝗋𝖾𝖺𝗍𝗈𝗋:** `{creator}`\n"
+            f"**{Symbols.anchor} 𝖢𝗋𝖾𝖺𝗍𝗈𝗋:** {creator}\n"
             f"**{Symbols.anchor} 𝖳𝗈𝗍𝖺𝗅 𝖺𝖽𝗆𝗂𝗇𝗌:** `{admins}`\n"
             f"**{Symbols.anchor} 𝖳𝗈𝗍𝖺𝗅 𝖻𝖺𝗇𝗌::** `{bans}`\n"
             f"**{Symbols.anchor} 𝖢𝗈𝗇𝗇𝖾𝖼𝗍𝖾𝖽 𝖢𝗁𝖺𝗍𝗌:** `{connected_chats}`\n"

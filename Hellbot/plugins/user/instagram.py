@@ -90,10 +90,13 @@ async def instagramPost(_, message: Message):
         element = wait.until(presence_of_element_located((By.TAG_NAME, "video")))
         reels.append(element.get_attribute("src"))
 
-        while driver.find_element(By.XPATH, "//button[@aria-label='Next']"):
-            driver.find_element(By.XPATH, "//button[@aria-label='Next']").click()
-            element = wait.until(presence_of_element_located((By.TAG_NAME, "video")))
-            reels.append(element.get_attribute("src"))
+        for _ in range(10):
+            try:
+                driver.find_element(By.XPATH, "//button[@aria-label='Next']").click()
+                element = wait.until(presence_of_element_located((By.TAG_NAME, "video")))
+                reels.append(element.get_attribute("src"))
+            except:
+                break
 
         driver.quit()
 
@@ -117,7 +120,7 @@ async def instagramPost(_, message: Message):
                 "Unable to download the post. Make sure the link is valid or the post is not from a private account.",
             )
     except Exception as e:
-        await hellbot.error(hell, f"**Error:** `{e}`")
+        await hellbot.error(hell, f"`{e}`")
 
 
 @on_message("iguser", allow_stan=True)
@@ -134,7 +137,7 @@ async def instagramUser(_, message: Message):
 
     driver, _ = Driver.get()
     if not driver:
-        return await hellbot.error(hell, _)
+        return await hellbot.error(hell, f"**Unable to get driver:** `{_}`")
 
     try:
         driver.get(url)
@@ -175,7 +178,7 @@ HelpMenu("instagram").add(
     "igpost https://www.instagram.com/p/C06rAjDJlJs/",
     "If the post has multiple videos, it will download all of them one by one.",
 ).add(
-    "iguser",
+    "iguser", #Bugged: to-be-fixed
     "<instagram username>",
     "Get instagram user info.",
     "iguser therock",

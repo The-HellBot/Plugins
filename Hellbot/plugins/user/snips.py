@@ -85,7 +85,7 @@ async def snips(client: Client, message: Message):
 
         if await db.is_snip(client.me.id, message.chat.id, keyword.lower()):
             data = await db.get_snip(client.me.id, message.chat.id, keyword.lower())
-            data = data["snips"]
+            data = data["snips"][0]
             file_id = data.get("fileId", None)
             caption = data.get("text", None)
 
@@ -119,7 +119,7 @@ async def snipHandler(client: Client, message: Message):
     keyword = message.text.split("#", 1)[1].lower()
     if await db.is_snip(client.me.id, message.chat.id, keyword):
         data = await db.get_snip(client.me.id, message.chat.id, keyword)
-        data = data["snips"]
+        data = data["snips"][0]
         file_id = data.get("fileId", None)
         caption = data.get("text", None)
 

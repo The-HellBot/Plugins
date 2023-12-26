@@ -28,6 +28,8 @@ async def getpfp(client: Client, message: Message):
             limit = int(message.command[1])
         elif message.command[1] == "all":
             limit = 0
+        else:
+            limit = 1
 
     else:
         try:
@@ -39,6 +41,8 @@ async def getpfp(client: Client, message: Message):
                     limit = int(message.command[2])
                 elif message.command[2] == "all":
                     limit = 0
+                else:
+                    limit = 1
 
         except Exception as e:
             return await hellbot.error(hell, f"`{str(e)}`")
@@ -205,8 +209,13 @@ async def gituser(_, message: Message):
         if not bio:
             bio = "No bio found."
 
+        file = f"{Config.TEMP_DIR}{username}.jpg"
+        resp = requests.get(avatar_url)
+        with open(file, "wb") as f:
+            f.write(resp.content)
+
         await message.reply_photo(
-            avatar_url,
+            file,
             caption=await github_user_templates(
                 username=username,
                 git_id=git_id,
@@ -226,6 +235,7 @@ async def gituser(_, message: Message):
             ),
         )
         await hell.delete()
+        os.remove(file)
     except Exception as e:
         return await hellbot.error(hell, f"`{str(e)}`")
 

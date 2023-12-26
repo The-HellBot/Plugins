@@ -8,7 +8,7 @@ from pyrogram.types import ChatPermissions, ChatPrivileges, Message
 
 from Hellbot.functions.templates import gban_templates
 
-from . import Config, HelpMenu, Symbols, db, hellbot, on_message, custom_handler
+from . import Config, HelpMenu, Symbols, custom_handler, db, hellbot, on_message
 
 
 @on_message("gpromote", allow_stan=True)
@@ -251,11 +251,17 @@ async def unglobalban(client: Client, message: Message):
         user = message.reply_to_message.from_user
 
     if user.id not in Config.BANNED_USERS:
-        await hellbot.delete(message, "This user is not gbanned. Unbanning in all my admin chats anyway...")
+        await hellbot.delete(
+            message,
+            "This user is not gbanned. Unbanning in all my admin chats anyway...",
+        )
     else:
         reason = await db.rm_gban(user.id)
         Config.BANNED_USERS.remove(user.id)
-        await hellbot.edit(message, f"**𝖴𝗇𝗀𝖻𝖺𝗇𝗇𝖾𝖽** {user.mention}!\n\n**𝖦𝖻𝖺𝗇 𝖱𝖾𝖺𝗌𝗈𝗇 𝗐𝖺𝗌::** `{reason}`")
+        await hellbot.edit(
+            message,
+            f"**𝖴𝗇𝗀𝖻𝖺𝗇𝗇𝖾𝖽** {user.mention}!\n\n**𝖦𝖻𝖺𝗇 𝖱𝖾𝖺𝗌𝗈𝗇 𝗐𝖺𝗌:** `{reason}`",
+        )
 
     async for dialog in client.get_dialogs():
         if dialog.chat.type in [
@@ -304,7 +310,9 @@ async def globalkick(client: Client, message: Message):
         return await hellbot.delete(message, "I can't gkick my auth user.")
 
     if user.id in Config.BANNED_USERS:
-        return await hellbot.delete(message, "This user is already gbanned. There's no point in kicking them!")
+        return await hellbot.delete(
+            message, "This user is already gbanned. There's no point in kicking them!"
+        )
 
     if user.id in Config.DEVS:
         return await hellbot.delete(message, "I can't gkick my devs.")
@@ -320,14 +328,18 @@ async def globalkick(client: Client, message: Message):
             ChatType.SUPERGROUP,
         ]:
             try:
-                await dialog.chat.ban_member(user.id, datetime.datetime.now() + datetime.timedelta(seconds=35))
+                await dialog.chat.ban_member(
+                    user.id, datetime.datetime.now() + datetime.timedelta(seconds=35)
+                )
                 success += 1
             except FloodWait as e:
                 await hell.edit(
                     f"Gkick initiated on {user.mention}...\nSleeping for {e.x} seconds due to floodwait..."
                 )
                 await asyncio.sleep(e.x)
-                await dialog.chat.ban_member(user.id, datetime.datetime.now() + datetime.timedelta(seconds=35))
+                await dialog.chat.ban_member(
+                    user.id, datetime.datetime.now() + datetime.timedelta(seconds=35)
+                )
                 success += 1
                 await hell.edit(f"Gkick initiated on {user.mention}...")
             except BaseException:
@@ -440,11 +452,16 @@ async def unglobalmute(client: Client, message: Message):
         user = message.reply_to_message.from_user
 
     if user.id not in Config.MUTED_USERS:
-        await hellbot.delete(message, "This user is not gmuted. Unmuting in all my admin chats anyway...")
+        await hellbot.delete(
+            message, "This user is not gmuted. Unmuting in all my admin chats anyway..."
+        )
     else:
         reason = await db.rm_gmute(user.id)
         Config.MUTED_USERS.remove(user.id)
-        await hellbot.edit(message, f"**𝖴𝗇𝗀𝗆𝗎𝗍𝖾𝖽** {user.mention}!\n\n**𝖦𝗆𝗎𝗍𝖾 𝖱𝖾𝖺𝗌𝗈𝗇 𝗐𝖺𝗌::** `{reason}`")
+        await hellbot.edit(
+            message,
+            f"**𝖴𝗇𝗀𝗆𝗎𝗍𝖾𝖽** {user.mention}!\n\n**𝖦𝗆𝗎𝗍𝖾 𝖱𝖾𝖺𝗌𝗈𝗇 𝗐𝖺𝗌:** `{reason}`",
+        )
 
     permissions = ChatPermissions(can_send_messages=True)
 
@@ -480,7 +497,7 @@ async def gbanlist(_, message: Message):
     for user in gban_users:
         text += f"{Symbols.bullet} `{user['user_id']}` | __{user['reason']}__\n\n"
 
-    await hell.edit(text)    
+    await hell.edit(text)
 
 
 @on_message("gmutelist", allow_stan=True)
@@ -526,19 +543,40 @@ async def globalbanwatcher(_, message: Message):
 
 
 HelpMenu("superpowers").add(
-    "gpromote", "<reply/username/id> <reason (optional)>", "Promote a user in all the chats where you have add admin right.", "gpromote @ForGo10God Why not?"
+    "gpromote",
+    "<reply/username/id> <reason (optional)>",
+    "Promote a user in all the chats where you have add admin right.",
+    "gpromote @ForGo10God Why not?",
 ).add(
-    "gdemote", "<reply/username/id> <reason (optional)>", "Demotes a user in all the chats where you are on top level from the user.", "gdemote @ForGo10God Why?"
+    "gdemote",
+    "<reply/username/id> <reason (optional)>",
+    "Demotes a user in all the chats where you are on top level from the user.",
+    "gdemote @ForGo10God Why?",
 ).add(
-    "gban", "<reply/username/id> <reason (optional)>", "Ban a user in all the chats where you have ban rights.", "gban @ForGo10God :)"
+    "gban",
+    "<reply/username/id> <reason (optional)>",
+    "Ban a user in all the chats where you have ban rights.",
+    "gban @ForGo10God :)",
 ).add(
-    "ungban", "<reply/username/id>", "Unban a user in all the chats where you have ban rights.", "ungban @ForGo10God"
+    "ungban",
+    "<reply/username/id>",
+    "Unban a user in all the chats where you have ban rights.",
+    "ungban @ForGo10God",
 ).add(
-    "gkick", "<reply/username/id> <reason (optional)>", "Kick a user in all the chats where you have ban rights.", "gkick @ForGo10God :)"
+    "gkick",
+    "<reply/username/id> <reason (optional)>",
+    "Kick a user in all the chats where you have ban rights.",
+    "gkick @ForGo10God :)",
 ).add(
-    "gmute", "<reply/username/id> <reason (optional)>", "Mute a user in all the chats where you have mute rights.", "gmute @ForGo10God :)"
+    "gmute",
+    "<reply/username/id> <reason (optional)>",
+    "Mute a user in all the chats where you have mute rights.",
+    "gmute @ForGo10God :)",
 ).add(
-    "ungmute", "<reply/username/id>", "Unmute a user in all the chats where you have mute rights.", "ungmute @ForGo10God"
+    "ungmute",
+    "<reply/username/id>",
+    "Unmute a user in all the chats where you have mute rights.",
+    "ungmute @ForGo10God",
 ).add(
     "gbanlist", None, "List all the gbanned users.", "gbanlist"
 ).add(

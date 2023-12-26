@@ -8,7 +8,7 @@ from pyrogram.types import ChatPermissions, Message
 from . import HelpMenu, Symbols, hellbot, on_message
 
 
-@on_message("lock", allow_stan=True)
+@on_message("lock", admin_only=True, allow_stan=True)
 async def lockGC(client: Client, message: Message):
     if not message.chat.type == ChatType.SUPERGROUP:
         return await hellbot.delete(message, "Only supergroups are supported.")
@@ -73,7 +73,7 @@ async def lockGC(client: Client, message: Message):
     )
 
 
-@on_message("unlock", allow_stan=True)
+@on_message("unlock", admin_only=True, allow_stan=True)
 async def unlockGC(client: Client, message: Message):
     if not message.chat.type == ChatType.SUPERGROUP:
         return await hellbot.delete(message, "Only supergroups are supported.")

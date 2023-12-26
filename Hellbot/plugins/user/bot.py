@@ -94,6 +94,12 @@ async def history(client: Client, message: Message):
             f"Your quota of using SangMata Bot is over. Wait till 00:00 UTC before using it again.",
         )
 
+    try:
+        await response.delete()
+        await response.request.delete()
+    except:
+        pass
+
     await hellbot.edit(hell, response.text)
 
 

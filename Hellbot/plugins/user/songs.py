@@ -29,7 +29,7 @@ async def dwlSong(_, message: Message):
 
     try:
         url = f"https://www.youtube.com{ytSearch['url_suffix']}"
-        with YoutubeDL(YoutubeDriver.song_options) as ytdl:
+        with YoutubeDL(YoutubeDriver.song_options()) as ytdl:
             yt_data = ytdl.extract_info(url, False)
             yt_file = ytdl.prepare_filename(yt_data)
             ytdl.process_info(yt_data)
@@ -77,7 +77,7 @@ async def dwlSong(_, message: Message):
 
     try:
         url = f"https://www.youtube.com{ytSearch['url_suffix']}"
-        with YoutubeDL(YoutubeDriver.video_options) as ytdl:
+        with YoutubeDL(YoutubeDriver.video_options()) as ytdl:
             yt_data = ytdl.extract_info(url, True)
             yt_file = yt_data["id"]
 
@@ -168,9 +168,9 @@ HelpMenu("songs").add(
 ).add(
     "lyrics",
     "<song name>",
-    "Get the lyrics of the given song!",
+    "Get the lyrics of the given song! Give artist name after - to get accurate results.",
     "lyrics believer - imagine dragons",
-    "Give artist name after - to get accurate results.",
+    "Need to setup Lyrics Api key from https://genius.com/developers",
 ).info(
     "Song and Lyrics"
 ).done()

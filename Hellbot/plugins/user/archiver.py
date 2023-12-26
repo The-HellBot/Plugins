@@ -7,7 +7,7 @@ from pyrogram.types import Message
 from Hellbot.functions.formatter import readable_time
 from Hellbot.functions.tools import get_files_from_directory, progress
 
-from . import HelpMenu, hellbot, on_message, Config
+from . import Config, HelpMenu, hellbot, on_message
 
 
 @on_message("zip", allow_stan=True)
@@ -84,9 +84,13 @@ async def unzip_file(_, message: Message):
 
 
 HelpMenu("archiver").add(
-    "zip", "<reply to a media>", "Zip the replied media and upload it in the chat."
+    "zip",
+    "<reply to a media>",
+    "Zip the replied media and upload it in the chat.",
 ).add(
-    "unzip", "<reply to a zip file>", "Unzip the replied zip file and upload it in the chat.",
+    "unzip",
+    "<reply to a zip file>",
+    "Unzip the replied zip file and upload it in the chat.",
 ).info(
     "Manage Archives"
 ).done()

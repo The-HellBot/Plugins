@@ -12,14 +12,8 @@ from . import Config, HelpMenu, hellbot, on_message
 
 @on_message("download", allow_stan=True)
 async def download(_, message: Message):
-    if not message.reply_to_message or len(message.command) < 2:
-        return await hellbot.delete(
-            message,
-            "Reply to a message or pass me direct link to download on my server!",
-        )
-
     hell = await hellbot.edit(message, "Starting to download...")
-    if message.reply_to_message.document or message.reply_to_message.media:
+    if message.reply_to_message and message.reply_to_message.media:
         start_time = time.time()
         try:
             dwl_path = await message.reply_to_message.download(

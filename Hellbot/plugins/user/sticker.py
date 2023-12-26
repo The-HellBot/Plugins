@@ -5,6 +5,7 @@ from pyrogram.errors import PeerIdInvalid, UserIsBlocked
 from pyrogram.types import Message
 
 from Hellbot.core import ENV
+from pyrogram.raw.types import InputDocument, InputStickerSetItem
 from Hellbot.functions.convert import image_to_sticker, video_to_sticker
 from Hellbot.functions.sticker import (
     add_sticker,
@@ -131,11 +132,12 @@ async def packKang(client: Client, message: Message):
         return await hellbot.delete(hell, "Reply to a sticker to kang whole pack!")
 
     for sticker in replied_set.documents:
-        stickers.append(
-            await create_sticker(
-                hellbot.bot, message.chat.id, sticker.id, "🍀", True
-            )
+        document = InputDocument(
+            id=sticker.id,
+            access_hash=sticker.access_hash,
+            file_reference=sticker.file_reference,
         )
+        stickers.append(InputStickerSetItem(document=document, emoji="🍀"))
     try:
         while True:
             stickerset = await get_sticker_set(hellbot.bot, pack_url_suffix)
@@ -212,16 +214,20 @@ async def removeSticker(_, message: Message):
 
     hell = await hellbot.edit(message, "__Removing sticker from pack...__")
 
+    sticker_set = await get_sticker_set(hellbot.bot, sticker.set_name)
+    if not sticker_set:
+        return await hellbot.delete(hell, "This sticker is not part of a pack.")
+
     sticker = message.reply_to_message.sticker
     try:
         await remove_sticker(hellbot.bot, sticker.file_id)
-        await hellbot.delete(hell, f"Deleted tthe sticker from pack {sticker.set_name}")
+        await hellbot.delete(hell, f"**𝖣𝖾𝗅𝖾𝗍𝖾𝖽 𝗍𝗁𝖾 𝗌𝗍𝗂𝖼𝗄𝖾𝗋 𝖿𝗋𝗈𝗆 𝗉𝖺𝖼𝗄:** {sticker_set.set.title}")
     except Exception as e:
         await hellbot.error(hell, str(e))
 
 
 HelpMenu("sticker").add(
-    "kang",
+    "kang", #Bugged: to-be-fixed - video/animated sticker
     "<reply> <packid (optional)> <emoji (optional)>",
     "Add the replied image/gif/video/sticker into your own sticker pack.",
     "kang 2 👀"

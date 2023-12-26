@@ -272,9 +272,8 @@ class YoutubeDriver:
         else:
             return False, "Invalid YouTube URL!"
 
-    @property
     @staticmethod
-    def song_options():
+    def song_options() -> dict:
         return {
             "format": "bestaudio",
             "addmetadata": True,
@@ -294,9 +293,8 @@ class YoutubeDriver:
             "logtostderr": False,
         }
 
-    @property
     @staticmethod
-    def video_options():
+    def video_options() -> dict:
         return {
             "format": "best",
             "addmetadata": True,

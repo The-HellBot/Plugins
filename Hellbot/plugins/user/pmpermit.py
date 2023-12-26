@@ -167,6 +167,9 @@ async def handle_incoming_pm(client: Client, message: Message):
     if message.from_user.id in Config.DEVS:
         return
 
+    if message.from_user.id == 777000:
+        return
+
     if await db.is_pmpermit(client.me.id, message.from_user.id):
         return
 

@@ -189,6 +189,11 @@ HelpMenu("antiflood").add(
     "Set antiflood in the chat! All arguments are optional, bydefault limit is 5 and mode is permanent mute.",
     "setflood 10 ban 1d",
     "Mode can be mute, kick or ban. Time can be xd (days), xh (hours) or xm (minutes) where x is number.",
-).add("setflood 0", None, "Disable antiflood in the chat!", "setflood 0").info(
+).add(
+    "setflood 0",
+    None,
+    "Disable antiflood in the chat!",
+    "setflood 0",
+).info(
     "Control Flood in the chat!"
 ).done()

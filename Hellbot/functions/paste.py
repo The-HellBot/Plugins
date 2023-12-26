@@ -11,7 +11,7 @@ def post_to_telegraph(
     client = TelegraphPoster(use_api=True)
     client.create_api_token(author)
     response = client.post(title, author, content, url)
-    return response["url"]
+    return str(response["url"]).replace("telegra.ph", "te.legra.ph")
 
 
 def spaceBin(data: str, extension: str = "none") -> str:

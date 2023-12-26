@@ -67,7 +67,7 @@ async def mediaInfo(_, message: Message):
     to_paste = f"<h1>💫 HellBot Media Info:</h1><br>{metadata}<br><b>📝 MediaInfo:</b><br><code>{out}</code>"
     link = post_to_telegraph("HellBotMediaInfo", to_paste)
 
-    await hell.edit(f"**📌 Media Info:** [Here]({link})")
+    await hell.edit(f"**📌 Media Info:** [Here]({link})", disable_web_page_preview=True)
     os.remove(file_path)
 
 

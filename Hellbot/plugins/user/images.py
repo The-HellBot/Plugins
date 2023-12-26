@@ -1,7 +1,8 @@
 import io
 import os
 from shutil import rmtree
-
+import time
+import requests
 from glitch_this import ImageGlitcher
 from PIL import Image
 from pyrogram.enums import MessageMediaType
@@ -90,11 +91,17 @@ async def searchWallpaper(_, message: Message):
     if not wallpapers:
         return await hellbot.delete(hell, "No wallpapers found.")
 
-    for wallpaper in wallpapers:
-        to_send.append(InputMediaPhoto(wallpaper))
+    trash = []
+    for i, wallpaper in enumerate(wallpapers):
+        file_name = f"{i}_{int(time.time())}.jpg"
+        with open(file_name, "wb") as f:
+            f.write(requests.get(wallpaper).content)
+        to_send.append(InputMediaPhoto(file_name))
+        trash.append(file_name)
 
     await hell.reply_media_group(to_send)
     await hellbot.delete(hell, "Uploaded!")
+    [os.remove(trash_file) for trash_file in trash]
 
 
 @on_message("glitch", allow_stan=True)
@@ -211,9 +218,9 @@ HelpMenu("images").add(
 ).add(
     "wallpaper",
     "<query> ; <limit>",
-    "Search for x wallpapers on unsplash and upload them to current chat. Requires unsplash API.",
+    "Search for x wallpapers on unsplash and upload them to current chat. If no query is given, random wallpapers will be uploaded.",
     "wallpaper supra ; 5",
-    "If no query is given, random wallpapers will be uploaded.",
+    "Need to setup Unsplash Api key from https://unsplash.com/join",
 ).add(
     "glitch",
     "<reply to media> <intensity>",

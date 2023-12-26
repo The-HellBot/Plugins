@@ -5,7 +5,7 @@ from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 
 from Hellbot.core import ENV, LOGS
 
-from . import HelpMenu, custom_handler, db, hellbot, on_message
+from . import custom_handler, db, hellbot, on_message
 
 
 @on_message("save", allow_stan=True)

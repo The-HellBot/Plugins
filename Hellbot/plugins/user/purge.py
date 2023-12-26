@@ -1,7 +1,7 @@
 import asyncio
+
 from pyrogram import Client
 from pyrogram.types import Message
-from datetime import datetime
 
 from . import HelpMenu, hellbot, on_message
 
@@ -83,7 +83,7 @@ async def purgeUser(client: Client, message: Message):
 
     await hellbot.delete(
         hell,
-        f"__🧹 Purged {count} messages of {message.reply_to_message.from_user.mention}.__,"
+        f"__🧹 Purged {count} messages of {message.reply_to_message.from_user.mention}.__,,"
     )
 
 

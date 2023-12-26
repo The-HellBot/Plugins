@@ -10,7 +10,7 @@ from pyrogram.raw.types import (
     InputDocument,
     InputMediaUploadedDocument,
 )
-from pyrogram.types import Animation, Audio, Document, Photo, Sticker, Video
+from pyrogram.types import Animation, Audio, Document, Message, Photo, Sticker, Video
 
 from Hellbot.core import Symbols
 
@@ -122,7 +122,7 @@ async def get_metedata(media: Union[Animation, Audio, Document, Photo, Sticker, 
     return output
 
 
-def get_media_text_ocr(filename: str, api_key: str, language: str = "eng"):
+def get_media_text_ocr(filename: str, api_key: str, language: str = "eng") -> dict:
     payload = {
         "isOverlayRequired": False,
         "apikey": api_key,
@@ -169,3 +169,24 @@ async def get_media_from_id(file_id: str) -> InputDocument:
         access_hash=file.access_hash,
         file_reference=file.file_reference,
     )
+
+
+async def get_media_fileid(message: Message) -> str | None:
+    file_id = None
+    if message.photo:
+        file_id = message.photo.file_id
+    elif message.animation:
+        file_id = message.animation.file_id
+    elif message.audio:
+        file_id = message.audio.file_id
+    elif message.document:
+        file_id = message.document.file_id
+    elif message.video:
+        file_id = message.video.file_id
+    elif message.sticker:
+        file_id = message.sticker.file_id
+    elif message.video_note:
+        file_id = message.video_note.file_id
+    elif message.voice:
+        file_id = message.voice.file_id
+    return file_id

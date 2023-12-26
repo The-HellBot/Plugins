@@ -56,7 +56,7 @@ def readable_time(seconds: int) -> str:
     time_list.reverse()
     out_time += " ".join(time_list)
 
-    return out_time
+    return out_time or "0 secs"
 
 
 def humanbytes(size: int):

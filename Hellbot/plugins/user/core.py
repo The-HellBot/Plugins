@@ -41,7 +41,7 @@ async def help(client: Client, message: Message):
             return
 
     available_plugins = f"{Symbols.bullet} **𝖠𝗏𝖺𝗂𝗅𝖺𝖻𝗅𝖾 𝗉𝗅𝗎𝗀𝗂𝗇𝗌:**\n\n"
-    for i in Config.CMD_MENU.keys():
+    for i in sorted(list(Config.CMD_MENU.keys())):
         available_plugins += f"`{i}`, "
     available_plugins = available_plugins[:-2]
     available_plugins += (
@@ -52,7 +52,12 @@ async def help(client: Client, message: Message):
 
 @on_message("repo", allow_stan=True)
 async def repo(_, message: Message):
-    REPO_TEXT = "__🍀 𝖱𝖾𝗉𝗈:__ [Github](https://github.com/The-HellBot/HellBot)\n\n__🍀 Updates:__ @Its_HellBot\n__🍀 Support:__ @HellBot_Chats\n\n**By ©️ @HellBot_Networks**"
+    REPO_TEXT = (
+        "__🍀 𝖱𝖾𝗉𝗈:__ [Github](https://github.com/The-HellBot/HellBot)\n\n"
+        "__🍀 Updates:__ @Its_HellBot\n"
+        "__🍀 Support:__ @HellBot_Chats\n\n"
+        "**By ©️ @HellBot_Networks**"
+    )
     await hellbot.edit(message, REPO_TEXT, no_link_preview=True)
 
 

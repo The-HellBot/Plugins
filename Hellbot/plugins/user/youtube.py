@@ -28,7 +28,7 @@ async def youtube_audio(_, message: Message):
 
     await hell.edit("🎼 __Downloading audio ...__")
     try:
-        with YoutubeDL(YoutubeDriver.song_options) as ytdl:
+        with YoutubeDL(YoutubeDriver.song_options()) as ytdl:
             yt_data = ytdl.extract_info(url, False)
             yt_file = ytdl.prepare_filename(yt_data)
             ytdl.process_info(yt_data)
@@ -79,7 +79,7 @@ async def ytvideo(_, message: Message):
 
     await hell.edit("🎼 __Downloading video ...__")
     try:
-        with YoutubeDL(YoutubeDriver.song_options) as ytdl:
+        with YoutubeDL(YoutubeDriver.song_options()) as ytdl:
             yt_data = ytdl.extract_info(url, True)
             yt_file = yt_data["id"]
 

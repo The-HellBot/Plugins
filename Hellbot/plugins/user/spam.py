@@ -156,7 +156,7 @@ async def listSpam(_, message: Message):
 
     text = "**Active Spam Tasks:**\n\n"
     for active in active_spams:
-        text += f"{Symbols.anchor} `{active}` -> {spamTask.get(active, 'None')}\n"
+        text += f"{Symbols.anchor} `{active}`\n"
 
     await hellbot.edit(message, text)
 

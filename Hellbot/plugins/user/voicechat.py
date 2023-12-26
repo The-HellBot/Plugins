@@ -26,7 +26,7 @@ async def startvc(client: Client, message: Message):
         await client.invoke(
             CreateGroupCall(
                 peer=(await client.resolve_peer(message.chat.id)),
-                random_id=str(uuid.uuid4().int)[:8],
+                random_id=int(str(uuid.uuid4().int)[:8]),
                 title=call_name,
             )
         )
@@ -43,7 +43,7 @@ async def endvc(client: Client, message: Message):
         full_chat: base.messages.ChatFull = await client.invoke(
             GetFullChannel(channel=(await client.resolve_peer(message.chat.id)))
         )
-        await client.invoke(DiscardGroupCall(call=full_chat.call))
+        await client.invoke(DiscardGroupCall(call=full_chat.full_chat.call))
         await hellbot.delete(hell, "VC ended!")
     except Exception as e:
         await hellbot.error(hell, str(e))
@@ -59,7 +59,7 @@ async def vclink(client: Client, message: Message):
         )
 
         invite: base.phone.ExportedGroupCallInvite = await client.invoke(
-            ExportGroupCallInvite(call=full_chat.call)
+            ExportGroupCallInvite(call=full_chat.full_chat.call)
         )
         await hellbot.delete(hell, f"VC Link: {invite.link}")
     except Exception as e:
@@ -76,7 +76,7 @@ async def vcmembers(client: Client, message: Message):
         )
         participants: base.phone.GroupParticipants = await client.invoke(
             GetGroupParticipants(
-                call=full_chat.call,
+                call=full_chat.full_chat.call,
                 ids=[],
                 sources=[],
                 offset="",

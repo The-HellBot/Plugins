@@ -11,12 +11,9 @@ from . import Config, HelpMenu, hellbot, on_message
 
 @on_message("vtrim", allow_stan=True)
 async def videotrim(_, message: Message):
-    if (
-        not message.reply_to_message
-        or not message.reply_to_message.video
-        or not message.reply_to_message.document
-    ):
-        return await hellbot.delete(message, "Reply to a video file")
+    if message.reply_to_message:
+        if not (message.reply_to_message.video or message.reply_to_message.document):
+            return await hellbot.delete(message, "Reply to a video file")
 
     if len(message.command) < 2:
         return await hellbot.delete(message, "Provide a valid timestamp.")
@@ -54,7 +51,7 @@ async def videotrim(_, message: Message):
         cmd = f"ffmpeg -i {file} -ss {start} -vframes 1 {file_name}"
         caption = f"**Trimmed {start}!**\n\n**Trimmed By:** {message.from_user.mention}"
 
-    out, err, _, _ = await runcmd(cmd)
+    _, err, _, _ = await runcmd(cmd)
     if not os.path.lexists(file_name):
         return await hellbot.error(hell, f"**Error:** `{err}`")
 
@@ -78,13 +75,9 @@ async def videotrim(_, message: Message):
 
 @on_message("atrim", allow_stan=True)
 async def audiotrim(_, message: Message):
-    if (
-        not message.reply_to_message
-        or not message.reply_to_message.video
-        or not message.reply_to_message.document
-        or not message.reply_to_message.audio
-    ):
-        return await hellbot.delete(message, "Reply to an video/audio file")
+    if message.reply_to_message:
+        if not (message.reply_to_message.video or message.reply_to_message.document or message.reply_to_message.audio):
+            return await hellbot.delete(message, "Reply to a video/audio file")
 
     if len(message.command) < 2:
         return await hellbot.delete(message, "Provide a valid timestamp.")

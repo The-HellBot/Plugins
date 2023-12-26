@@ -106,14 +106,14 @@ async def googleSearch(_, message: Message):
     hell = await hellbot.edit(message, f"Searching for `{search_query}` on google...")
 
     try:
-        results = search(search_query, 5, advanced=True)
+        results = search(search_query, 7, advanced=True)
     except Exception as error:
         return await hellbot.error(hell, f"`{str(error)}`")
 
     outStr = f"**🔍 𝖲𝖾𝖺𝗋𝖼𝗁:** `{search_query}`\n\n"
     for result in results:
         outStr += f"**🌐 𝖱𝖾𝗌𝗎𝗅𝗍:** [{result.title}]({result.url})\n"
-        outStr += f"**📖 𝖣𝖾𝗌𝖼:** {str(result.description)[:40]}...\n\n"
+        outStr += f"**📖 𝖣𝖾𝗌𝖼:** {str(result.description)[:50]}...\n\n"
 
     await hell.edit(outStr, disable_web_page_preview=True)
 
@@ -149,16 +149,20 @@ async def reverseSearch(_, message: Message):
         },
     )
 
-    soup = BeautifulSoup(webresp.text, "html.parser")
-    div = soup.find_all("div", {"class": "r5a77d"})[0]
-    alls = div.find("a")
-    link = alls["href"]
-    text = alls.text
-
-    await hell.edit(
-        f"**𝖯𝗈𝗌𝗌𝗂𝖻𝗅𝖾 𝖱𝖾𝗌𝗎𝗅𝗍:** [{text}]({link})", disable_web_page_preview=True
-    )
     os.remove(dl_path)
+    soup = BeautifulSoup(webresp.text, "html.parser")
+    div = soup.find("div", {"class": "r5a77d"})
+    if div:
+        alls = div.find("a")
+        link = alls["href"]
+        text = alls.text
+
+        await hell.edit(
+            f"**𝖯𝗈𝗌𝗌𝗂𝖻𝗅𝖾 𝖱𝖾𝗌𝗎𝗅𝗍:** [{text}]({link})", disable_web_page_preview=True
+        )
+    else:
+        return await hell.edit("No results found.")
+
 
     googleImage = googleimagesdownload()
     to_send = []
@@ -317,7 +321,7 @@ async def translateHandler(_, message: Message):
 
     hell = await hellbot.edit(message, f"Translating to `{toLang}`...")
     text = emoji.demojize(text.strip())
-    translator = Translator()
+    translator = Translator(http2=False)
 
     try:
         translated = translator.translate(text, toLang)
@@ -517,6 +521,11 @@ HelpMenu("google").add(
     "Sends the text as a voice message.",
     "voice I'm Helly and this is an Text to Speech Example.",
     "An alias of 'tts' can also be used.",
+).add(
+    "movie", #Bugged: to-be-fixed
+    "<movie name>",
+    "Sends the details of the given movie.",
+    "movie the shawshak redemption",
 ).info(
     "Every Google command you need."
 ).done()

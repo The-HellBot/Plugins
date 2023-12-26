@@ -73,3 +73,20 @@ async def uploadDir(_, message: Message):
     await hell.edit(
         f"**Uploaded** `{uploaded}/{len(files_list)}` **files in** `{ul_time}`"
     )
+
+
+HelpMenu("uploads").add(
+    "upload",
+    "<filepath>",
+    "Uploads the mentioned file from the local server to current chat.",
+    "upload README.md",
+    "Be cautious while uploading files.",
+).add(
+    "uploaddir",
+    "<dirpath>",
+    "Uploads all the files from the mentioned directory to current chat.",
+    "uploaddir ./downloads/",
+    "Be cautious while uploading files.",
+).info(
+    "Upload Manager"
+).done()

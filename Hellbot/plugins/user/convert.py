@@ -170,7 +170,7 @@ async def media_to_mp3(_, message: Message):
 
 
 HelpMenu("convert").add(
-    "stog",
+    "stog", #Bugged: to-be-fixed
     "<reply>",
     "Converts animated sticker to gif.",
     None,

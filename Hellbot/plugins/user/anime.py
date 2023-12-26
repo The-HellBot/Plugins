@@ -143,17 +143,42 @@ async def watch_order(_, message: Message):
 
 
 HelpMenu("anime").add(
-    "anime", "<name>", "Get a detailed information about the mentioned anime.", "anime one piece"
+    "anime",
+    "<name>",
+    "Get a detailed information about the mentioned anime.",
+    "anime one piece",
 ).add(
-    "manga", "<name>", "Get a detailed information about the mentioned manga.", "manga one piece"
+    "manga",
+    "<name>",
+    "Get a detailed information about the mentioned manga.",
+    "manga one piece",
 ).add(
-    "character", "<name>", "Get a detailed information about the mentioned character.", "character monkey d luffy"
+    "character",
+    "<name>",
+    "Get a detailed information about the mentioned character.",
+    "character monkey d luffy",
 ).add(
-    "airing", "<name>", "Get a detailed airing information about the mentioned anime.", "airing one piece"
+    "airing",
+    "<name>",
+    "Get a detailed airing information about the mentioned anime.",
+    "airing one piece",
 ).add(
-    "anilistuser", "<username>", "Get a detailed information about the mentioned anilist user.", "anilistuser meizhellboy", "You can also use 'aniuser' as alias"
+    "anilistuser",
+    "<username>",
+    "Get a detailed information about the mentioned anilist user.",
+    "anilistuser meizhellboy",
+    "You can also use 'aniuser' as alias",
 ).add(
-    "filler", "<name>", "Get the list of filler/canon episodes about the mentioned anime.", "filler one piece", "You can also use 'canon' as alias"
+    "filler",
+    "<name>",
+    "Get the list of filler/canon episodes about the mentioned anime.",
+    "filler one piece",
+    "You can also use 'canon' as alias",
 ).add(
-    "watchorder", "<name>", "Get the watch order about the mentioned anime.", "watchorder one piece"
-).info("Anime Menu").done()
+    "watchorder",
+    "<name>",
+    "Get the watch order about the mentioned anime.",
+    "watchorder one piece",
+).info(
+    "Anime Menu"
+).done()

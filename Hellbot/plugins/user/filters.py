@@ -86,7 +86,7 @@ async def allfilters(client: Client, message: Message):
 
         if await db.is_filter(client.me.id, message.chat.id, keyword.lower()):
             data = await db.get_filter(client.me.id, message.chat.id, keyword.lower())
-            data = data["filter"]
+            data = data["filter"][0]
 
             file_id = data.get("fileId", None)
             caption = data.get("text", None)
