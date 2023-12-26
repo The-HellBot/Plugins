@@ -134,6 +134,9 @@ async def renameMedia(_, message: Message):
         MessageMediaType.PHOTO,
         MessageMediaType.VIDEO,
         MessageMediaType.VOICE,
+        MessageMediaType.ANIMATION,
+        MessageMediaType.STICKER,
+        MessageMediaType.VIDEO_NOTE,
     ]:
         return await hellbot.delete(message, "Unsupported media type!")
 

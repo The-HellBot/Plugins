@@ -100,8 +100,9 @@ class HellClient(Client):
             return False
 
     async def start_message(self, version: dict) -> None:
-        await self.bot.send_message(
+        await self.bot.send_photo(
             Config.LOGGER_ID,
+            "https://te.legra.ph/file/8deca5343c64d9db9401f.mp4",
             f"**{Symbols.check_mark} 𝖧𝖾𝗅𝗅𝖡𝗈𝗍 𝗂𝗌 𝗇𝗈𝗐 𝖮𝗇𝗅𝗂𝗇𝖾!**\n\n"
             f"**{Symbols.triangle_right} 𝖢𝗅𝗂𝖾𝗇𝗍𝗌:** `{len(self.users)}`\n"
             f"**{Symbols.triangle_right} 𝖯𝗅𝗎𝗀𝗂𝗇𝗌:** `{len(Config.CMD_MENU)}`\n"
@@ -113,7 +114,7 @@ class HellClient(Client):
             f"**{Symbols.triangle_right} 𝖯𝗒𝗍𝗁𝗈𝗇 𝖵𝖾𝗋𝗌𝗂𝗈𝗇:** `{version['python']}`\n\n"
             f"**</> @HellBot_Networks**",
             ParseMode.MARKDOWN,
-            disable_web_page_preview=True,
+            disable_notification=True,
             reply_markup=InlineKeyboardMarkup(
                 [
                     [
