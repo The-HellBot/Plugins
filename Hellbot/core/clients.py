@@ -10,8 +10,6 @@ from pyrogram import Client
 from pyrogram.enums import ParseMode
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
-from Hellbot import __version__
-
 from .config import ENV, Config, Symbols
 from .database import db
 from .logger import LOGS
@@ -101,7 +99,7 @@ class HellClient(Client):
         except Exception:
             return False
 
-    async def start_message(self) -> None:
+    async def start_message(self, version: dict) -> None:
         await self.bot.send_message(
             Config.LOGGER_ID,
             f"**{Symbols.check_mark} 𝖧𝖾𝗅𝗅𝖡𝗈𝗍 𝗂𝗌 𝗇𝗈𝗐 𝖮𝗇𝗅𝗂𝗇𝖾!**\n\n"
@@ -110,9 +108,9 @@ class HellClient(Client):
             f"**{Symbols.triangle_right} 𝖢𝗈𝗆𝗆𝖺𝗇𝖽𝗌:** `{len(Config.CMD_INFO)}`\n"
             f"**{Symbols.triangle_right} 𝖲𝗍𝖺𝗇 𝖴𝗌𝖾𝗋𝗌:** `{len(Config.STAN_USERS)}`\n"
             f"**{Symbols.triangle_right} 𝖠𝗎𝗍𝗁 𝖴𝗌𝖾𝗋𝗌:** `{len(Config.AUTH_USERS)}`\n\n"
-            f"**{Symbols.triangle_right} 𝖧𝖾𝗅𝗅𝖡𝗈𝗍 𝖵𝖾𝗋𝗌𝗂𝗈𝗇:** `{__version__['hellbot']}`\n"
-            f"**{Symbols.triangle_right} 𝖯𝗒𝗋𝗈𝗀𝗋𝖺𝗆 𝖵𝖾𝗋𝗌𝗂𝗈𝗇:** `{__version__['pyrogram']}`\n"
-            f"**{Symbols.triangle_right} 𝖯𝗒𝗍𝗁𝗈𝗇 𝖵𝖾𝗋𝗌𝗂𝗈𝗇:** `{__version__['python']}`\n\n"
+            f"**{Symbols.triangle_right} 𝖧𝖾𝗅𝗅𝖡𝗈𝗍 𝖵𝖾𝗋𝗌𝗂𝗈𝗇:** `{version['hellbot']}`\n"
+            f"**{Symbols.triangle_right} 𝖯𝗒𝗋𝗈𝗀𝗋𝖺𝗆 𝖵𝖾𝗋𝗌𝗂𝗈𝗇:** `{version['pyrogram']}`\n"
+            f"**{Symbols.triangle_right} 𝖯𝗒𝗍𝗁𝗈𝗇 𝖵𝖾𝗋𝗌𝗂𝗈𝗇:** `{version['python']}`\n\n"
             f"**</> @HellBot_Networks**",
             ParseMode.MARKDOWN,
             disable_web_page_preview=True,
