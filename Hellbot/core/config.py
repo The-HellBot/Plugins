@@ -39,6 +39,7 @@ class Config:
     MUTED_USERS = filters.user()
     DEVS = filters.user([1432756163, 1874070588])
     STAN_USERS = filters.user()
+    FORCESUBS = filters.chat()
 
     # Global config: do not edit
     BOT_CMD_INFO = {}

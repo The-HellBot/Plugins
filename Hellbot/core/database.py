@@ -20,6 +20,7 @@ class Database:
         self.echo = self.db["echo"]
         self.env = self.db["env"]
         self.filter = self.db["filter"]
+        self.forcesub = self.db["forcesub"]
         self.gban = self.db["gban"]
         self.gmute = self.db["gmute"]
         self.greetings = self.db["greetings"]
@@ -339,9 +340,7 @@ class Database:
 
         return data["echo"]
 
-    async def set_filter(
-        self, client: int, chat: int, keyword: str, msgid: int
-    ):
+    async def set_filter(self, client: int, chat: int, keyword: str, msgid: int):
         await self.filter.update_one(
             {"client": client, "chat": chat},
             {"$push": {"filter": {"keyword": keyword, "msgid": msgid}}},
@@ -379,9 +378,7 @@ class Database:
 
         return data["filter"]
 
-    async def set_snip(
-        self, client: int, chat: int, keyword: str, msgid: int
-    ):
+    async def set_snip(self, client: int, chat: int, keyword: str, msgid: int):
         await self.snips.update_one(
             {"client": client, "chat": chat},
             {"$push": {"snips": {"keyword": keyword, "msgid": msgid}}},
@@ -486,6 +483,37 @@ class Database:
 
     async def get_all_greetings(self, client: int) -> list:
         return [i async for i in self.greetings.find({"client": client})]
+
+    async def add_forcesub(self, chat: int, must_join: int):
+        await self.forcesub.update_one(
+            {"chat": chat},
+            {"$push": {"must_join": must_join}},
+            upsert=True,
+        )
+
+    async def rm_forcesub(self, chat: int, must_join: int) -> int:
+        await self.forcesub.update_one(
+            {"chat": chat},
+            {"$pull": {"must_join": must_join}},
+        )
+        data = await self.forcesub.find_one({"chat": chat})
+        return len(data["must_join"])
+
+    async def rm_all_forcesub(self, in_chat: int):
+        await self.forcesub.delete_one({"chat": in_chat})
+
+    async def is_forcesub(self, chat: int, must_join: int) -> bool:
+        data = await self.get_forcesub(chat)
+        if must_join in data["must_join"]:
+            return True
+        return False
+
+    async def get_forcesub(self, in_chat: int):
+        data = await self.forcesub.find_one({"chat": in_chat})
+        return data
+
+    async def get_all_forcesubs(self) -> list:
+        return [i async for i in self.forcesub.find({})]
 
 
 db = Database(Config.DATABASE_URL)

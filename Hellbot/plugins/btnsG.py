@@ -4,7 +4,7 @@ from math import ceil
 
 from pyrogram.types import InlineKeyboardButton
 
-from Hellbot.core import ENV, Symbols, db
+from Hellbot.core import ENV, Symbols, db, Config
 
 
 def gen_inline_keyboard(collection: list, row: int = 2) -> list[list[InlineKeyboardButton]]:
@@ -63,3 +63,39 @@ async def gen_inline_help_buttons(page: int, plugins: list) -> tuple[list, int]:
     )
 
     return buttons, max_pages
+
+
+async def gen_bot_help_buttons() -> list[list[InlineKeyboardButton]]:
+    buttons = []
+    plugins = sorted(Config.BOT_CMD_MENU)
+    emoji = await db.get_env(ENV.help_emoji) or "✧"
+    pairs = list(map(list, zip(plugins[::2], plugins[1::2])))
+
+    if len(plugins) % 2 == 1:
+        pairs.append([plugins[-1]])
+
+    for pair in pairs:
+        btn_pair = []
+        for i, plugin in enumerate(pair):
+            if i % 2 == 0:
+                btn_pair.append(
+                    InlineKeyboardButton(f"{emoji} {plugin}", f"bot_help_menu:{plugin}")
+                )
+            else:
+                btn_pair.append(
+                    InlineKeyboardButton(f"{plugin} {emoji}", f"bot_help_menu:{plugin}")
+                )
+        buttons.append(btn_pair)
+
+    buttons.append([InlineKeyboardButton(Symbols.close, "help_data:botclose")])
+
+    return buttons
+
+
+def start_button() -> list[list[InlineKeyboardButton]]:
+    return [
+        [
+            InlineKeyboardButton("⚙️ Help", "help_data:bothelp"),
+            InlineKeyboardButton("Source 📦", "help_data:source"),
+        ]
+    ]

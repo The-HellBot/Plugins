@@ -6,10 +6,10 @@ from pyrogram.types import (
     InputTextMessageContent,
 )
 
-from Hellbot.core import Config, hellbot
 from Hellbot.functions.templates import help_template
 
 from ..btnsG import gen_inline_help_buttons
+from . import Config, hellbot
 
 
 @hellbot.bot.on_inline_query(filters.regex(r"help_menu"))

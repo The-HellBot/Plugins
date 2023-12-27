@@ -1,5 +1,5 @@
 from pyrogram.enums import ChatMembersFilter, ChatMemberStatus, ChatType
-from pyrogram.types import Message
+from pyrogram.types import Chat
 
 from Hellbot.core import hellbot
 
@@ -13,11 +13,11 @@ async def get_admins(chat_id: int) -> list:
     return admins
 
 
-async def is_user_admin(message: Message, user_id: int) -> bool:
-    if message.chat.type in [ChatType.PRIVATE, ChatType.BOT]:
+async def is_user_admin(chat: Chat, user_id: int) -> bool:
+    if chat.type in [ChatType.PRIVATE, ChatType.BOT]:
         return True
 
-    status = (await message.chat.get_member(user_id)).status
+    status = (await chat.get_member(user_id)).status
     if status in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR]:
         return True
 

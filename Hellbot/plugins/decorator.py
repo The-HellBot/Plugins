@@ -3,7 +3,7 @@ from pyrogram.enums import ChatType
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
 
-from Hellbot.core import Config, hellbot, db
+from Hellbot.core import Config, db, hellbot
 from Hellbot.functions.admins import is_user_admin
 
 
@@ -36,7 +36,7 @@ def on_message(
                     return
 
             if admin_only and not message.chat.type == ChatType.PRIVATE:
-                if not await is_user_admin(message, client.me.id):
+                if not await is_user_admin(message.chat, client.me.id):
                     return await hellbot.edit(message, "𝖨 𝖺𝗆 𝗇𝗈𝗍 𝖺𝗇 𝖺𝖽𝗆𝗂𝗇 𝗁𝖾𝗋𝖾!")
 
             if chat_type and message.chat.type not in chat_type:
@@ -46,7 +46,7 @@ def on_message(
             message.continue_propagation()
 
         for user in hellbot.users:
-            user.add_handler(MessageHandler(wrapper, _filter), group)        
+            user.add_handler(MessageHandler(wrapper, _filter), group)
 
         return wrapper
 

@@ -74,16 +74,16 @@ def generate_alive_image(
     background.paste(img, (383, 445), img)
     draw = ImageDraw.Draw(background)
 
-    text = format_text(username[:20] + ("..." if len(username) > 20 else ""))
+    text = format_text(username[:25] + ("..." if len(username) > 25 else ""))
 
-    font_size = width // len(text)
+    font_size = width // 15
     font = ImageFont.truetype(font_path, font_size, encoding="utf-8")
 
     text_length = draw.textlength(text, font)
-    position = ((background.width - text_length) / 2, background.height - 155)
+    position = ((background.width - text_length) / 2, background.height - 145)
     draw.text(position, text, (255, 255, 255), font=font)
 
-    output_img = f"alive_{round(time.time())}.png"
+    output_img = f"alive_{int(time.time())}.png"
     background.save(output_img, "PNG")
     background.close()
 

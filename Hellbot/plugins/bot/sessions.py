@@ -10,10 +10,8 @@ from pyrogram.types import (
     ReplyKeyboardRemove,
 )
 
-from Hellbot.core import Config, Symbols, db, hellbot
-
 from ..btnsG import gen_inline_keyboard
-from . import START_MSG, BotHelp
+from . import START_MSG, BotHelp, Config, Symbols, db, hellbot
 
 
 @hellbot.bot.on_message(
@@ -40,20 +38,21 @@ async def new_session(_, message: Message):
         "**𝖮𝗄𝖺𝗒!** 𝖫𝖾𝗍'𝗌 𝗌𝖾𝗍𝗎𝗉 𝖺 𝗇𝖾𝗐 𝗌𝖾𝗌𝗌𝗂𝗈𝗇",
         reply_markup=ReplyKeyboardRemove(),
     )
+
     phone_number = await hellbot.bot.ask(
         message.chat.id,
         "**1.** 𝖤𝗇𝗍𝖾𝗋 𝗒𝗈𝗎𝗋 𝗍𝖾𝗅𝖾𝗀𝗋𝖺𝗆 𝖺𝖼𝖼𝗈𝗎𝗇𝗍 𝗉𝗁𝗈𝗇𝖾 𝗇𝗎𝗆𝖻𝖾𝗋 𝗍𝗈 𝖺𝖽𝖽 𝗍𝗁𝖾 𝗌𝖾𝗌𝗌𝗂𝗈𝗇: \n\n__𝖲𝖾𝗇𝖽 /cancel 𝗍𝗈 𝖼𝖺𝗇𝖼𝖾𝗅 𝗍𝗁𝖾 𝗈𝗉𝖾𝗋𝖺𝗍𝗂𝗈𝗇.__",
         filters=filters.text,
         timeout=120,
     )
+
     if phone_number.text == "/cancel":
-        await message.reply_text("**𝖢𝖺𝗇𝖼𝖾𝗅𝗅𝖾𝖽!**")
-        return
+        return await message.reply_text("**𝖢𝖺𝗇𝖼𝖾𝗅𝗅𝖾𝖽!**")
     elif not phone_number.text.startswith("+") and not phone_number.text[1:].isdigit():
-        await message.reply_text(
+        return await message.reply_text(
             "**𝖤𝗋𝗋𝗈𝗋!** 𝖯𝗁𝗈𝗇𝖾 𝗇𝗎𝗆𝖻𝖾𝗋 𝗆𝗎𝗌𝗍 𝖻𝖾 𝗂𝗇 𝖽𝗂𝗀𝗂𝗍𝗌 𝖺𝗇𝖽 𝗌𝗁𝗈𝗎𝗅𝖽 𝖼𝗈𝗇𝗍𝖺𝗂𝗇 𝖼𝗈𝗎𝗇𝗍𝗋𝗒 𝖼𝗈𝖽𝖾."
         )
-        return
+
     try:
         client = Client(
             name="Hellbot",
@@ -62,6 +61,7 @@ async def new_session(_, message: Message):
             in_memory=True,
         )
         await client.connect()
+
         code = await client.send_code(phone_number.text)
         ask_otp = await hellbot.bot.ask(
             message.chat.id,
@@ -70,9 +70,9 @@ async def new_session(_, message: Message):
             timeout=300,
         )
         if ask_otp.text == "/cancel":
-            await message.reply_text("**𝖢𝖺𝗇𝖼𝖾𝗅𝗅𝖾𝖽!**")
-            return
+            return await message.reply_text("**𝖢𝖺𝗇𝖼𝖾𝗅𝗅𝖾𝖽!**")
         otp = ask_otp.text.replace(" ", "")
+
         try:
             await client.sign_in(phone_number.text, code.phone_code_hash, otp)
         except SessionPasswordNeeded:
@@ -83,9 +83,9 @@ async def new_session(_, message: Message):
                 timeout=120,
             )
             if two_step_pass.text == "/cancel":
-                await message.reply_text("**𝖢𝖺𝗇𝖼𝖾𝗅𝗅𝖾𝖽!**")
-                return
+                return await message.reply_text("**𝖢𝖺𝗇𝖼𝖾𝗅𝗅𝖾𝖽!**")
             await client.check_password(two_step_pass.text)
+
         session_string = await client.export_session_string()
         await message.reply_text(
             f"**𝖲𝗎𝖼𝖼𝖾𝗌𝗌!** 𝖸𝗈𝗎𝗋 𝗌𝖾𝗌𝗌𝗂𝗈𝗇 𝗌𝗍𝗋𝗂𝗇𝗀 𝗂𝗌 𝗀𝖾𝗇𝖾𝗋𝖺𝗍𝖾𝖽. 𝖠𝖽𝖽𝗂𝗇𝗀 𝗂𝗍 𝗍𝗈 𝖽𝖺𝗍𝖺𝖻𝖺𝗌𝖾..."
@@ -100,10 +100,8 @@ async def new_session(_, message: Message):
         await message.reply_text(
             "**𝖳𝗂𝗆𝖾𝗈𝗎𝗍𝖤𝗋𝗋𝗈𝗋!** 𝖸𝗈𝗎 𝗍𝗈𝗈𝗄 𝗅𝗈𝗇𝗀𝖾𝗋 𝗍𝗁𝖺𝗇 𝖾𝗑𝖼𝗉𝖾𝖼𝗍𝖾𝖽 𝗍𝗈 𝖼𝗈𝗆𝗉𝗅𝖾𝗍𝖾 𝗍𝗁𝖾 𝗉𝗋𝗈𝖼𝖾𝗌𝗌. 𝖯𝗅𝖾𝖺𝗌𝖾 𝗍𝗋𝗒 𝖺𝗀𝖺𝗂𝗇."
         )
-        return
     except Exception as e:
         await message.reply_text(f"**𝖤𝗋𝗋𝗈𝗋!** {e}")
-        return
 
 
 @hellbot.bot.on_message(
@@ -112,13 +110,15 @@ async def new_session(_, message: Message):
 async def delete_session(_, message: Message):
     all_sessions = await db.get_all_sessions()
     if not all_sessions:
-        await message.reply_text("𝖭𝗈 𝗌𝖾𝗌𝗌𝗂𝗈𝗇𝗌 𝖿𝗈𝗎𝗇𝖽 𝗂𝗇 𝖽𝖺𝗍𝖺𝖻𝖺𝗌𝖾.")
-        return
+        return await message.reply_text("𝖭𝗈 𝗌𝖾𝗌𝗌𝗂𝗈𝗇𝗌 𝖿𝗈𝗎𝗇𝖽 𝗂𝗇 𝖽𝖺𝗍𝖺𝖻𝖺𝗌𝖾.")
+
     collection = []
     for i in all_sessions:
         collection.append((i["user_id"], f"rm_session:{i['user_id']}"))
+
     buttons = gen_inline_keyboard(collection, 2)
     buttons.append([InlineKeyboardButton("Cancel ❌", "auth_close")])
+
     await message.reply_text(
         "**𝖢𝗁𝗈𝗈𝗌𝖾 𝖺 𝗌𝖾𝗌𝗌𝗂𝗈𝗇 𝗍𝗈 𝖽𝖾𝗅𝖾𝗍𝖾:**",
         reply_markup=InlineKeyboardMarkup(buttons),
@@ -127,17 +127,22 @@ async def delete_session(_, message: Message):
 
 @hellbot.bot.on_callback_query(filters.regex(r"rm_session"))
 async def rm_session_cb(_, cb: CallbackQuery):
-    user_id = int(cb.data.split(":")[1])
-    await db.rm_session(user_id)
-    await cb.answer("**𝖲𝗎𝖼𝖼𝖾𝗌𝗌!** 𝖲𝖾𝗌𝗌𝗂𝗈𝗇 𝖽𝖾𝗅𝖾𝗍𝖾𝖽 𝖿𝗋𝗈𝗆 𝖽𝖺𝗍𝖺𝖻𝖺𝗌𝖾.", show_alert=True)
     collection = []
+    user_id = int(cb.data.split(":")[1])
     all_sessions = await db.get_all_sessions()
+
     if not all_sessions:
         return await cb.message.delete()
+
+    await db.rm_session(user_id)
+    await cb.answer("**𝖲𝗎𝖼𝖼𝖾𝗌𝗌!** 𝖲𝖾𝗌𝗌𝗂𝗈𝗇 𝖽𝖾𝗅𝖾𝗍𝖾𝖽 𝖿𝗋𝗈𝗆 𝖽𝖺𝗍𝖺𝖻𝖺𝗌𝖾.", show_alert=True)
+
     for i in all_sessions:
         collection.append((i["user_id"], f"rm_session:{i['user_id']}"))
+
     buttons = gen_inline_keyboard(collection, 2)
     buttons.append([InlineKeyboardButton("Cancel ❌", "auth_close")])
+
     await cb.message.edit_reply_markup(InlineKeyboardMarkup(buttons))
 
 
@@ -147,11 +152,12 @@ async def rm_session_cb(_, cb: CallbackQuery):
 async def list_sessions(_, message: Message):
     all_sessions = await db.get_all_sessions()
     if not all_sessions:
-        await message.reply_text("𝖭𝗈 𝗌𝖾𝗌𝗌𝗂𝗈𝗇𝗌 𝖿𝗈𝗎𝗇𝖽 𝗂𝗇 𝖽𝖺𝗍𝖺𝖻𝖺𝗌𝖾.")
-        return
+        return await message.reply_text("𝖭𝗈 𝗌𝖾𝗌𝗌𝗂𝗈𝗇𝗌 𝖿𝗈𝗎𝗇𝖽 𝗂𝗇 𝖽𝖺𝗍𝖺𝖻𝖺𝗌𝖾.")
+
     text = f"**{Symbols.cross_mark} 𝖫𝗂𝗌𝗍 𝗈𝖿 𝗌𝖾𝗌𝗌𝗂𝗈𝗇𝗌:**\n\n"
     for i, session in enumerate(all_sessions):
         text += f"[{'0' if i <= 9 else ''}{i+1}] {Symbols.bullet} **𝖴𝗌𝖾𝗋 𝖨𝖣:** `{session['user_id']}`\n"
+
     await message.reply_text(text)
 
 
@@ -162,6 +168,8 @@ async def go_home(_, message: Message):
     await message.reply_text(START_MSG, reply_markup=ReplyKeyboardRemove())
 
 
-BotHelp("Sessions").add(
-    "session", "To manage user sessions of the bot."
-).info("Manage Userbot Sessions").done()
+BotHelp("sessions").add(
+    "session", "This command is packed with tools to manage userbot sessions."
+).info(
+    "Session 🚀"
+).done()

@@ -1,14 +1,15 @@
 from pyrogram import idle
 
-from Hellbot.core import UserSetup, db, hellbot
-from Hellbot.functions.utility import BList, Flood, TGraph
 from Hellbot import __version__
+from Hellbot.core import ForcesubSetup, UserSetup, db, hellbot
+from Hellbot.functions.utility import BList, Flood, TGraph
 
 
 async def main():
     await hellbot.startup()
     await db.connect()
     await UserSetup()
+    await ForcesubSetup()
     await Flood.updateFromDB()
     await BList.updateBlacklists()
     await TGraph.setup()

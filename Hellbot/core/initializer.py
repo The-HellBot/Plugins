@@ -50,7 +50,16 @@ async def _GbanUsers() -> None:
 
 
 async def UserSetup() -> None:
+    """Initialize Users Config"""
     LOGS.info(f"{Symbols.bullet * 3} Setting Up Users {Symbols.bullet * 3}")
     await _AuthUsers()
     await _StanUsers()
     await _GbanUsers()
+
+
+async def ForcesubSetup() -> None:
+    """Initialize Forcesub Config"""
+    chats = await db.get_all_forcesubs()
+    for chat in chats:
+        if chat not in Config.FORCESUBS:
+            Config.FORCESUBS.add(chat["chat"])

@@ -2,10 +2,10 @@ from pyrogram import Client, filters
 from pyrogram.enums import ParseMode
 from pyrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 
-from Hellbot.core import Config, Symbols, hellbot
 from Hellbot.functions.templates import command_template, help_template
 
-from ..btnsG import gen_inline_help_buttons
+from ..btnsG import gen_bot_help_buttons, gen_inline_help_buttons, start_button
+from . import HELP_MSG, START_MSG, Config, Symbols, hellbot
 
 
 async def check_auth_click(cb: CallbackQuery) -> bool:
@@ -131,7 +131,7 @@ async def help_cmd_cb(_, cb: CallbackQuery):
 
 
 @hellbot.bot.on_callback_query(filters.regex(r"help_data"))
-async def help_close_cb(client: Client, cb: CallbackQuery):
+async def help_close_cb(_, cb: CallbackQuery):
     if not await check_auth_click(cb):
         return
 
@@ -152,5 +152,50 @@ async def help_close_cb(client: Client, cb: CallbackQuery):
         )
         await cb.edit_message_text(
             caption,
+            reply_markup=InlineKeyboardMarkup(buttons),
+        )
+    elif action == "botclose":
+        await cb.message.delete()
+    elif action == "bothelp":
+        buttons = await gen_bot_help_buttons()
+        await cb.edit_message_text(
+            HELP_MSG,
+            disable_web_page_preview=True,
+            reply_markup=InlineKeyboardMarkup(buttons),
+        )
+    elif action == "source":
+        buttons = [
+            [
+                InlineKeyboardButton("🚀 Deploy", url="https://github.com/The-HellBot/HellBot"),
+                InlineKeyboardButton("Plugins 📂", url="https://github.com/The-HellBot/Plugins"),
+            ],
+            [
+                InlineKeyboardButton("нєℓℓвσт ηєтωσяк 🇮🇳", url="https://t.me/HellBot_Networks"),
+            ],
+            [
+                InlineKeyboardButton("🎙️ Support", url="https://t.me/HellBot_Chats"),
+                InlineKeyboardButton("Updates 📣", url="https://t.me/Its_HellBot"),
+            ],
+            [
+                InlineKeyboardButton("🔙", "help_data:start"),
+                InlineKeyboardButton(Symbols.close, "help_data:botclose"),
+            ],
+        ]
+        await cb.edit_message_text(
+            "**Source 📦:**\n\n"
+            "**Note:** \n__» The source code is available on GitHub. You can find the link below.__\n"
+            "__» Every project available under The-HellBot are open-source and free to use and modify to your needs.__\n"
+            "__» Anyone pretending to be the developer of this bot and selling the code, is a scammer.__\n\n"
+            "__» Please consider giving a star to the repository if you liked the project.__\n"
+            "__» Feel free to contact us if you need any help regarding the source code.__\n\n"
+            "**❤️ @HellBot_Networks 🇮🇳**",
+            disable_web_page_preview=True,
+            reply_markup=InlineKeyboardMarkup(buttons),
+        )
+    elif action == "start":
+        buttons = start_button()
+        await cb.edit_message_text(
+            START_MSG.format(cb.from_user.mention),
+            disable_web_page_preview=True,
             reply_markup=InlineKeyboardMarkup(buttons),
         )
