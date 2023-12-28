@@ -54,7 +54,7 @@ class Config:
 
 
 class ENV:
-    """ Database ENV Names """
+    """Database ENV Names"""
 
     airing_template = "AIRING_TEMPLATE"
     airpollution_template = "AIRPOLLUTION_TEMPLATE"
@@ -135,5 +135,21 @@ class Symbols:
     triangle_right = "▸"
 
 
-os_configs = ["API_HASH", "API_ID", "BOT_TOKEN", "DATABASE_URL", "HANDLERS", "LOGGER_ID", "OWNER_ID"]
-all_env: list[str] = [value for key, value in ENV.__dict__.items() if not key.startswith("__")]
+os_configs = [
+    "API_HASH",
+    "API_ID",
+    "BOT_TOKEN",
+    "DATABASE_URL",
+    "DEPLOY_BRANCH",
+    "DEPLOY_REPO",
+    "HANDLERS",
+    "HEROKU_APIKEY",
+    "HEROKU_APPNAME",
+    "LOGGER_ID",
+    "OWNER_ID",
+    "PLUGINS_BRANCH",
+    "PLUGINS_REPO",
+]
+all_env: list[str] = [
+    value for key, value in ENV.__dict__.items() if not key.startswith("__")
+]
