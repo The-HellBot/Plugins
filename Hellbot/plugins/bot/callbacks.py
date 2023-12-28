@@ -29,6 +29,69 @@ async def close_cb(_, cb: CallbackQuery):
     await cb.message.delete()
 
 
+@hellbot.bot.on_callback_query(filters.regex(r"bot_help_menu"))
+async def boot_help_menu_cb(_, cb: CallbackQuery):
+    if not await check_auth_click(cb):
+        return
+
+    plugin = str(cb.data.split(":")[1])
+
+    try:
+        buttons = [
+            InlineKeyboardButton(
+                f"{Symbols.bullet} {i}", f"bot_help_cmd:{plugin}:{i}"
+            )
+            for i in sorted(Config.BOT_HELP[plugin]["commands"])
+        ]
+    except KeyError:
+        await cb.answer("No description provided for this plugin!", show_alert=True)
+        return
+
+    buttons = [buttons[i : i + 2] for i in range(0, len(buttons), 2)]
+    buttons.append([InlineKeyboardButton(Symbols.back, "help_data:bothelp")])
+
+    caption = (
+        f"**𝖯𝗅𝗎𝗀𝗂𝗇 𝖥𝗂𝗅𝖾:** `{plugin}`\n"
+        f"**𝖯𝗅𝗎𝗀𝗂𝗇 𝖨𝗇𝖿𝗈:** __{Config.HELP_DICT[plugin]['info']} 🍀__\n\n"
+        f"**📃 𝖫𝗈𝖺𝖽𝖾𝖽 𝖢𝗈𝗆𝗆𝖺𝗇𝖽𝗌:** `{len(sorted(Config.HELP_DICT[plugin]['commands']))}`"
+    )
+
+    await cb.edit_message_text(
+        caption,
+        disable_web_page_preview=True,
+        reply_markup=InlineKeyboardMarkup(buttons),
+    )
+
+
+@hellbot.bot.on_callback_query(filters.regex(r"bot_help_cmd"))
+async def bot_help_cmd_cb(_, cb: CallbackQuery):
+    if not await check_auth_click(cb):
+        return
+
+    result = ""
+    plugin = str(cb.data.split(":")[1])
+    command = str(cb.data.split(":")[2])
+    cmd_dict = Config.BOT_HELP[plugin]["commands"][command]
+
+    result += f"**{Symbols.radio_select} 𝖢𝗈𝗆𝗆𝖺𝗇𝖽:** `/{cmd_dict['command']}`"
+    result += f"\n\n**{Symbols.arrow_right} 𝖣𝖾𝗌𝖼𝗋𝗂𝗉𝗍𝗂𝗈𝗇:** __{cmd_dict['description']}__"
+    result += f"\n\n**<\> @Its_HellBot 🍀**"
+
+    buttons = [
+        [
+            InlineKeyboardButton(Symbols.back, f"bot_help_menu:{plugin}"),
+            InlineKeyboardButton(Symbols.close, "help_data:botclose"),
+        ]
+    ]
+
+    await cb.edit_message_text(
+        result,
+        ParseMode.MARKDOWN,
+        True,
+        InlineKeyboardMarkup(buttons),
+    )
+
+
 @hellbot.bot.on_callback_query(filters.regex(r"help_page"))
 async def help_page_cb(_, cb: CallbackQuery):
     if not await check_auth_click(cb):

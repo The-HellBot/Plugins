@@ -28,10 +28,16 @@ async def addclient(_, message: Message):
 async def help_pm(_, message: Message):
     btns = gen_bot_help_buttons()
     await message.reply_text(
-        HELP_MSG, disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup(btns)
+        HELP_MSG,
+        disable_web_page_preview=True,
+        reply_markup=InlineKeyboardMarkup(btns),
     )
 
 
-BotHelp("Others").add("start", "To check if bot alive or not.").add(
+BotHelp("Others").add("start", "To start the bot and get main menu.").add(
     "settings", "To change settings of bot."
-).info("Some basic commands of the bot.").done()
+).add(
+    "help", "To get the help message with all the command for this assistant bot."
+).info(
+    "Some basic commands of the bot."
+).done()

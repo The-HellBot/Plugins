@@ -87,7 +87,12 @@ async def gen_bot_help_buttons() -> list[list[InlineKeyboardButton]]:
                 )
         buttons.append(btn_pair)
 
-    buttons.append([InlineKeyboardButton(Symbols.close, "help_data:botclose")])
+    buttons.append(
+        [
+            InlineKeyboardButton(Symbols.close, "help_data:botclose"),
+            InlineKeyboardButton("🏠", "help_data:start")
+        ]
+    )
 
     return buttons
 
