@@ -165,7 +165,10 @@ async def list_sessions(_, message: Message):
     filters.regex(r"Home 🏠") & filters.user(Config.OWNER_ID) & filters.private
 )
 async def go_home(_, message: Message):
-    await message.reply_text(START_MSG, reply_markup=ReplyKeyboardRemove())
+    await message.reply_text(
+        START_MSG.format(message.from_user.mention),
+        reply_markup=ReplyKeyboardRemove(),
+    )
 
 
 BotHelp("sessions").add(
