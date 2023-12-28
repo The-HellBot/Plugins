@@ -416,7 +416,7 @@ class Database:
 
         return data["snips"]
 
-    async def add_pmpermit(self, client: int, user: int, reason: str):
+    async def add_pmpermit(self, client: int, user: int):
         await self.pmpermit.update_one(
             {"client": client, "user": user},
             {"$set": {"date": self.get_datetime()}},
