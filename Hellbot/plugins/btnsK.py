@@ -13,10 +13,33 @@ def gen_keyboard(collection: list, row: int = 2) -> list[list[KeyboardButton]]:
     return keyboard
 
 
-SETTINGS_KB = ReplyKeyboardMarkup(
-    [
-        [KeyboardButton("Clients 👥")],
-        [KeyboardButton("Home 🏠")],
-    ],
-    resize_keyboard=True,
-)
+def session_keyboard() -> ReplyKeyboardMarkup:
+    return ReplyKeyboardMarkup(
+        [
+            [
+                KeyboardButton("New 💫"),
+                KeyboardButton("Delete ❌"),
+            ],
+            [
+                KeyboardButton("List 📜"),
+                KeyboardButton("Home 🏠"),
+            ],
+        ],
+        resize_keyboard=True,
+    )
+
+
+def start_keyboard() -> ReplyKeyboardMarkup:
+    return ReplyKeyboardMarkup(
+        [
+            [
+                KeyboardButton("📟 Session"),
+                KeyboardButton("Force Sub ✨"),
+            ],
+            [
+                KeyboardButton("👥 Users"),
+                KeyboardButton("Others 📣"),
+            ],
+        ],
+        resize_keyboard=True,
+    )

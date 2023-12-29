@@ -191,6 +191,8 @@ async def make_logo(background: str, text: str, font_path: str) -> str:
     bg.save(output_img, "PNG")
     bg.close()
 
+    os.remove(background)
+
     return output_img
 
 

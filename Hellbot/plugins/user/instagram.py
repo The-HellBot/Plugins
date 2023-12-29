@@ -144,12 +144,14 @@ async def instagramUser(_, message: Message):
         wait = WebDriverWait(driver, 10)
         element = wait.until(presence_of_element_located((By.XPATH, "//img[@alt='Profile photo']")))
         profilePic = element.get_attribute("src")
+        print(profilePic)
         about = driver.find_element(By.XPATH, "//div/h1").text
-
+        print(about)
         profile_info_ul = driver.find_elements(By.XPATH, "//ul[@class='x78zum5 x1q0g3np xieb3on']/li/button")  # post, followers, following
         posts = profile_info_ul[0].text
         followers = profile_info_ul[1].text
         following = profile_info_ul[2].text
+        print(posts, followers, following)
 
         fileName = f"iguser_{int(time.time())}.jpg"
         binary = requests.get(profilePic).content

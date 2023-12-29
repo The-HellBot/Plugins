@@ -4,35 +4,26 @@ from pyrogram.types import (
     CallbackQuery,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
-    KeyboardButton,
     Message,
-    ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
 )
 
 from ..btnsG import gen_inline_keyboard
+from ..btnsK import session_keyboard
 from . import START_MSG, BotHelp, Config, Symbols, db, hellbot
 
 
 @hellbot.bot.on_message(
-    filters.command("session") & filters.user(Config.OWNER_ID) & filters.private
+    filters.command("session") & Config.AUTH_USERS & filters.private
 )
 async def session_menu(_, message: Message):
     await message.reply_text(
         "**🍀 𝖯𝗅𝖾𝖺𝗌𝖾 𝖼𝗁𝗈𝗈𝗌𝖾 𝖺𝗇 𝗈𝗉𝗍𝗂𝗈𝗇 𝖿𝗋𝗈𝗆 𝖻𝖾𝗅𝗈𝗐:**",
-        reply_markup=ReplyKeyboardMarkup(
-            [
-                [KeyboardButton("New 💫"), KeyboardButton("Delete ❌")],
-                [KeyboardButton("List 📜"), KeyboardButton("Home 🏠")],
-            ],
-            resize_keyboard=True,
-        ),
+        reply_markup=session_keyboard(),
     )
 
 
-@hellbot.bot.on_message(
-    filters.regex(r"New 💫") & filters.user(Config.OWNER_ID) & filters.private
-)
+@hellbot.bot.on_message(filters.regex(r"New 💫") & Config.AUTH_USERS & filters.privat)
 async def new_session(_, message: Message):
     await message.reply_text(
         "**𝖮𝗄𝖺𝗒!** 𝖫𝖾𝗍'𝗌 𝗌𝖾𝗍𝗎𝗉 𝖺 𝗇𝖾𝗐 𝗌𝖾𝗌𝗌𝗂𝗈𝗇",
@@ -105,7 +96,7 @@ async def new_session(_, message: Message):
 
 
 @hellbot.bot.on_message(
-    filters.regex(r"Delete ❌") & filters.user(Config.OWNER_ID) & filters.private
+    filters.regex(r"Delete ❌") & Config.AUTH_USERS & filters.private
 )
 async def delete_session(_, message: Message):
     all_sessions = await db.get_all_sessions()
@@ -146,9 +137,7 @@ async def rm_session_cb(_, cb: CallbackQuery):
     await cb.message.edit_reply_markup(InlineKeyboardMarkup(buttons))
 
 
-@hellbot.bot.on_message(
-    filters.regex(r"List 📜") & filters.user(Config.OWNER_ID) & filters.private
-)
+@hellbot.bot.on_message(filters.regex(r"List 📜") & Config.AUTH_USERS & filters.private)
 async def list_sessions(_, message: Message):
     all_sessions = await db.get_all_sessions()
     if not all_sessions:
@@ -161,9 +150,7 @@ async def list_sessions(_, message: Message):
     await message.reply_text(text)
 
 
-@hellbot.bot.on_message(
-    filters.regex(r"Home 🏠") & filters.user(Config.OWNER_ID) & filters.private
-)
+@hellbot.bot.on_message(filters.regex(r"Home 🏠") & filters.private & Config.AUTH_USERS)
 async def go_home(_, message: Message):
     await message.reply_text(
         START_MSG.format(message.from_user.mention),

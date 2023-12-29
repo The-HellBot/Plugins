@@ -58,9 +58,12 @@ async def delauth(client: Client, message: Message):
 )
 async def authlist(client: Client, message: Message):
     text = "**🍀 Authorized Users:**\n\n"
-    for userid in Config.AUTH_USERS:
-        user = await client.get_users(userid)
-        text += f"    {Symbols.anchor} {user.mention} (`{user.id}`)\n"
+    for i, userid in enumerate(Config.AUTH_USERS):
+        try:
+            user = await client.get_users(userid)
+            text += f"    {Symbols.anchor} {user.mention} (`{user.id}`)\n"
+        except:
+            text += f"    {Symbols.anchor} Auth User #{i} (`{userid}`)\n"
 
     await message.reply_text(text)
 

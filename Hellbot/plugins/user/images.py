@@ -6,7 +6,7 @@ import requests
 from glitch_this import ImageGlitcher
 from PIL import Image
 from pyrogram.enums import MessageMediaType
-from pyrogram.types import InputMediaPhoto, Message
+from pyrogram.types import InputMediaPhoto, Message, InputMediaDocument
 
 from Hellbot.core import ENV
 from Hellbot.functions.google import googleimagesdownload
@@ -96,7 +96,7 @@ async def searchWallpaper(_, message: Message):
         file_name = f"{i}_{int(time.time())}.jpg"
         with open(file_name, "wb") as f:
             f.write(requests.get(wallpaper).content)
-        to_send.append(InputMediaPhoto(file_name))
+        to_send.append(InputMediaDocument(file_name))
         trash.append(file_name)
 
     await hell.reply_media_group(to_send)

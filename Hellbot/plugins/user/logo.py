@@ -54,7 +54,6 @@ async def makeLogo(_, message: Message):
     )
     await hell.delete()
     os.remove(logo_path)
-    os.remove(Config.TEMP_DIR + "temp_bg.jpg")
 
 
 @on_message("setfont", allow_stan=True)
