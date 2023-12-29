@@ -171,7 +171,7 @@ async def go_home(_, message: Message):
     )
 
 
-BotHelp("sessions").add(
+BotHelp("Sessions").add(
     "session", "This command is packed with tools to manage userbot sessions."
 ).info(
     "Session 🚀"

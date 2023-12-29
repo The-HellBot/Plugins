@@ -95,17 +95,22 @@ async def demote(client: Client, message: Message):
     allow_stan=True,
 )
 async def ban(client: Client, message: Message):
-    if len(message.command) < 2 and not message.reply_to_message:
+    if message.reply_to_message:
+        user = message.reply_to_message.from_user
+        if len(message.command) < 2:
+            reason = None
+        else:
+            reason = await hellbot.input(message)
+    elif len(message.command) == 2:
+        user = await client.get_users(message.command[1])
+        reason = None
+    elif len(message.command) > 2:
+        user = await client.get_users(message.command[1])
+        reason = (await hellbot.input(message)).split(" ", 1)[1].strip()
+    else:
         return await hellbot.delete(
             message, "𝖭𝖾𝖾𝖽 𝖺 𝗎𝗌𝖾𝗋𝗇𝖺𝗆𝖾/𝗂𝖽 𝗈𝗋 𝗋𝖾𝗉𝗅𝗒 𝗍𝗈 𝖺 𝗎𝗌𝖾𝗋 𝗍𝗈 𝖻𝖺𝗇 𝗍𝗁𝖾𝗆!"
         )
-
-    if message.reply_to_message:
-        user = message.reply_to_message.from_user
-        reason = await hellbot.input(message)
-    else:
-        user = await client.get_users(message.command[1])
-        reason = (await hellbot.input(message)).split(" ", 1)[1].strip()
 
     try:
         await message.chat.ban_member(user.id)
@@ -160,17 +165,22 @@ async def unban(client: Client, message: Message):
     allow_stan=True,
 )
 async def kick(client: Client, message: Message):
-    if len(message.command) < 2 and not message.reply_to_message:
+    if message.reply_to_message:
+        user = message.reply_to_message.from_user
+        if len(message.command) < 2:
+            reason = None
+        else:
+            reason = await hellbot.input(message)
+    elif len(message.command) == 2:
+        user = await client.get_users(message.command[1])
+        reason = None
+    elif len(message.command) > 2:
+        user = await client.get_users(message.command[1])
+        reason = (await hellbot.input(message)).split(" ", 1)[1].strip()
+    else:
         return await hellbot.delete(
             message, "𝖭𝖾𝖾𝖽 𝖺 𝗎𝗌𝖾𝗋𝗇𝖺𝗆𝖾/𝗂𝖽 𝗈𝗋 𝗋𝖾𝗉𝗅𝗒 𝗍𝗈 𝖺 𝗎𝗌𝖾𝗋 𝗍𝗈 𝗄𝗂𝖼𝗄 𝗍𝗁𝖾𝗆!"
         )
-
-    if message.reply_to_message:
-        user = message.reply_to_message.from_user
-        reason = await hellbot.input(message)
-    else:
-        user = await client.get_users(message.command[1])
-        reason = (await hellbot.input(message)).split(" ", 1)[1].strip()
 
     try:
         await message.chat.ban_member(user.id)
@@ -198,17 +208,22 @@ async def kick(client: Client, message: Message):
     allow_stan=True,
 )
 async def mute(client: Client, message: Message):
-    if len(message.command) < 2 and not message.reply_to_message:
+    if message.reply_to_message:
+        user = message.reply_to_message.from_user
+        if len(message.command) < 2:
+            reason = None
+        else:
+            reason = await hellbot.input(message)
+    elif len(message.command) == 2:
+        user = await client.get_users(message.command[1])
+        reason = None
+    elif len(message.command) > 2:
+        user = await client.get_users(message.command[1])
+        reason = (await hellbot.input(message)).split(" ", 1)[1].strip()
+    else:
         return await hellbot.delete(
             message, "𝖭𝖾𝖾𝖽 𝖺 𝗎𝗌𝖾𝗋𝗇𝖺𝗆𝖾/𝗂𝖽 𝗈𝗋 𝗋𝖾𝗉𝗅𝗒 𝗍𝗈 𝖺 𝗎𝗌𝖾𝗋 𝗍𝗈 𝗆𝗎𝗍𝖾 𝗍𝗁𝖾𝗆!"
         )
-
-    if message.reply_to_message:
-        user = message.reply_to_message.from_user
-        reason = await hellbot.input(message)
-    else:
-        user = await client.get_users(message.command[1])
-        reason = (await hellbot.input(message)).split(" ", 1)[1].strip()
 
     try:
         permissions = ChatPermissions(

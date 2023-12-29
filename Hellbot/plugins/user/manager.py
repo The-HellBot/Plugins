@@ -60,7 +60,7 @@ async def setvar(_, message: Message):
 
     is_heroku = False
     varname = message.command[1]
-    varvalue = message.command[2]
+    varvalue = " ".join(message.command[2:])
 
     if varname.upper() in os_configs:
         if HEROKU_APP:

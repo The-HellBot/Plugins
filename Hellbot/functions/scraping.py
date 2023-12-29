@@ -37,6 +37,10 @@ anime_query = """query ($id: Int,$search: String) {
                 site
             }
             genres
+            tags {
+                name
+            }
+            isAdult
             averageScore
             studios (isMain: true){
                 nodes{
@@ -70,6 +74,7 @@ manga_query = """query ($id: Int,$search: String) {
             countryOfOrigin
             source
             genres
+            isAdult
             averageScore
             siteUrl
         }
@@ -300,6 +305,7 @@ async def get_anime_info(search_term: str) -> tuple[str, str]:
     score = data["averageScore"] if data["averageScore"] else "N/A"
     source = str(data["source"]).title() if data["source"] else "N/A"
     mtype = str(data["type"]).title() if data["type"] else "N/A"
+    synopsis = data["description"]
 
     episodes = data["episodes"]
     if not episodes:
@@ -312,8 +318,10 @@ async def get_anime_info(search_term: str) -> tuple[str, str]:
     status = str(data["status"]).title() if data["status"] else "N/A"
     format = str(data["format"]).title() if data["format"] else "N/A"
     genre = ", ".join(data["genres"]) if data["genres"] else "N/A"
+    tags = ", ".join([i["name"] for i in data["tags"][:5]]) if data["tags"] else "N/A"
     studio = data["studios"]["nodes"][0]["name"] if data["studios"]["nodes"] else "N/A"
     siteurl = f"[Anilist Website]({data['siteUrl']})" if data["siteUrl"] else "N/A"
+    isAdult = data["isAdult"]
 
     trailer = "N/A"
     if data["trailer"] and data["trailer"]["site"] == "youtube":
@@ -323,6 +331,8 @@ async def get_anime_info(search_term: str) -> tuple[str, str]:
     banner = f"anime_{anime_id}.jpg"
     with open(banner, "wb") as f:
         f.write(response)
+
+    description = post_to_telegraph(name, synopsis)
 
     message = await anime_template(
         name=name,
@@ -337,6 +347,9 @@ async def get_anime_info(search_term: str) -> tuple[str, str]:
         studio=studio,
         trailer=trailer,
         siteurl=siteurl,
+        description=description,
+        tags=tags,
+        isAdult=isAdult,
     )
 
     return message, banner
@@ -359,6 +372,7 @@ async def get_manga_info(search_term: str) -> tuple[str, str]:
     score = data["averageScore"] if data["averageScore"] else "N/A"
     source = str(data["source"]).title() if data["source"] else "N/A"
     mtype = str(data["type"]).title() if data["type"] else "N/A"
+    synopsis = data["description"]
 
     chapters = data["chapters"] if data["chapters"] else "N/A"
     volumes = data["volumes"] if data["volumes"] else "N/A"
@@ -366,11 +380,14 @@ async def get_manga_info(search_term: str) -> tuple[str, str]:
     format = str(data["format"]).title() if data["format"] else "N/A"
     genre = ", ".join(data["genres"]) if data["genres"] else "N/A"
     siteurl = f"[Anilist Website]({data['siteUrl']})" if data["siteUrl"] else "N/A"
+    isAdult = data["isAdult"]
 
     response = httpx.get(f"https://img.anili.st/media/{manga_id}").content
     banner = f"manga_{manga_id}.jpg"
     with open(banner, "wb") as f:
         f.write(response)
+
+    description = post_to_telegraph(name, synopsis)
 
     message = await manga_templates(
         name=name,
@@ -382,7 +399,9 @@ async def get_manga_info(search_term: str) -> tuple[str, str]:
         status=status,
         format=format,
         genre=genre,
-        siteurl=siteurl
+        siteurl=siteurl,
+        description=description,
+        isAdult=isAdult,
     )
 
     return message, banner

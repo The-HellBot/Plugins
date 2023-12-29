@@ -30,7 +30,7 @@ async def close_cb(_, cb: CallbackQuery):
 
 
 @hellbot.bot.on_callback_query(filters.regex(r"bot_help_menu"))
-async def boot_help_menu_cb(_, cb: CallbackQuery):
+async def bot_help_menu_cb(_, cb: CallbackQuery):
     if not await check_auth_click(cb):
         return
 
@@ -52,8 +52,8 @@ async def boot_help_menu_cb(_, cb: CallbackQuery):
 
     caption = (
         f"**𝖯𝗅𝗎𝗀𝗂𝗇 𝖥𝗂𝗅𝖾:** `{plugin}`\n"
-        f"**𝖯𝗅𝗎𝗀𝗂𝗇 𝖨𝗇𝖿𝗈:** __{Config.HELP_DICT[plugin]['info']} 🍀__\n\n"
-        f"**📃 𝖫𝗈𝖺𝖽𝖾𝖽 𝖢𝗈𝗆𝗆𝖺𝗇𝖽𝗌:** `{len(sorted(Config.HELP_DICT[plugin]['commands']))}`"
+        f"**𝖯𝗅𝗎𝗀𝗂𝗇 𝖨𝗇𝖿𝗈:** __{Config.BOT_HELP[plugin]['info']} 🍀__\n\n"
+        f"**📃 𝖫𝗈𝖺𝖽𝖾𝖽 𝖢𝗈𝗆𝗆𝖺𝗇𝖽𝗌:** `{len(sorted(Config.BOT_HELP[plugin]['commands']))}`"
     )
 
     await cb.edit_message_text(
@@ -245,8 +245,7 @@ async def help_close_cb(_, cb: CallbackQuery):
             ],
         ]
         await cb.edit_message_text(
-            "**Source 📦:**\n\n"
-            "**Note:** \n__» The source code is available on GitHub. You can find the link below.__\n"
+            "__» The source code is available on GitHub. You can find the link below.__\n"
             "__» Every project available under The-HellBot are open-source and free to use and modify to your needs.__\n"
             "__» Anyone pretending to be the developer of this bot and selling the code, is a scammer.__\n\n"
             "__» Please consider giving a star to the repository if you liked the project.__\n"

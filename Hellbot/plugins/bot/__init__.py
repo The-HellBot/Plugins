@@ -25,5 +25,5 @@ HELP_MSG = """
 __» All commands are categorized and you can use these buttons below to navigate each category and get respective commands.__
 __» Feel free to contact us if you need any help regarding the bot.__
 
-**❤️ @HellBot_Networks 🇮🇳**"
+**❤️ @HellBot_Networks 🇮🇳**
 """

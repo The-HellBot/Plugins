@@ -27,18 +27,19 @@ async def zip_files(_, message: Message):
         progress_args=(hell, start, "📦 Zipping"),
     )
 
-    with zipfile.ZipFile(download_path, "w", zipfile.ZIP_DEFLATED) as zip_file:
+    zip_path = Config.TEMP_DIR + f"zipped_{int(time.time())}.zip"
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zip_file:
         zip_file.write(download_path)
 
     await hellbot.delete(hell, "Zipped Successfully.")
     await message.reply_document(
-        download_path + ".zip",
+        zip_path,
         caption=f"**Zipped in {readable_time(time.time() - start)}.**",
         progress=progress,
         progress_args=(hell, start, "⬆️ Uploading"),
     )
 
-    os.remove(download_path + ".zip")
+    os.remove(zip_path)
     os.remove(download_path)
 
 
@@ -60,10 +61,12 @@ async def unzip_file(_, message: Message):
     )
 
     with zipfile.ZipFile(download_path, "r") as zip_file:
-        zip_file.extractall(download_path)
+        if not os.path.isdir(Config.TEMP_DIR + "unzipped/"):
+            os.mkdir(Config.TEMP_DIR + "unzipped/")
+        zip_file.extractall(Config.TEMP_DIR + "unzipped/")
 
     await hellbot.delete(hell, "Unzipped Successfully.")
-    files = await get_files_from_directory(download_path)
+    files = await get_files_from_directory(Config.TEMP_DIR + "unzipped/")
 
     for file in files:
         if os.path.exists(file):

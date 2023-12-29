@@ -208,7 +208,7 @@ async def forcesub_cb(client: Client, cb: CallbackQuery):
         return await cb.message.delete()
 
 
-BotHelp("forcesub").add(
+BotHelp("ForceSub").add(
     "forcesub",
     "This command is used to force users to join some channels to chat in group.",
 ).add(
