@@ -63,7 +63,7 @@ async def authlist(client: Client, message: Message):
             user = await client.get_users(userid)
             text += f"    {Symbols.anchor} {user.mention} (`{user.id}`)\n"
         except:
-            text += f"    {Symbols.anchor} Auth User #{i} (`{userid}`)\n"
+            text += f"    {Symbols.anchor} Auth User #{i+1} (`{userid}`)\n"
 
     await message.reply_text(text)
 

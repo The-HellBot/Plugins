@@ -12,6 +12,15 @@ from Hellbot.functions.driver import Driver
 
 from . import HelpMenu, hellbot, on_message
 
+
+def obtain_ids(user: str):
+    response = requests.get("https://www.instagram.com/" + user)
+    appid = re.search('appId":"(\d*)', response.text)[1]
+    serverid = re.search('server_revision":(\d*)', response.text)[1]
+
+    return appid, serverid
+
+
 @on_message("reels", allow_stan=True)
 async def instagramReels(_, message: Message):
     if len(message.command) < 2:
@@ -128,42 +137,70 @@ async def instagramUser(_, message: Message):
     if len(message.command) < 2:
         return await hellbot.delete(message, "Give an instagram username to fetch info.")
 
+    BASE_URL = "https://i.instagram.com/api/v1/users/web_profile_info/"
 
-    query = await hellbot.input(message)
-    query = query.replace("@", "").strip()
-
+    query = (await hellbot.input(message)).replace("@", "").strip()
     hell = await hellbot.edit(message, f"**Searching** `{query}` **on instagram**...")
-    url = f"https://instagram.com/{query}/"
 
-    driver, _ = Driver.get()
-    if not driver:
-        return await hellbot.error(hell, f"**Unable to get driver:** `{_}`")
+    appid, serverid = obtain_ids(query)
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) 20100101 Firefox/103.0",
+        "Accept": "*/*",
+        "Accept-Language": "en,en-US;q=0.3",
+        "X-Instagram-AJAX": serverid,
+        "X-IG-App-ID": appid,
+        "X-ASBD-ID": "198337",
+        "X-IG-WWW-Claim": "0",
+        "Origin": "https://www.instagram.com",
+        "DNT": "1",
+        "Alt-Used": "i.instagram.com",
+        "Connection": "keep-alive",
+        "Referer": "https://www.instagram.com/",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-site",
+        "Sec-GPC": "1",
+    }
+
+    params = {"username": query}
 
     try:
-        driver.get(url)
-        wait = WebDriverWait(driver, 10)
-        element = wait.until(presence_of_element_located((By.XPATH, "//img[@alt='Profile photo']")))
-        profilePic = element.get_attribute("src")
-        print(profilePic)
-        about = driver.find_element(By.XPATH, "//div/h1").text
-        print(about)
-        profile_info_ul = driver.find_elements(By.XPATH, "//ul[@class='x78zum5 x1q0g3np xieb3on']/li/button")  # post, followers, following
-        posts = profile_info_ul[0].text
-        followers = profile_info_ul[1].text
-        following = profile_info_ul[2].text
-        print(posts, followers, following)
+        response: dict = requests.get(BASE_URL, params, headers=headers).json()
 
-        fileName = f"iguser_{int(time.time())}.jpg"
-        binary = requests.get(profilePic).content
-        with open(fileName, "wb") as file:
-            file.write(binary)
+        if response["status"] != "ok":
+            return await hellbot.error(hell, "Unable to fetch info.")
+
+        data = response["data"]["user"]
+        about = data["biography"] if data["biography"] else "Not Available"
+        followers = data["edge_followed_by"]["count"]
+        following = data["edge_follow"]["count"]
+        full_name = data["full_name"]
+        is_private = data["is_private"]
+        is_verified = data["is_verified"]
+        posts = data["edge_owner_to_timeline_media"]["count"]
+        username = data["username"]
+
+        profile_pic = f"iguser_{int(time.time())}.jpg"
+        with open(profile_pic, "wb") as f:
+            f.write(requests.get(data["profile_pic_url_hd"]).content)
 
         await message.reply_photo(
-            fileName,
-            caption=f"**💬 𝖠𝖻𝗈𝗎𝗍:** `{about}`\n\n**📸 𝖯𝗈𝗌𝗍𝗌:** `{posts}`\n**💫 𝖥𝗈𝗅𝗅𝗈𝗐𝖾𝗋𝗌:** `{followers}`\n**🍀 𝖥𝗈𝗅𝗅𝗈𝗐𝗂𝗇𝗀:** `{following}`\n\n**</> @HellBot_Networks**",
+            profile_pic,
+            caption=(
+                f"**🍀 𝖥𝗎𝗅𝗅 𝖭𝖺𝗆𝖾:** `{full_name}`\n"
+                f"**👤 𝖴𝗌𝖾𝗋𝗇𝖺𝗆𝖾:** [{username}](https://instagram.com/{username})\n"
+                f"**👁‍🗨 𝖯𝗋𝗂𝗏𝖺𝗍𝖾:** `{is_private}`\n"
+                f"**👑 𝖵𝖾𝗋𝗂𝖿𝗂𝖾𝖽:** `{is_verified}`\n"
+                f"**📸 𝖯𝗈𝗌𝗍𝗌:** `{posts}`\n"
+                f"**💫 𝖥𝗈𝗅𝗅𝗈𝗐𝖾𝗋𝗌:** `{followers}`\n"
+                f"**🍂 𝖥𝗈𝗅𝗅𝗈𝗐𝗂𝗇𝗀:** `{following}`\n"
+                f"**💬 𝖡𝗂𝗈:** `{about}`\n\n"
+                "**</> @HellBot_Networks**"
+            ),
         )
         await hell.delete()
-        os.remove(fileName)
+        os.remove(profile_pic)
     except Exception as e:
         return await hellbot.error(hell, f"`{e}`")
 
@@ -180,7 +217,7 @@ HelpMenu("instagram").add(
     "igpost https://www.instagram.com/p/C06rAjDJlJs/",
     "If the post has multiple videos, it will download all of them one by one.",
 ).add(
-    "iguser", #Bugged: to-be-fixed
+    "iguser",
     "<instagram username>",
     "Get instagram user info.",
     "iguser therock",
