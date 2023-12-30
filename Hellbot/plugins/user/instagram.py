@@ -168,6 +168,7 @@ async def instagramUser(_, message: Message):
     try:
         response = requests.get(BASE_URL, params, headers=headers)
         if not response.ok:
+            print(response.text)
             return await hellbot.error(hell, "Unable to fetch info.")
 
         data = response.json()["data"]["user"]
