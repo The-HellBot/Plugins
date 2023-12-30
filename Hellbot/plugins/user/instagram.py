@@ -166,12 +166,15 @@ async def instagramUser(_, message: Message):
     params = {"username": query}
 
     try:
-        response = requests.get(BASE_URL, params, headers=headers)
-        if not response.ok:
-            print(response.text)
-            return await hellbot.error(hell, "Unable to fetch info.")
+        response: dict = requests.get(BASE_URL, params, headers=headers).json()
 
-        data = response.json()["data"]["user"]
+        if response["status"] != "ok":
+            return await hellbot.error(
+                hell,
+                f"**Message:** `{response['message']}`\n**Required Login:** `{response['require_login']}`"
+            )
+
+        data = response["data"]["user"]
         about = data["biography"] if data["biography"] else "Not Available"
         followers = data["edge_followed_by"]["count"]
         following = data["edge_follow"]["count"]
