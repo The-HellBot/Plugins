@@ -36,7 +36,7 @@ async def youtube_audio(_, message: Message):
         upload_text = f"**⬆️ 𝖴𝗉𝗅𝗈𝖺𝖽𝗂𝗇𝗀 𝖲𝗈𝗇𝗀 ...** \n\n**{Symbols.anchor} 𝖳𝗂𝗍𝗅𝖾:** `{yt_data['title'][:50]}`\n**{Symbols.anchor} 𝖢𝗁𝖺𝗇𝗇𝖾𝗅:** `{yt_data['channel']}`"
         await hell.edit(upload_text)
         response = requests.get(f"https://i.ytimg.com/vi/{yt_data['id']}/hqdefault.jpg")
-        with open(f"{yt_data}.jpg", "wb") as f:
+        with open(f"{yt_file}.jpg", "wb") as f:
             f.write(response.content)
 
         await message.reply_audio(
@@ -45,7 +45,7 @@ async def youtube_audio(_, message: Message):
             duration=int(yt_data["duration"]),
             performer="[тнє нєℓℓвσт]",
             title=yt_data["title"],
-            thumb=f"{yt_data}.jpg",
+            thumb=f"{yt_file}.jpg",
             progress=progress,
             progress_args=(
                 hell,
@@ -58,7 +58,7 @@ async def youtube_audio(_, message: Message):
         return await hellbot.delete(hell, f"**🍀 Audio not Downloaded:** `{e}`")
 
     try:
-        os.remove(f"{yt_data}.jpg")
+        os.remove(f"{yt_file}.jpg")
         os.remove(f"{yt_file}.mp3")
     except:
         pass
@@ -87,14 +87,14 @@ async def ytvideo(_, message: Message):
         upload_text = f"**⬆️ 𝖴𝗉𝗅𝗈𝖺𝖽𝗂𝗇𝗀 𝖲𝗈𝗇𝗀 ...** \n\n**{Symbols.anchor} 𝖳𝗂𝗍𝗅𝖾:** `{yt_data['title'][:50]}`\n**{Symbols.anchor} 𝖢𝗁𝖺𝗇𝗇𝖾𝗅:** `{yt_data['channel']}`"
         await hell.edit(upload_text)
         response = requests.get(f"https://i.ytimg.com/vi/{yt_data['id']}/hqdefault.jpg")
-        with open(f"{yt_data}.jpg", "wb") as f:
+        with open(f"{yt_file}.jpg", "wb") as f:
             f.write(response.content)
 
         await message.reply_video(
             f"{yt_file}.mp4",
             caption=f"**🎧 𝖳𝗂𝗍𝗅𝖾:** {yt_data['title']} \n\n**👀 𝖵𝗂𝖾𝗐𝗌:** `{yt_data['view_coun viewst']}` \n**⌛ 𝖣𝗎𝗋𝖺𝗍𝗂𝗈𝗇:** `{secs_to_mins(int(yt_data['duration']))}`",
             duration=int(yt_data["duration"]),
-            thumb=f"{yt_data}.jpg",
+            thumb=f"{yt_file}.jpg",
             progress=progress,
             progress_args=(
                 hell,
@@ -107,7 +107,7 @@ async def ytvideo(_, message: Message):
         return await hellbot.delete(hell, f"**🍀 Video not Downloaded:** `{e}`")
 
     try:
-        os.remove(f"{yt_data}.jpg")
+        os.remove(f"{yt_file}.jpg")
         os.remove(f"{yt_file}.mp4")
     except:
         pass

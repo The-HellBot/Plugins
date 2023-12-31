@@ -220,7 +220,7 @@ HelpMenu("instagram").add(
     "igpost https://www.instagram.com/p/C06rAjDJlJs/",
     "If the post has multiple videos, it will download all of them one by one.",
 ).add(
-    "iguser",
+    "iguser", #Bugged
     "<instagram username>",
     "Get instagram user info.",
     "iguser therock",

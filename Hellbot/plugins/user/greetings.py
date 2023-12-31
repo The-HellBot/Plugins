@@ -142,16 +142,11 @@ async def welcomehandler(client: Client, message: Message):
             chatid=message.chat.id,
         )
 
-    if message.media:
-        to_del = await msg.copy(
-            message.chat.id,
-            text,
-            reply_to_message_id=message.id,
-        )
-    else:
-        to_del = await message.reply_text(
-            text, reply_to_message_id=message.id, disable_web_page_preview=True
-        )
+    to_del = await msg.copy(
+        message.chat.id,
+        text,
+        reply_to_message_id=message.id,
+    )
 
     if message.chat.id in GREETINGS_CACHE["welcome"]:
         msg: Message = GREETINGS_CACHE.get("welcome", {}).get(message.chat.id)
@@ -196,16 +191,11 @@ async def goodbyehandler(client: Client, message: Message):
             chatid=message.chat.id,
         )
 
-    if message.media:
-        to_del = await msg.copy(
-            message.chat.id,
-            text,
-            reply_to_message_id=message.id,
-        )
-    else:
-        to_del = await message.reply_text(
-            text, reply_to_message_id=message.id, disable_web_page_preview=True
-        )
+    to_del = await msg.copy(
+        message.chat.id,
+        text,
+        reply_to_message_id=message.id,
+    )
 
     if message.chat.id in GREETINGS_CACHE["goodbye"]:
         msg: Message = GREETINGS_CACHE.get("goodbye", {}).get(message.chat.id)
