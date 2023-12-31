@@ -15,9 +15,17 @@ from . import Config, HelpMenu, hellbot, on_message
 
 @on_message("restart", allow_stan=True)
 async def restart_bot(_, message: Message):
+    await hellbot.edit(message, "💫 Restarted Bot Successfully!")
     try:
-        await hellbot.edit(message, "💫 Restarted Bot Successfully!")
-        await restart()
+        if HEROKU_APP:
+            try:
+                heroku = heroku3.from_key(Config.HEROKU_APIKEY)
+                app = heroku.apps()[Config.HEROKU_APPNAME]
+                app.restart()
+            except:
+                await restart()
+        else:
+            await restart()
     except Exception as e:
         LOGS.error(e)
 
@@ -34,10 +42,12 @@ async def shutdown_bot(_, message: Message):
                 heroku = heroku3.from_key(Config.HEROKU_APIKEY)
                 app = heroku.apps()[Config.HEROKU_APPNAME]
                 app.process_formation()["worker"].scale(0)
-            except BaseException as e:
+            except:
                 await restart(shutdown=True)
-    except:
-        await restart(shutdown=True)
+        else:
+            await restart(shutdown=True)
+    except Exception as e:
+        LOGS.error(e)
 
 
 @on_message("cleanup", allow_stan=True)

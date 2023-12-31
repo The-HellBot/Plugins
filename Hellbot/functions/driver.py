@@ -308,7 +308,7 @@ class YoutubeDriver:
                     "preferedformat": "mp4",
                 }
             ],
-            "outtmpl": "%(id)s",
+            "outtmpl": "%(id)s.mp4",
             "quiet": True,
             "logtostderr": False,
         }

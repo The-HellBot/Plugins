@@ -28,7 +28,7 @@ async def kangSticker(client: Client, message: Message):
     hell = await hellbot.edit(message, "__Kanging sticker...__")
 
     pack_id, pack_emoji = get_emoji_and_id(message)
-    pack_type, is_animated, is_video, _, pack_limit = check_sticker_data(
+    pack_type, is_animated, is_video, is_static, pack_limit = check_sticker_data(
         message.reply_to_message
     )
 
@@ -45,17 +45,13 @@ async def kangSticker(client: Client, message: Message):
     )
 
     if message.reply_to_message.sticker:
-        repliedsticker = await get_sticker_set(
-            hellbot.bot, message.reply_to_message.sticker.set_name
-        )
-        sticker = InputStickerSetItem(
-            document=InputDocument(
-                id=repliedsticker.documents[0].id,
-                access_hash=repliedsticker.documents[0].access_hash,
-                file_reference=repliedsticker.documents[0].file_reference,
-            ),
-            emoji=pack_emoji,
-        )
+        if is_static:
+            file = await message.reply_to_message.download(Config.TEMP_DIR)
+            status, path = await image_to_sticker(file)
+            if not status:
+                return await hellbot.error(hell, path)
+        else:
+            path = await message.reply_to_message.download(Config.TEMP_DIR)
     else:
         if is_video:
             await hell.edit("Converting to video sticker...")
@@ -72,8 +68,8 @@ async def kangSticker(client: Client, message: Message):
             if not status:
                 return await hellbot.error(hell, path)
 
-        sticker = await create_sticker(hellbot.bot, message.chat.id, path, pack_emoji)
-        os.remove(path)
+    sticker = await create_sticker(hellbot.bot, message.chat.id, path, pack_emoji)
+    os.remove(path)
 
     try:
         while True:
