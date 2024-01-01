@@ -1,4 +1,4 @@
-import asyncio
+import contextlib
 import os
 
 import heroku3
@@ -8,7 +8,7 @@ from pyrogram.types import Message
 
 from Hellbot import HEROKU_APP
 from Hellbot.core import LOGS
-from Hellbot.functions.tools import gen_changelogs, restart, runcmd
+from Hellbot.functions.tools import restart, gen_changelogs, initialize_git
 
 from . import Config, HelpMenu, hellbot, on_message
 
@@ -34,7 +34,7 @@ async def restart_bot(_, message: Message):
 async def shutdown_bot(_, message: Message):
     await hellbot.edit(
         message,
-        "**[ ⚠️ ]** __HellBot is now offline! Manually start again to get it back online.__"
+        "**[ ⚠️ ]** __HellBot is now offline! Manually start again to get it back online.__",
     )
     try:
         if HEROKU_APP:
@@ -58,14 +58,32 @@ async def clenup_bot(_, message: Message):
 
 @on_message("update", allow_stan=True)
 async def update_bot(_, message: Message):
+    hell = await hellbot.edit(message, "**🔄 𝖨𝗇 𝖯𝗋𝗈𝗀𝗋𝖾𝗌𝗌...**")
+
     if len(message.command) < 2:
-        return await hellbot.delete(
-            message, "**[ ⚠️ ]** __Please specify what to update.__"
+        status, repo, force = await initialize_git(Config.PLUGINS_REPO)
+        if not status:
+            return await hellbot.error(hell, repo)
+
+        active_branch = repo.active_branch.name
+        upstream = repo.remote("upstream")
+        upstream.fetch(active_branch)
+
+        changelogs = await gen_changelogs(repo, f"HEAD..upstream/{active_branch}")
+        if not changelogs and not force:
+            repo.__del__()
+            return await hellbot.error(
+                hell, "__There are no updates available right now.__"
+            )
+
+        if force:
+            return await hell.edit(f"Force-Sync in progress... Please wait for a moment and try again.\n\n{changelogs}")
+
+        return await hell.edit(
+            f"**🍂 𝖴𝗉𝖽𝖺𝗍𝖾 𝖠𝗏𝖺𝗂𝗅𝖺𝖻𝗅𝖾 𝖿𝗈𝗋 𝖯𝗅𝗎𝗀𝗂𝗇𝗌:**\n\n{changelogs}"
         )
 
-    hell = await hellbot.edit(message, "**🔄 𝖨𝗇 𝖯𝗋𝗈𝗀𝗋𝖾𝗌𝗌...**")
     cmd = message.command[1].lower()
-
     if cmd == "plugins":
         if HEROKU_APP:
             try:
@@ -86,30 +104,49 @@ async def update_bot(_, message: Message):
     elif cmd == "deploy":
         if HEROKU_APP:
             os.chdir("/app")
-            try:
-                repo = Repo()
-            except NoSuchPathError as e:
-                return await hellbot.error(hell, f"__No GitRepo found:__ `{e}`")
-            except GitCommandError as e:
-                return await hellbot.error(hell, f"__Invalid Git Command:__ `{e}`")
-            except InvalidGitRepositoryError as e:
-                return await hellbot.error(hell, f"__Invalid Git Repo.__ `{e}`")
+            status, repo, _ = await initialize_git(Config.DEPLOY_REPO)
+            if not status:
+                return await hellbot.error(hell, repo)
 
-            await runcmd(f"git fetch orgin {Config.DEPLOY_BRANCH} &> /dev/null")
-            await asyncio.sleep(5)
+            active_branch = repo.active_branch.name
+            upstream = repo.remote("upstream")
+            upstream.fetch(active_branch)
 
-            changelogs = await gen_changelogs(repo, Config.DEPLOY_BRANCH)
-            if not changelogs:
-                return await hell.edit("**🔁 𝖣𝖾𝗉𝗅𝗈𝗒 𝗂𝓈 𝓊𝓅 𝓉𝑜 𝒹𝒶𝓉𝑒!**")
+            heroku = heroku3.from_key(Config.HEROKU_APIKEY)
+            app = heroku.apps()[Config.HEROKU_APPNAME]
 
             await hell.edit(
-                f"**🔄 𝖣𝖾𝗉𝗅𝗈𝗒𝗂𝗇𝗀 𝖨𝗇 𝖯𝗋𝗈𝗀𝗋𝖾𝗌𝗌...**\n\n**📑 𝖢𝗁𝖺𝗇𝗀𝖾𝗅𝗈𝗀𝗌:**\n{changelogs}"
+                "**🔄 𝖣𝖾𝗉𝗅𝗈𝗒𝗂𝗇𝗀 𝖨𝗇 𝖯𝗋𝗈𝗀𝗋𝖾𝗌𝗌...**\nThis might take upto 5 minutes to complete!"
+            )
+            repo.git.reset("--hard", "FETCH_HEAD")
+            heroku_git = app.git_url.replace(
+                "https://", f"https://api:{Config.HEROKU_APIKEY}@"
             )
 
-            os.system("git stash &> /dev/null && git pull")
-            os.system(
-                f"git push https://{Config.HEROKU_APIKEY}@git.heroku.com/{Config.HEROKU_APPNAME}.git HEAD:master"
-            )
+            if "heroku" in repo.remotes:
+                remote = repo.remote("heroku")
+                remote.set_url(heroku_git)
+            else:
+                remote = repo.create_remote("heroku", heroku_git)
+
+            try:
+                remote.push(f"HEAD:refs/heads/master", force=True)
+            except BaseException as e:
+                repo.__del__()
+                return await hellbot.error(hell, f"__Invalid Heroku Creds:__ `{e}`")
+
+            build = app.builds(order_by="created_at", sort="desc")[0]
+            if build.status == "failed":
+                return await hellbot.error(
+                    hell,
+                    "__There were some problems with the update! Make sure your heroku api and app name are correct.__",
+                )
+
+            try:
+                remote.push("master:main", force=True)
+            except BaseException as e:
+                repo.__del__()
+                return await hellbot.error(hell, f"__Invalid Heroku Creds:__ `{e}`")
         else:
             await hell.edit(
                 "**🔄 𝖣𝖾𝗉𝗅𝗈𝗒𝗂𝗇𝗀 𝖨𝗇 𝖯𝗋𝗈𝗀𝗋𝖾𝗌𝗌...**\n\n__Please wait for a minute or two.__"

@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import math
 import os
 import shlex
@@ -6,6 +7,7 @@ import shutil
 import time
 
 from git import Repo
+from git.exc import GitCommandError, InvalidGitRepositoryError, NoSuchPathError
 from pyrogram.types import Message
 
 from Hellbot.core import Config, Symbols
@@ -106,8 +108,32 @@ async def restart(
 
 async def gen_changelogs(repo: Repo, branch: str) -> str:
     changelogs = ""
-    commits = list(repo.iter_commits(f"HEAD..origin/{branch}"))[:5]
+    commits = list(repo.iter_commits(branch))[:5]
     for index, commit in enumerate(commits):
         changelogs += f"**{Symbols.triangle_right} {index + 1}.** {commit.summary}\n"
 
     return changelogs
+
+
+async def initialize_git(git_repo: str):
+    force = False
+    try:
+        repo = Repo()
+    except NoSuchPathError as pathErr:
+        repo.__del__()
+        return False, pathErr, force
+    except GitCommandError as gitErr:
+        repo.__del__()
+        return False, gitErr, force
+    except InvalidGitRepositoryError:
+        repo = Repo.init()
+        origin = repo.create_remote("upstream", f"https://github.com/{git_repo}")
+        origin.fetch()
+        repo.create_head("master", origin.refs.master)
+        repo.heads.master.set_tracking_branch(origin.refs.master)
+        repo.heads.master.checkout(True)
+        force = True
+    with contextlib.suppress(BaseException):
+        repo.create_remote("upstream", f"https://github.com/{git_repo}")
+
+    return True, repo, force

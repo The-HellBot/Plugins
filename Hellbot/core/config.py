@@ -22,9 +22,7 @@ class Config:
 
     # github related configs
     PLUGINS_REPO = getenv("PLUGINS_REPO", "The-HellBot/Plugins")
-    PLUGINS_BRANCH = getenv("PLUGINS_BRANCH", "master")
     DEPLOY_REPO = getenv("DEPLOY_REPO", "The-HellBot/Hellbot")
-    DEPLOY_BRANCH = getenv("DEPLOY_BRANCH", "master")
 
     # storage dir: you may or may not edit
     DWL_DIR = "./downloads/"

@@ -8,7 +8,7 @@ from pyrogram.errors import FloodWait
 from pyrogram.types import Message
 from telegraph import Telegraph
 
-from Hellbot.core import ENV, db, LOGS
+from Hellbot.core import ENV, db
 
 from .formatter import readable_time
 
@@ -23,8 +23,6 @@ class TelegraphAPI:
 
         self.telegraph = Telegraph()
         self.telegraph.create_account(shortname)
-
-        LOGS.info(f"Telegraph Account created: '{shortname}'")
 
 
 class Gcast:
