@@ -54,8 +54,13 @@ async def quotely(client: Client, message: Message):
     if not message.reply_to_message:
         return await hellbot.delete(message, "Reply to a message to quote it.")
 
-    if not message.reply_to_message.text:
-        return await hellbot.delete(message, "Reply to a text message to quote it.")
+    if message.reply_to_message.media:
+        if message.reply_to_message.caption:
+            message.reply_to_message.text = message.reply_to_message.caption
+        else:
+            return await hellbot.delete(
+                message, "Reply to a text message to quote it."
+            )
 
     cmd = None
     if len(message.command) > 1:
@@ -65,18 +70,23 @@ async def quotely(client: Client, message: Message):
 
     msg_data = []
     if cmd and cmd == "r":
-        reply_msg = message.reply_to_message.reply_to_message
-        if reply_msg and reply_msg.text:
-            replied_name = reply_msg.from_user.first_name
-            if reply_msg.from_user.last_name:
-                replied_name += f" {reply_msg.from_user.last_name}"
+        await hell.edit("__Generating quote with reply...__")
+        reply_msg_id = message.reply_to_message.reply_to_message_id
+        if reply_msg_id:
+            reply_msg = await client.get_messages(message.chat.id, reply_msg_id)
+            if reply_msg and reply_msg.text:
+                replied_name = reply_msg.from_user.first_name
+                if reply_msg.from_user.last_name:
+                    replied_name += f" {reply_msg.from_user.last_name}"
 
-            reply_message = {
-                "chatId": reply_msg.from_user.id,
-                "entities": get_entities(reply_msg),
-                "name": replied_name,
-                "text": reply_msg.text,
-            }
+                reply_message = {
+                    "chatId": reply_msg.from_user.id,
+                    "entities": get_entities(reply_msg),
+                    "name": replied_name,
+                    "text": reply_msg.text,
+                }
+            else:
+                reply_message = {}
         else:
             reply_message = {}
     else:
@@ -88,7 +98,7 @@ async def quotely(client: Client, message: Message):
 
     emoji_status = None
     if message.reply_to_message.from_user.emoji_status:
-        emoji_status = message.reply_to_message.from_user.emoji_status.custom_emoji_id
+        emoji_status = str(message.reply_to_message.from_user.emoji_status.custom_emoji_id)
 
     msg_data.append(
         {
@@ -97,7 +107,7 @@ async def quotely(client: Client, message: Message):
             "from": {
                 "id": message.reply_to_message.from_user.id,
                 "name": name,
-                "emoji_status": str(emoji_status),
+                "emoji_status": emoji_status,
             },
             "text": message.reply_to_message.text,
             "replyMessage": reply_message,
