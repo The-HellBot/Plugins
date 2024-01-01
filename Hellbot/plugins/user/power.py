@@ -171,6 +171,11 @@ HelpMenu("power").add(
     "Cleanup the bot. Delete downloaded files and temp files.",
     "cleanup",
 ).add(
+    "update",
+    None,
+    "Check if there's any update available for the bot. If there is, it'll give new last 5 changelogs.",
+    "update",
+).add(
     "update plugins",
     None,
     "Updates the plugins to the latest code if there is any update available, else it'll just restart the bot.",
