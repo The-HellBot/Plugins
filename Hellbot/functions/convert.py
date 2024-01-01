@@ -79,9 +79,9 @@ async def video_to_sticker(file: Message) -> tuple[str, bool]:
         output_path = os.path.join(Config.TEMP_DIR, "videoSticker.webm")
 
         if height > width:
-            scale_params = f"scale=512:-1"
-        else:
             scale_params = f"scale=-1:512"
+        else:
+            scale_params = f"scale=512:-1"
 
         cmd = (
             f"ffmpeg -i {file_path} "

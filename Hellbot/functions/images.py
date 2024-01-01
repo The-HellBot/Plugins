@@ -3,7 +3,7 @@ import os
 import random
 import textwrap
 import time
-
+from unidecode import unidecode
 import httpx
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
@@ -81,7 +81,12 @@ def generate_alive_image(
 
     text_length = draw.textlength(text, font)
     position = ((background.width - text_length) / 2, background.height - 145)
-    draw.text(position, text, (255, 255, 255), font=font)
+    draw.text(
+        position,
+        unidecode(text),
+        (255, 255, 255),
+        font,
+    )
 
     output_img = f"alive_{int(time.time())}.png"
     background.save(output_img, "PNG")
@@ -184,7 +189,12 @@ async def make_logo(background: str, text: str, font_path: str) -> str:
     y = (bgHeight - font_size) // 2
 
     draw.text(
-        (x, y), text, (255, 255, 255), font, stroke_fill=(0, 0, 0), stroke_width=2
+        (x, y),
+        unidecode(text),
+        (255, 255, 255),
+        font,
+        stroke_fill=(0, 0, 0),
+        stroke_width=2,
     )
 
     output_img = f"logo_{int(time.time())}.png"
@@ -210,12 +220,12 @@ async def draw_meme(
     for utext in textwrap.wrap(upper_text, 25):
         upper_width = draw.textlength(utext, font=font)
         draw.text(
-            xy=((width - upper_width) / 2, curr_height),
-            text=utext,
-            font=font,
-            fill=(255, 255, 255),
-            stroke_fill=(0, 0, 0),
+            ((width - upper_width) / 2, curr_height),
+            unidecode(utext),
+            (255, 255, 255),
+            font,
             stroke_width=3,
+            stroke_fill=(0, 0, 0),
         )
         curr_height += font_size + padding
 
@@ -223,12 +233,12 @@ async def draw_meme(
     for ltext in reversed(textwrap.wrap(lower_text, 25)):
         lower_width = draw.textlength(ltext, font=font)
         draw.text(
-            xy=((width - lower_width) / 2, curr_height - font_size),
-            text=ltext,
-            font=font,
-            fill=(255, 255, 255),
-            stroke_fill=(0, 0, 0),
+            ((width - lower_width) / 2, curr_height - font_size),
+            ltext,
+            (255, 255, 255),
+            font,
             stroke_width=3,
+            stroke_fill=(0, 0, 0),
         )
         curr_height -= font_size + padding
 

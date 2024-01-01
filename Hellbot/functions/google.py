@@ -5,7 +5,6 @@
 ###### Searching and Downloading Google Images to the local disk ######
 
 # Import Libraries
-import argparse
 import codecs
 import datetime
 import http.client

@@ -3,6 +3,8 @@ import asyncio
 from pyrogram import Client
 from pyrogram.types import ChatPermissions, ChatPrivileges, Message
 
+from Hellbot.core import LOGS
+
 from . import HelpMenu, group_only, handler, hellbot, on_message
 
 
@@ -355,7 +357,8 @@ async def zombies(_, message: Message):
             try:
                 await message.chat.ban_member(user)
                 success += 1
-            except Exception:
+            except Exception as e:
+                LOGS.error(e)
                 failed += 1
 
         await hell.edit(f"**𝖯𝗎𝗋𝗀𝖾𝖽 {success} 𝗓𝗈𝗆𝖻𝗂𝖾𝗌!**\n`{failed}` holds immunity!")

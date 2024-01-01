@@ -25,5 +25,6 @@ selenium
 speedtest-cli
 telegraph
 tgcrypto
+Unidecode
 wikipedia
 yt-dlp @ git+https://github.com/HellBoy-OP/yt-dp-fork

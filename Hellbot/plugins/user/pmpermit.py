@@ -99,25 +99,29 @@ async def allow_pm(client: Client, message: Message):
     if len(message.command) > 1:
         try:
             user = await client.get_users(message.command[1])
+            user_id = user.id
+            user_mention = user.mention
         except Exception as e:
             return await hellbot.error(message, f"`{e}`")
     elif message.chat.type == ChatType.PRIVATE:
-        user = message.chat
+        user_id = message.chat.id
+        user_mention = message.chat.first_name or message.chat.title
     elif message.reply_to_message:
-        user = message.reply_to_message.from_user
+        user_id = message.reply_to_message.from_user.id
+        user_mention = message.reply_to_message.from_user.mention
     else:
         return await hellbot.delete(
             message, "`Reply to a user or give their id/username`"
         )
 
-    if user.id == client.me.id:
+    if user_id == client.me.id:
         return await hellbot.delete(message, "`I can't allow myself`")
 
-    if await db.is_pmpermit(client.me.id, user.id):
+    if await db.is_pmpermit(client.me.id, user_id):
         return await hellbot.delete(message, "`User is already allowed to pm!`")
 
-    await db.add_pmpermit(client.me.id, user.id)
-    await hellbot.delete(message, f"**{Symbols.check_mark} Allowed:** {user.mention}")
+    await db.add_pmpermit(client.me.id, user_id)
+    await hellbot.delete(message, f"**{Symbols.check_mark} Allowed:** {user_mention}")
 
 
 @on_message(["disallow", "disapprove"], allow_stan=True)
@@ -125,26 +129,30 @@ async def disallow_pm(client: Client, message: Message):
     if len(message.command) > 1:
         try:
             user = await client.get_users(message.command[1])
+            user_id = user.id
+            user_mention = user.mention
         except Exception as e:
             return await hellbot.error(message, f"`{e}`")
     elif message.chat.type == ChatType.PRIVATE:
-        user = message.chat
+        user_id = message.chat.id
+        user_mention = message.chat.first_name or message.chat.title
     elif message.reply_to_message:
-        user = message.reply_to_message.from_user
+        user_id = message.reply_to_message.from_user.id
+        user_mention = message.reply_to_message.from_user.mention
     else:
         return await hellbot.delete(
             message, "`Reply to a user or give their id/username`"
         )
 
-    if user.id == client.me.id:
+    if user_id == client.me.id:
         return await hellbot.delete(message, "`I can't disallow myself`")
 
-    if not await db.is_pmpermit(client.me.id, user.id):
+    if not await db.is_pmpermit(client.me.id, user_id):
         return await hellbot.delete(message, "`User is not allowed to pm!`")
 
-    await db.rm_pmpermit(client.me.id, user.id)
+    await db.rm_pmpermit(client.me.id, user_id)
     await hellbot.delete(
-        message, f"**{Symbols.cross_mark} Disallowed:** {user.mention}"
+        message, f"**{Symbols.cross_mark} Disallowed:** {user_mention}"
     )
 
 
