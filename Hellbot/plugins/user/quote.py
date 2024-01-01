@@ -35,14 +35,16 @@ def generate_quote(messages: list[dict]) -> tuple[bool, str]:
 
 def get_entities(message: Message) -> list[dict]:
     entities = []
-    for entity in message.entities:
-        entities.append(
-            {
-                "type": entity.type.name.lower(),
-                "offset": entity.offset,
-                "length": entity.length,
-            }
-        )
+
+    if message.entities:
+        for entity in message.entities:
+            entities.append(
+                {
+                    "type": entity.type.name.lower(),
+                    "offset": entity.offset,
+                    "length": entity.length,
+                }
+            )
 
     return entities
 
