@@ -75,7 +75,7 @@ async def quotely(client: Client, message: Message):
                 "chatId": reply_msg.from_user.id,
                 "entities": get_entities(reply_msg),
                 "name": replied_name,
-                "text": message.reply_to_message.text,
+                "text": reply_msg.text,
             }
         else:
             reply_message = {}
@@ -97,7 +97,7 @@ async def quotely(client: Client, message: Message):
             "from": {
                 "id": message.reply_to_message.from_user.id,
                 "name": name,
-                "emoji_status": emoji_status,
+                "emoji_status": str(emoji_status),
             },
             "text": message.reply_to_message.text,
             "replyMessage": reply_message,
@@ -109,7 +109,7 @@ async def quotely(client: Client, message: Message):
         return await hellbot.error(message, f"`{path}`")
 
     await message.reply_sticker(path)
-    await hellbot.delete(hell)
+    await hell.delete()
     os.remove(path)
 
 
