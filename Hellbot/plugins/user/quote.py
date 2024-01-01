@@ -24,7 +24,7 @@ def generate_quote(messages: list[dict]) -> tuple[bool, str]:
         response = requests.post("https://bot.lyo.su/quote/generate", json=json).json()
         image = base64.b64decode(str(response["result"]["image"]).encode("utf-8"))
 
-        file_name = f"Quote_{int(time.time())}.png"
+        file_name = f"Quote_{int(time.time())}.webp"
         with open(file_name, "wb") as f:
             f.write(image)
 
