@@ -165,8 +165,12 @@ async def allowlist(client: Client, message: Message):
 
     text = "**🍀 𝖠𝗉𝗉𝗋𝗈𝗏𝖾𝖽 𝖴𝗌𝖾𝗋'𝗌 𝖫𝗂𝗌𝗍:**\n\n"
     for user in users:
-        text += f"    {Symbols.anchor} `{user['user']}` | {user['date']}\n"
-
+        try:
+            name = (await client.get_users(user["user"])).first_name
+            text += f"    {Symbols.anchor} {name} (`{user['user']}`) | {user['date']}\n"
+        except:
+            text += f"    {Symbols.anchor} Unkown Peer (`{user['user']}`) | {user['date']}\n"
+            
     await hell.edit(text)
 
 
@@ -211,6 +215,7 @@ async def handle_incoming_pm(client: Client, message: Message):
                 message.from_user.id,
                 pm_pic,
                 pm_msg,
+                force_document=False,
             )
         else:
             msg = await client.send_message(

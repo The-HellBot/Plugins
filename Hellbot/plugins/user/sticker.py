@@ -230,7 +230,7 @@ async def removeSticker(_, message: Message):
 
 
 HelpMenu("sticker").add(
-    "kang", #Bugged: to-be-fixed - video/animated sticker
+    "kang",
     "<reply> <packid (optional)> <emoji (optional)>",
     "Add the replied image/gif/video/sticker into your own sticker pack.",
     "kang 2 👀",

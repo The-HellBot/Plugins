@@ -12,7 +12,7 @@ async def addsnip(client: Client, message: Message):
             f"Reply to a message with {handler}snip <keyword> to save it as a snip.",
         )
 
-    keyword = await hellbot.input(message)
+    keyword = (await hellbot.input(message)).replace("#", "")
     hell = await hellbot.edit(message, f"Saving snip `#{keyword}`")
     msg = await message.reply_to_message.forward(Config.LOGGER_ID)
 
@@ -29,7 +29,7 @@ async def rmsnip(client: Client, message: Message):
         if len(message.command) < 2:
             return await hellbot.delete(message, "Give a snip note name to remove.")
 
-        keyword = await hellbot.input(message)
+        keyword = (await hellbot.input(message)).replace("#", "")
         hell = await hellbot.edit(message, f"Removing snip `#{keyword}`")
 
         if await db.is_snip(client.me.id, message.chat.id, keyword.lower()):

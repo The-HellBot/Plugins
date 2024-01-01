@@ -2,20 +2,12 @@ from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup, Message
 
 from ..btnsG import gen_bot_help_buttons, start_button
-from ..btnsK import start_keyboard
 from . import HELP_MSG, START_MSG, BotHelp, Config, hellbot
 
 
-@hellbot.bot.on_message(filters.command("start") & Config.AUTH_USERS & filters.private)
+@hellbot.bot.on_message(filters.command("start") & Config.AUTH_USERS)
 async def start_pm(_, message: Message):
     btns = start_button()
-
-    hell = await message.reply_text(
-        "starting...",
-        disable_web_page_preview=True,
-        reply_markup=start_keyboard()
-    )
-    await hell.delete()
 
     await message.reply_text(
         START_MSG.format(message.from_user.mention),
@@ -24,7 +16,7 @@ async def start_pm(_, message: Message):
     )
 
 
-@hellbot.bot.on_message(filters.command("help") & Config.AUTH_USERS & filters.private)
+@hellbot.bot.on_message(filters.command("help") & Config.AUTH_USERS)
 async def help_pm(_, message: Message):
     btns = gen_bot_help_buttons()
 

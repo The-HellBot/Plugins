@@ -109,7 +109,7 @@ async def memify(_, message: Message):
     await hell.edit("Adding text...")
     memes = await draw_meme(file, upper_text, lower_text)
 
-    await hell.edit("Done!")
+    await hellbot.delete(hell, "Done!")
     await message.reply_sticker(memes[1])
     await message.reply_photo(
         memes[0],

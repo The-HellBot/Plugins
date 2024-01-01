@@ -5,20 +5,22 @@ from . import BotHelp, Config, Symbols, hellbot
 
 
 @hellbot.bot.on_message(
-    filters.command("addauth") & Config.AUTH_USERS & filters.private
+    filters.command("addauth") & Config.AUTH_USERS
 )
 async def addauth(client: Client, message: Message):
-    if len(message.command) < 2:
-        return await message.reply_text(
-            "Give me a userid/username to add them as an auth user!"
-        )
-
-    try:
-        user = await client.get_users(message.command[1])
-    except Exception:
-        return await message.reply_text(
-            "Give me a valid userid/username to add them as an auth user!"
-        )
+    if not message.reply_to_message:
+        if len(message.command) < 2:
+            return await message.reply_text(
+                "Reply to a user or give me a userid/username to add them as an auth user!"
+            )
+        try:
+            user = await client.get_users(message.command[1])
+        except Exception:
+            return await message.reply_text(
+                "Give me a valid userid/username to add them as an auth user!"
+            )
+    else:
+        user = message.reply_to_message.from_user
 
     if user.is_self:
         return await message.reply_text("I can't add myself as an auth user!")
@@ -31,20 +33,22 @@ async def addauth(client: Client, message: Message):
 
 
 @hellbot.bot.on_message(
-    filters.command("delauth") & Config.AUTH_USERS & filters.private
+    filters.command("delauth") & Config.AUTH_USERS
 )
 async def delauth(client: Client, message: Message):
-    if len(message.command) < 2:
-        return await message.reply_text(
-            "Give me a userid/username to remove them from auth users!"
-        )
-
-    try:
-        user = await client.get_users(message.command[1])
-    except Exception:
-        return await message.reply_text(
-            "Give me a valid userid/username to remove them from auth users!"
-        )
+    if not message.reply_to_message:
+        if len(message.command) < 2:
+            return await message.reply_text(
+                "Reply to a user or give me a userid/username to add them as an auth user!"
+            )
+        try:
+            user = await client.get_users(message.command[1])
+        except Exception:
+            return await message.reply_text(
+                "Give me a valid userid/username to add them as an auth user!"
+            )
+    else:
+        user = message.reply_to_message.from_user
 
     if user.id in Config.AUTH_USERS:
         Config.AUTH_USERS.remove(user.id)
@@ -54,7 +58,7 @@ async def delauth(client: Client, message: Message):
 
 
 @hellbot.bot.on_message(
-    filters.command("authlist") & Config.AUTH_USERS & filters.private
+    filters.command("authlist") & Config.AUTH_USERS
 )
 async def authlist(client: Client, message: Message):
     text = "**🍀 Authorized Users:**\n\n"

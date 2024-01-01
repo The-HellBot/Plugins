@@ -1,4 +1,4 @@
-from pyrogram import Client, filters
+from pyrogram import filters
 from pyrogram.enums import ParseMode
 from pyrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 
@@ -38,9 +38,7 @@ async def bot_help_menu_cb(_, cb: CallbackQuery):
 
     try:
         buttons = [
-            InlineKeyboardButton(
-                f"{Symbols.bullet} {i}", f"bot_help_cmd:{plugin}:{i}"
-            )
+            InlineKeyboardButton(f"{Symbols.bullet} {i}", f"bot_help_cmd:{plugin}:{i}")
             for i in sorted(Config.BOT_HELP[plugin]["commands"])
         ]
     except KeyError:
@@ -56,11 +54,15 @@ async def bot_help_menu_cb(_, cb: CallbackQuery):
         f"**📃 𝖫𝗈𝖺𝖽𝖾𝖽 𝖢𝗈𝗆𝗆𝖺𝗇𝖽𝗌:** `{len(sorted(Config.BOT_HELP[plugin]['commands']))}`"
     )
 
-    await cb.edit_message_text(
-        caption,
-        disable_web_page_preview=True,
-        reply_markup=InlineKeyboardMarkup(buttons),
-    )
+    try:
+        await cb.edit_message_text(
+            caption,
+            disable_web_page_preview=True,
+            reply_markup=InlineKeyboardMarkup(buttons),
+        )
+    except Exception:
+        # handles MessageNotModified error
+        pass
 
 
 @hellbot.bot.on_callback_query(filters.regex(r"bot_help_cmd"))
@@ -74,7 +76,9 @@ async def bot_help_cmd_cb(_, cb: CallbackQuery):
     cmd_dict = Config.BOT_HELP[plugin]["commands"][command]
 
     result += f"**{Symbols.radio_select} 𝖢𝗈𝗆𝗆𝖺𝗇𝖽:** `/{cmd_dict['command']}`"
-    result += f"\n\n**{Symbols.arrow_right} 𝖣𝖾𝗌𝖼𝗋𝗂𝗉𝗍𝗂𝗈𝗇:** __{cmd_dict['description']}__"
+    result += (
+        f"\n\n**{Symbols.arrow_right} 𝖣𝖾𝗌𝖼𝗋𝗂𝗉𝗍𝗂𝗈𝗇:** __{cmd_dict['description']}__"
+    )
     result += f"\n\n**<\> @Its_HellBot 🍀**"
 
     buttons = [
@@ -84,12 +88,16 @@ async def bot_help_cmd_cb(_, cb: CallbackQuery):
         ]
     ]
 
-    await cb.edit_message_text(
-        result,
-        ParseMode.MARKDOWN,
-        True,
-        InlineKeyboardMarkup(buttons),
-    )
+    try:
+        await cb.edit_message_text(
+            result,
+            ParseMode.MARKDOWN,
+            True,
+            InlineKeyboardMarkup(buttons),
+        )
+    except Exception:
+        # handles MessageNotModified error
+        pass
 
 
 @hellbot.bot.on_callback_query(filters.regex(r"help_page"))
@@ -144,10 +152,14 @@ async def help_menu_cb(_, cb: CallbackQuery):
         len(sorted(Config.HELP_DICT[plugin]["commands"])),
     )
 
-    await cb.edit_message_text(
-        caption,
-        reply_markup=InlineKeyboardMarkup(buttons),
-    )
+    try:
+        await cb.edit_message_text(
+            caption,
+            reply_markup=InlineKeyboardMarkup(buttons),
+        )
+    except Exception:
+        # handles MessageNotModified error
+        pass
 
 
 @hellbot.bot.on_callback_query(filters.regex(r"help_cmd"))
@@ -186,11 +198,15 @@ async def help_cmd_cb(_, cb: CallbackQuery):
         ]
     ]
 
-    await cb.edit_message_text(
-        result,
-        ParseMode.MARKDOWN,
-        reply_markup=InlineKeyboardMarkup(buttons),
-    )
+    try:
+        await cb.edit_message_text(
+            result,
+            ParseMode.MARKDOWN,
+            reply_markup=InlineKeyboardMarkup(buttons),
+        )
+    except Exception:
+        # handles MessageNotModified error
+        pass
 
 
 @hellbot.bot.on_callback_query(filters.regex(r"help_data"))

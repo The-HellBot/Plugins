@@ -8,7 +8,7 @@ from pyrogram.types import (
     ReplyKeyboardRemove,
 )
 
-from ..btnsG import gen_inline_keyboard
+from ..btnsG import gen_inline_keyboard, start_button
 from ..btnsK import session_keyboard
 from . import START_MSG, BotHelp, Config, Symbols, db, hellbot
 
@@ -117,7 +117,7 @@ async def delete_session(_, message: Message):
 
 
 @hellbot.bot.on_callback_query(filters.regex(r"rm_session"))
-async def rm_session_cb(_, cb: CallbackQuery):
+async def rm_session_cb(client: Client, cb: CallbackQuery):
     collection = []
     user_id = int(cb.data.split(":")[1])
     all_sessions = await db.get_all_sessions()
@@ -125,8 +125,21 @@ async def rm_session_cb(_, cb: CallbackQuery):
     if not all_sessions:
         return await cb.message.delete()
 
+    try:
+        owner = await client.get_users(Config.OWNER_ID)
+        owner_id = owner.id
+        owner_name = owner.first_name
+    except:
+        owner_id = Config.OWNER_ID
+        owner_name = "𝖮𝗐𝗇𝖾𝗋"
+    if cb.from_user.id not in [user_id, owner_id]:
+        return await cb.answer(
+            f"𝖠𝖼𝖼𝖾𝗌𝗌 𝗋𝖾𝗌𝗍𝗋𝗂𝖼𝗍𝖾𝖽 𝗍𝗈 𝖺𝗇𝗈𝗍𝗁𝖾𝗋 𝗎𝗌𝖾𝗋𝗌. Only {owner_name} and session client can delete this session!",
+            show_alert=True,
+        )
+
     await db.rm_session(user_id)
-    await cb.answer("**𝖲𝗎𝖼𝖼𝖾𝗌𝗌!** 𝖲𝖾𝗌𝗌𝗂𝗈𝗇 𝖽𝖾𝗅𝖾𝗍𝖾𝖽 𝖿𝗋𝗈𝗆 𝖽𝖺𝗍𝖺𝖻𝖺𝗌𝖾.", show_alert=True)
+    await cb.answer("**𝖲𝗎𝖼𝖼𝖾𝗌𝗌!** 𝖲𝖾𝗌𝗌𝗂𝗈𝗇 𝖽𝖾𝗅𝖾𝗍𝖾𝖽 𝖿𝗋𝗈𝗆 𝖽𝖺𝗍𝖺𝖻𝖺𝗌𝖾. \n__Restart the bot to apply changes.__", show_alert=True)
 
     for i in all_sessions:
         collection.append((i["user_id"], f"rm_session:{i['user_id']}"))
@@ -153,8 +166,13 @@ async def list_sessions(_, message: Message):
 @hellbot.bot.on_message(filters.regex(r"Home 🏠") & filters.private & Config.AUTH_USERS)
 async def go_home(_, message: Message):
     await message.reply_text(
-        START_MSG.format(message.from_user.mention),
+        "**Home 🏠**",
         reply_markup=ReplyKeyboardRemove(),
+    )
+    await message.reply_text(
+        START_MSG.format(message.from_user.mention),
+        disable_web_page_preview=True,
+        reply_markup=InlineKeyboardMarkup(start_button()),
     )
 
 

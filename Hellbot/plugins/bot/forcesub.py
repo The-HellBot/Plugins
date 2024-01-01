@@ -15,13 +15,17 @@ from ..btnsG import gen_inline_keyboard
 from . import BotHelp, Config, Symbols, db, hellbot
 
 
-@hellbot.bot.on_message(filters.command("forcesub") & Config.AUTH_USERS)
+@hellbot.bot.on_message(filters.command("forcesub") & Config.AUTH_USERS & filters.group)
 async def force_sub(client: Client, message: Message):
     if len(message.command) < 2:
         return await message.reply_text("Give a channel username with command!")
 
-    if not await is_user_admin(message.chat, client.me.id):
-        return await message.reply_text("To use forcesub i must be an admin!")
+    try:
+        is_admin = await is_user_admin(message.chat, client.me.id)
+        if not is_admin:
+            return await message.reply_text(f"To use forcesub i must be an admin in {must_join}!")
+    except UserNotParticipant:
+        return await message.reply_text(f"To use forcesub i must be an admin in {must_join}!")
 
     must_join = message.command[1]
     try:

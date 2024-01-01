@@ -9,7 +9,7 @@ from .tools import runcmd
 
 
 async def convert_to_gif(file: str, is_video: bool = False) -> str:
-    resultFileName = f"gif_{round(time.time())}.gif"
+    resultFileName = f"gif_{round(time.time())}.mp4"
 
     if is_video:
         cmd = f"ffmpeg -i '{file}' -c copy '{resultFileName}'"

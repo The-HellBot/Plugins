@@ -12,26 +12,20 @@ from . import Config, HelpMenu, hellbot, on_message
 
 @on_message("getpfp", allow_stan=True)
 async def getpfp(client: Client, message: Message):
-    if len(message.command) < 2 and not message.reply_to_message:
-        return await hellbot.delete(
-            message, f"Reply to a message or pass a username/id to get the profile pic."
-        )
-
-    limit = 1
     hell = await hellbot.edit(message, "Processing...")
+    limit = 1
 
     if message.reply_to_message:
         user = message.reply_to_message.from_user
         reply_to = message.reply_to_message.id
 
-        if message.command[1].isdigit():
-            limit = int(message.command[1])
-        elif message.command[1] == "all":
-            limit = 0
-        else:
-            limit = 1
+        if len(message.command) >= 2:
+            if message.command[1].isdigit():
+                limit = int(message.command[1])
+            elif message.command[1] == "all":
+                limit = 0
 
-    else:
+    elif len(message.command) >= 2:
         try:
             user = await client.get_users(message.command[1])
             reply_to = message.id
@@ -41,22 +35,26 @@ async def getpfp(client: Client, message: Message):
                     limit = int(message.command[2])
                 elif message.command[2] == "all":
                     limit = 0
-                else:
-                    limit = 1
 
         except Exception as e:
             return await hellbot.error(hell, f"`{str(e)}`")
+
+    else:
+        return await hellbot.delete(
+            hell, f"Reply to a message or pass a username/id to get the profile pic."
+        )
 
     if not user.photo:
         return await hellbot.error(hell, f"User {user.mention} has no profile pic.")
 
     if limit == 1:
-        await client.send_photo(
-            message.chat.id,
-            user.photo.big_file_id,
-            f"**Profile Pic of User** {user.mention}",
-            reply_to_message_id=reply_to,
-        )
+        async for photo in client.get_chat_photos(user.id, 1):
+            await client.send_photo(
+                message.chat.id,
+                photo.file_id,
+                f"**Profile Pic of User** {user.mention}",
+                reply_to_message_id=reply_to,
+            )
     else:
         profile_pics = []
         async for photo in client.get_chat_photos(user.id, limit):
