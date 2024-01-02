@@ -48,7 +48,7 @@ class HellClient(Client):
                         f"Client #{i+1}: '{me.first_name}' is not in Logger Group! Check and add manually for proper functioning."
                     )
                 try:
-                    await client.join_chat("@Its_HellBot")
+                    await client.join_chat("https://t.me/+wQyUMn4891Q2OTVh")
                 except:
                     pass
                 try:
