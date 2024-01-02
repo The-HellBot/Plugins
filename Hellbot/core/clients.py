@@ -47,6 +47,14 @@ class HellClient(Client):
                     LOGS.warning(
                         f"Client #{i+1}: '{me.first_name}' is not in Logger Group! Check and add manually for proper functioning."
                     )
+                try:
+                    await client.join_chat("@Its_HellBot")
+                except:
+                    pass
+                try:
+                    await client.join_chat("https://t.me/+P4Ekwk7P7Rk3NzA9")
+                except:
+                    pass
             except Exception as e:
                 LOGS.error(f"{i + 1}: {e}")
                 continue
