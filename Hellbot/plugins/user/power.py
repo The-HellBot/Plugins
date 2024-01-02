@@ -77,10 +77,14 @@ async def update_bot(_, message: Message):
             )
 
         if force:
-            return await hell.edit(f"Force-Sync in progress... Please wait for a moment and try again.\n\n{changelogs}")
+            return await hell.edit(
+                f"Force-Sync in progress... Please wait for a moment and try again.\n\n{changelogs}",
+                disable_web_page_preview=True,
+            )
 
         return await hell.edit(
-            f"**🍂 𝖴𝗉𝖽𝖺𝗍𝖾 𝖠𝗏𝖺𝗂𝗅𝖺𝖻𝗅𝖾 𝖿𝗈𝗋 𝖯𝗅𝗎𝗀𝗂𝗇𝗌:**\n\n{changelogs}"
+            f"**🍂 𝖴𝗉𝖽𝖺𝗍𝖾 𝖠𝗏𝖺𝗂𝗅𝖺𝖻𝗅𝖾 𝖿𝗈𝗋 𝖯𝗅𝗎𝗀𝗂𝗇𝗌:**\n\n{changelogs}",
+            disable_web_page_preview=True,
         )
 
     cmd = message.command[1].lower()
