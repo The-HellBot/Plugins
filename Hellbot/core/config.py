@@ -138,14 +138,12 @@ os_configs = [
     "API_ID",
     "BOT_TOKEN",
     "DATABASE_URL",
-    "DEPLOY_BRANCH",
     "DEPLOY_REPO",
     "HANDLERS",
     "HEROKU_APIKEY",
     "HEROKU_APPNAME",
     "LOGGER_ID",
     "OWNER_ID",
-    "PLUGINS_BRANCH",
     "PLUGINS_REPO",
 ]
 all_env: list[str] = [
