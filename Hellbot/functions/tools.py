@@ -110,7 +110,7 @@ async def gen_changelogs(repo: Repo, branch: str) -> str:
     changelogs = ""
     commits = list(repo.iter_commits(branch))[:5]
     for index, commit in enumerate(commits):
-        changelogs += f"**{Symbols.triangle_right} {index + 1}.** {commit.summary}\n"
+        changelogs += f"**{Symbols.triangle_right} {index + 1}.** `{commit.summary}`\n"
 
     return changelogs
 

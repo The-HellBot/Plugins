@@ -140,10 +140,15 @@ class HellClient(Client):
 class CustomMethods(HellClient):
     async def input(self, message: Message) -> str:
         """Get the input from the user"""
-        try:
-            output = message.text.split(" ", 1)[1].strip() or ""
-        except IndexError:
+        if len(message.command) < 2:
             output = ""
+
+        else:
+            try:
+                output = message.text.split(" ", 1)[1].strip() or ""
+            except IndexError:
+                output = ""
+
         return output
 
     async def edit(
