@@ -68,7 +68,7 @@ async def kangSticker(client: Client, message: Message):
             if not status:
                 return await hellbot.error(hell, path)
 
-    sticker = await create_sticker(hellbot.bot, message.chat.id, path, pack_emoji)
+    sticker = await create_sticker(hellbot.bot, Config.LOGGER_ID, path, pack_emoji)
     os.remove(path)
 
     try:

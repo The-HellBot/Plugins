@@ -15,8 +15,8 @@ from . import HelpMenu, hellbot, on_message
 
 def obtain_ids(user: str):
     response = requests.get("https://www.instagram.com/" + user)
-    appid = re.search('appId":"(\d*)', response.text)[1]
-    serverid = re.search('server_revision":(\d*)', response.text)[1]
+    appid = re.search(r'appId":"(\d*)', response.text)[1]
+    serverid = re.search(r'server_revision":(\d*)', response.text)[1]
 
     return appid, serverid
 
