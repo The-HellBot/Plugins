@@ -210,12 +210,17 @@ async def handle_incoming_pm(client: Client, message: Message):
 
     try:
         pm_pic = await db.get_env(ENV.pmpermit_pic)
-        if pm_pic:
-            msg = await client.send_document(
+        if pm_pic and pm_pic.endswith(".mp4"):
+            msg = await client.send_video(
                 message.from_user.id,
                 pm_pic,
                 pm_msg,
-                force_document=False,
+            )
+        elif pm_pic:
+            msg = await client.send_photo(
+                message.from_user.id,
+                pm_pic,
+                pm_msg,
             )
         else:
             msg = await client.send_message(
