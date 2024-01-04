@@ -3,13 +3,13 @@ import random
 import time
 
 from pyrogram import Client, filters
-from pyrogram.enums import MessageMediaType
+from pyrogram.enums import MessageMediaType, ChatType
 from pyrogram.types import Message
 
 from Hellbot.core import Config, db, hellbot
 from Hellbot.functions.formatter import add_to_dict, get_from_dict, readable_time
 
-from . import HelpMenu, custom_handler, on_message
+from . import HelpMenu, custom_handler, on_message, group_only
 
 afk_quotes = [
     "🚶‍♂️ Taking a break, be back soon!",
@@ -77,7 +77,6 @@ async def afk(_, message: Message):
 
 @custom_handler(
     filters.incoming
-    & filters.mentioned
     & ~filters.bot
     & ~filters.service
 )
@@ -85,8 +84,13 @@ async def afk_watch(client: Client, message: Message):
     afk_data = await db.get_afk(client.me.id)
     if not afk_data:
         return
+
     if message.from_user.id == afk_data["user_id"]:
         return
+
+    if message.chat.type in group_only:
+        if not message.mentioned:
+            return
 
     afk_time = readable_time(round(time.time() - afk_data["time"]))
     caption = f"**{random.choice(afk_quotes)}**\n\n**💫 𝖱𝖾𝖺𝗌𝗈𝗇:** {afk_data['reason']}\n**⏰ 𝖠𝖥𝖪 𝖥𝗋𝗈𝗆:** `{afk_time}`"
@@ -108,9 +112,11 @@ async def afk_watch(client: Client, message: Message):
     else:
         sent = await message.reply_text(caption)
 
+    link = message.link if message.chat.type in group_only else "No DM Link"
+
     await hellbot.check_and_log(
         "afk",
-        f"{message.from_user.mention} mentioned you when you were AFK! \n\n**Link:** {message.link}",
+        f"{message.from_user.mention} mentioned you when you were AFK! \n\n**Link:** {link}",
     )
     try:
         data = get_from_dict(Config.AFK_CACHE, [afk_data["user_id"], message.chat.id])
