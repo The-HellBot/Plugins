@@ -38,7 +38,10 @@ async def alive(client: Client, message: Message):
     uptime = readable_time(time.time() - START_TIME)
     caption = await alive_template(client.me.first_name, uptime)
 
-    await message.reply_photo(img, caption=caption)
+    if img.endswith(".mp4"):
+        await message.reply_video(img, caption=caption)
+    else:
+        await message.reply_photo(img, caption=caption)
     await hell.delete()
 
     try:
@@ -58,11 +61,16 @@ async def ping(client: Client, message: Message):
     caption = await ping_template(round(speed, 3), uptime, client.me.mention)
     if img:
         img = random.choice(img.split(" "))
-        await message.reply_document(
-            img,
-            caption=caption,
-            force_document=False,
-        )
+        if img.endswith(".mp4"):
+            await message.reply_video(
+                img,
+                caption=caption,
+            )
+        else:
+            await message.reply_photo(
+                img,
+                caption=caption,
+            )
         return
     await hellbot.edit(hell, caption, no_link_preview=True)
 

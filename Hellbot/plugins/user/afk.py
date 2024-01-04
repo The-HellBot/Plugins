@@ -75,7 +75,7 @@ async def afk(_, message: Message):
     add_to_dict(Config.AFK_CACHE, [message.from_user.id, message.chat.id])
 
 
-@custom_handler(filters.incoming & filters.mentioned & ~filters.bot & ~filters.me & ~filters.service)
+@custom_handler(filters.incoming & filters.group & filters.private & filters.mentioned & ~filters.bot & ~filters.me & ~filters.service)
 async def afk_watch(client: Client, message: Message):
     afk_data = await db.get_afk(client.me.id)
     if not afk_data:
