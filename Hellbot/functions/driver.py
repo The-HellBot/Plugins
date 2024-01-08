@@ -263,8 +263,8 @@ class YoutubeDriver:
 
         youtube_regex = (
             r"(https?://)?(www\.)?"
-            "(youtube|youtu|youtube-nocookie)\.(com|be)/"
-            '(video|embed|shorts/|watch\?v=|v/|e/|u/\\w+/|\\w+/)?([^"&?\\s]{11})'
+            r"(youtube|youtu|youtube-nocookie)\.(com|be)/"
+            r'(video|embed|shorts/|watch\?v=|v/|e/|u/\\w+/|\\w+/)?([^"&?\\s]{11})'
         )
         match = re.match(youtube_regex, url)
         if match:
