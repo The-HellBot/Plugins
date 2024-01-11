@@ -71,6 +71,7 @@ async def ping(client: Client, message: Message):
                 img,
                 caption=caption,
             )
+            await hell.delete()
         return
     await hellbot.edit(hell, caption, no_link_preview=True)
 
