@@ -174,12 +174,34 @@ async def allowlist(client: Client, message: Message):
     await hell.edit(text)
 
 
+@on_message("pmpermit", allow_stan=True)
+async def set_pmpermit(_, message: Message):
+    if len(message.command) < 2:
+        status = await db.get_env(ENV.pmpermit)
+        text = "Enabled" if status else "Disabled"
+        return await hellbot.delete(message, f"**Current PM Permit Setting:** `{text}`\n\nTo change the setting give either `on` or `off` as argument.")
+
+    cmd = message.command[1].lower().strip()
+
+    if cmd == "on":
+        await db.set_env(ENV.pmpermit, True)
+        await hellbot.delete(message, "**PM Permit Enabled!**")
+    elif cmd == "off":
+        await db.set_env(ENV.pmpermit, False)
+        await hellbot.delete(message, "**PM Permit Disabled!**")
+    else:
+        await hellbot.delete(message, "**Invalid Argument!**")
+
+
 @custom_handler(filters.incoming & filters.private & ~filters.bot & ~filters.service)
 async def handle_incoming_pm(client: Client, message: Message):
     if message.from_user.id in Config.DEVS:
         return
 
     if message.from_user.id == 777000:
+        return
+
+    if not await db.get_env(ENV.pmpermit):
         return
 
     if await db.is_pmpermit(client.me.id, message.from_user.id):
