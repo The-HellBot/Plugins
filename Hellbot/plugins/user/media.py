@@ -1,18 +1,21 @@
 import os
 import time
 
+import requests
 from PIL import Image
 from pyrogram.enums import MessageMediaType
 from pyrogram.types import Message
 
+from Hellbot.core import ENV
 from Hellbot.functions.convert import tgs_to_png, video_to_png
 from Hellbot.functions.formatter import readable_time
-from Hellbot.functions.images import draw_meme
+from Hellbot.functions.images import create_thumbnail, draw_meme
 from Hellbot.functions.media import get_metedata
 from Hellbot.functions.paste import post_to_telegraph
 from Hellbot.functions.tools import progress, runcmd
+from Hellbot.functions.utility import TGraph
 
-from . import Config, HelpMenu, hellbot, on_message
+from . import Config, HelpMenu, db, hellbot, on_message
 
 
 @on_message("mediainfo", allow_stan=True)
@@ -122,6 +125,45 @@ async def memify(_, message: Message):
     os.remove(memes[1])
 
 
+@on_message("setthumbnail", allow_stan=True)
+async def set_thumbnail(_, message: Message):
+    if len(message.command) < 2:
+        return await hellbot.delete(
+            message, "Reply to a media file to set as thumbnail!"
+        )
+
+    if not message.reply_to_message or not message.reply_to_message.media:
+        return await hellbot.delete(
+            message, "Reply to a media file to set as thumbnail!"
+        )
+
+    media = message.reply_to_message.media
+    if media not in MessageMediaType.PHOTO:
+        return await hellbot.delete(
+            message,
+            "Only photos are supported! If this is a file, try converting it to a photo first.",
+        )
+
+    if message.reply_to_message.photo.file_size >= 5242880:
+        return await hellbot.delete(
+            message,
+            "This photo is too big to upload to telegraph! You need to choose a photo below 5mb.",
+        )
+
+    hell = await hellbot.edit(message, "Uploading to telegraph...")
+    path = await message.reply_to_message.download(Config.TEMP_DIR)
+
+    try:
+        media_url = TGraph.telegraph.upload_file(path)
+        url = f"https://te.legra.ph{media_url[0]['src']}"
+    except Exception as e:
+        return await hellbot.error(hell, str(e))
+
+    await db.set_env(ENV.thumbnail_url)
+    await hellbot.delete(hell, f"Thumbnail set to [this image]({url})!", 20)
+    os.remove(path)
+
+
 @on_message("rename", allow_stan=True)
 async def renameMedia(_, message: Message):
     if not message.reply_to_message or not message.reply_to_message.media:
@@ -159,8 +201,21 @@ async def renameMedia(_, message: Message):
     await hell.edit(f"**Downloaded and Renamed in** `{dwl_time}`**,** __uploading...__")
 
     start2 = time.time()
+
+    thumb = await db.get_env(ENV.thumbnail_url)
+    if thumb:
+        binary = requests.get(thumb).content
+        photo = f"{Config.TEMP_DIR}/thumb_{int(time.time())}.jpeg"
+        with open(photo, "wb") as f:
+            f.write(binary)
+        thumbnail = create_thumbnail(photo, (320, 320), 199)
+    else:
+        photo = None
+        thumbnail = None
+
     await message.reply_document(
         renamed_file,
+        thumb=thumbnail,
         caption=f"**📁 File Name:** `{new_name}`",
         file_name=new_name,
         force_document=True,
@@ -174,6 +229,8 @@ async def renameMedia(_, message: Message):
         f"**📁 File Name:** `{new_name}`\n\n**⬇️ Downloaded in:** `{dwl_time}`\n**⬆️ Uploaded in:** `{end_time}`\n**💫 Total time taken:** `{total_time}`"
     )
     os.remove(renamed_file)
+    if photo:
+        os.remove(photo)
 
 
 HelpMenu("media").add(
@@ -193,6 +250,12 @@ HelpMenu("media").add(
     "Rename a media file with the provided name.",
     "rename HellBot.jpg",
     "The file name must have an extention.",
+).add(
+    "setthumbnail",
+    "<reply to photo>",
+    "Set the replied photo as the thumbnail of the bot for all the upload/rename function.",
+    "setthumbnail <reply>",
+    "The photo must be below 5mb and in photo format and not in file.",
 ).info(
     "Media utils"
 ).done()

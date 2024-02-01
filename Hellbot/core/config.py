@@ -83,6 +83,7 @@ class ENV:
     pmpermit = "PMPERMIT"
     pmpermit_pic = "PMPERMIT_PIC"
     remove_bg_api = "REMOVE_BG_API"
+    thumbnail_url = "THUMBNAIL_URL"
     statistics_template = "STATISTICS_TEMPLATE"
     sticker_packname = "STICKER_PACKNAME"
     tag_logger = "TAG_LOGGER"

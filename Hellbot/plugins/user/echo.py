@@ -54,7 +54,7 @@ async def listecho(client: Client, message: Message):
     for echo in echos:
         text += f"    {Symbols.anchor} `{echo}`\n"
 
-    await hellbot.send_message(message.chat.id, text)
+    await hellbot.edit(message, text)
 
 
 @custom_handler(filters.incoming & filters.text & filters.sticker & ~filters.service)
@@ -62,7 +62,6 @@ async def echo_handler(client: Client, message: Message):
     if not await db.is_echo(client.me.id, message.chat.id, message.from_user.id):
         return
 
-    await asyncio.sleep(1)
     if message.sticker:
         await message.reply_sticker(message.sticker.file_id)
     else:

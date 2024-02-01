@@ -161,7 +161,7 @@ async def allowlist(client: Client, message: Message):
     hell = await hellbot.edit(message, "`Fetching allowlist...`")
     users = await db.get_all_pmpermits(client.me.id)
     if not users:
-        return await hell.edit("`No users allowed to pm!`")
+        return await hellbot.delete(hell, "`No users allowed to pm!`")
 
     text = "**🍀 𝖠𝗉𝗉𝗋𝗈𝗏𝖾𝖽 𝖴𝗌𝖾𝗋'𝗌 𝖫𝗂𝗌𝗍:**\n\n"
     for user in users:

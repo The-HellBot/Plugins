@@ -358,3 +358,20 @@ async def create_calendar(year: int, month: int) -> str:
     calendar_image.close()
 
     return filename
+
+
+async def create_thumbnail(photo: str, xy: tuple[int, int], file_size: int):
+    img = Image.open(photo)
+    img.thumbnail(xy)
+
+    size_in_bytes = file_size * 1024
+    quality = 90
+
+    while True:
+        img.save(photo, "JPEG", quality=quality, optimize=True)
+        if os.path.getsize(photo) <= size_in_bytes:
+            break
+
+        quality -= 5
+
+    return photo
