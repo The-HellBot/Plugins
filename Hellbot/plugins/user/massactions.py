@@ -39,7 +39,7 @@ async def banall(client: Client, message: Message):
             await client.ban_chat_member(chat_id, users.user.id)
             success += 1
         except FloodWait as fw:
-            await asyncio.sleep(fw.x)
+            await asyncio.sleep(fw.value)
         except Exception:
             pass
 
@@ -85,7 +85,7 @@ async def unbanall(client: Client, message: Message):
             await client.unban_chat_member(chat_id, users.user.id)
             success += 1
         except FloodWait as fw:
-            await asyncio.sleep(fw.x)
+            await asyncio.sleep(fw.value)
         except Exception:
             pass
 
@@ -132,7 +132,7 @@ async def kickall(client: Client, message: Message):
             )
             success += 1
         except FloodWait as fw:
-            await asyncio.sleep(fw.x)
+            await asyncio.sleep(fw.value)
         except Exception:
             pass
 
@@ -185,7 +185,7 @@ async def blockall(client: Client, message: Message):
             await client.block_user(users.user.id)
             success += 1
         except FloodWait as fw:
-            await asyncio.sleep(fw.x)
+            await asyncio.sleep(fw.value)
         except Exception:
             pass
 
@@ -222,7 +222,7 @@ async def unblockall(client: Client, message: Message):
             await client.unblock_user(users.user.id)
             success += 1
         except FloodWait as fw:
-            await asyncio.sleep(fw.x)
+            await asyncio.sleep(fw.value)
         except Exception:
             pass
 
