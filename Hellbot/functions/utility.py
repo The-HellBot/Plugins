@@ -76,7 +76,7 @@ class Gcast:
                         await self._send_msg(dialog.chat.id, message, tag)
                         count += 1
                     except FloodWait as fw:
-                        await asyncio.sleep(fw.x)
+                        await asyncio.sleep(fw.value)
                         await self._send_msg(dialog.chat.id, message, tag)
                         count += 1
                     except Exception as e:
@@ -98,7 +98,7 @@ class Gcast:
                         await self._send_msg(dialog.chat.id, message, tag)
                         count += 1
                     except FloodWait as fw:
-                        await asyncio.sleep(fw.x)
+                        await asyncio.sleep(fw.value)
                         await self._send_msg(dialog.chat.id, message, tag)
                         count += 1
                     except Exception as e:
