@@ -1,14 +1,15 @@
 import os
 import re
+import shutil
 import time
 
 import requests
-from pyrogram.types import Message
+from pyrogram.types import InputMediaPhoto, InputMediaVideo, Message
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.expected_conditions import presence_of_element_located
 from selenium.webdriver.support.wait import WebDriverWait
 
-from Hellbot.functions.driver import Driver
+from Hellbot.functions.driver import Driver, INSTAGRAM, SCRAP_DATA
 
 from . import HelpMenu, hellbot, on_message
 
@@ -31,7 +32,8 @@ async def instagramReels(_, message: Message):
     hell = await hellbot.edit(message, "Searching...")
 
     query = await hellbot.input(message)
-    isInstagramLink = lambda link: bool(
+
+    def isInstagramLink(link): return bool(
         (re.compile(r"^https?://(?:www\.)?instagram\.com/reel/")).match(link)
     )
 
@@ -45,7 +47,8 @@ async def instagramReels(_, message: Message):
 
         driver.get(query)
         wait = WebDriverWait(driver, 10)
-        element = wait.until(presence_of_element_located((By.TAG_NAME, "video")))
+        element = wait.until(
+            presence_of_element_located((By.TAG_NAME, "video")))
         reels = element.get_attribute("src")
         driver.quit()
 
@@ -81,7 +84,8 @@ async def instagramPost(_, message: Message):
     hell = await hellbot.edit(message, "Searching...")
 
     query = await hellbot.input(message)
-    isInstagramLink = lambda link: bool(
+
+    def isInstagramLink(link): return bool(
         (re.compile(r"^https?://(?:www\.)?instagram\.com/p/")).match(link)
     )
 
@@ -89,45 +93,33 @@ async def instagramPost(_, message: Message):
         return await hellbot.error(hell, "Give a valid instagram post link.")
 
     try:
-        driver, _ = Driver.get()
-        if not driver:
-            return await hellbot.error(hell, _)
-
-        reels = []
-        driver.get(query)
-        wait = WebDriverWait(driver, 10)
-        element = wait.until(presence_of_element_located((By.TAG_NAME, "video")))
-        reels.append(element.get_attribute("src"))
-
-        try:
-            driver.find_element(By.XPATH, "//button[@aria-label='Next']").click()
-            element = wait.until(presence_of_element_located((By.TAG_NAME, "video")))
-            reels.append(element.get_attribute("src"))
-        except Exception as e:
-            driver.quit()
-            return await hellbot.error(hell, f"`{e}`")
-
-        driver.quit()
-
-        if reels:
-            await hell.edit("**Downloading...**")
-
-            for reel in reels:
-                binary = requests.get(reel).content
-                fileName = f"post_{int(time.time())}.mp4"
-                with open(fileName, "wb") as file:
-                    file.write(binary)
-                await message.reply_video(
-                    fileName,
-                    caption=f"__💫 Downloaded Instagram Post!__ \n\n**</> @HellBot_Networks**",
-                )
-                await hell.delete()
-                os.remove(fileName)
-        else:
+        posts = INSTAGRAM(query).get_all()
+        if type(posts) == str:
             await hellbot.error(
                 hell,
-                "Unable to download the post. Make sure the link is valid or the post is not from a private account.",
+                f"Got an error\n{posts}"
             )
+            return
+
+        images = posts.get("image")
+        videos = posts.get("video")
+        all_media = []
+        if images:
+            downloaded = SCRAP_DATA(images).get_images()
+            for i in downloaded:
+                all_media.append(InputMediaPhoto(i))
+        if videos:
+            downloaded = SCRAP_DATA(videos).get_videos()
+            all_media.extend(downloaded)
+            for i in downloaded:
+                all_media.append(InputMediaVideo(i))
+
+        await hell.edit_text("Uploading...")
+        path = "./scrapped/"
+        await message.reply_media_group(all_media)
+        await hell.delete()
+        shutil.rmtree(path)
+
     except Exception as e:
         await hellbot.error(hell, f"`{e}`")
 
@@ -214,13 +206,13 @@ HelpMenu("instagram").add(
     "Download instagram reels.",
     "reels https://www.instagram.com/reel/Cr24EiKNTL7/",
 ).add(
-    "igpost", #Bugged: to-be-fixed : only downloads a single post
+    "igpost",  # Bugged: to-be-fixed : only downloads a single post
     "<instagram post link>",
     "Download instagram post.",
     "igpost https://www.instagram.com/p/C06rAjDJlJs/",
     "If the post has multiple videos, it will download all of them one by one.",
 ).add(
-    "iguser", #Bugged
+    "iguser",  # Bugged
     "<instagram username>",
     "Get instagram user info.",
     "iguser therock",
