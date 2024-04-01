@@ -39,7 +39,7 @@ async def addgatcha(client: Client, message: Message):
 
     catch_command = message.command[2]
     chat_id = message.chat.id
-    if len(message.command) > 3 and message.command[3].lower() == "--g":
+    if len(message.command) > 3 and message.command[3].lower() == "-g":
         chat_id = 0
 
     await db.add_gachabot(client.me.id, (bot.id, bot.username), catch_command, chat_id)
@@ -50,7 +50,8 @@ async def addgatcha(client: Client, message: Message):
         f"**{Symbols.anchor} Chat:** `{'All groups' if chat_id == 0 else message.chat.title}`",
         30,
     )
-    Config.GACHA_BOTS.add(bot.id)
+    if bot.id not in Config.GACHA_BOTS:
+        Config.GACHA_BOTS.add(bot.id)
 
 
 @on_message("delgatcha", chat_type=group_only, allow_stan=True)
@@ -69,10 +70,10 @@ async def delgatcha(client: Client, message: Message):
         return await hellbot.delete(message, "Bot not found!")
 
     chat_id = message.chat.id
-    if len(message.command) > 2 and message.command[2].lower() == "--g":
+    if len(message.command) > 2 and message.command[2].lower() == "-g":
         chat_id = 0
 
-    if len(message.command) > 2 and message.command[2].lower() == "--a":
+    if len(message.command) > 2 and message.command[2].lower() == "-a":
         await db.rm_gachabot(client.me.id, bot.id)
         return await hellbot.delete(
             message, f"**Removed {bot.username} from gatcha bots list for all chats.**"
@@ -84,7 +85,8 @@ async def delgatcha(client: Client, message: Message):
             message,
             f"**Removed {bot.username} from gatcha bots list from {'All groups' if chat_id == 0 else message.chat.title}.**",
         )
-        Config.GACHA_BOTS.remove(bot.id)
+        if bot.id not in await db.get_all_gachabots_id():
+            Config.GACHA_BOTS.remove(bot.id)
     else:
         await hellbot.delete(
             message, f"{bot.username} is not in the gatcha bots list for this chat."
