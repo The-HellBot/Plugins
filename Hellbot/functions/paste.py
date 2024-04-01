@@ -1,5 +1,8 @@
+import uuid
+
 import requests
-from html_telegraph_poster import TelegraphPoster
+
+from .utility import TGraph
 
 
 def post_to_telegraph(
@@ -8,10 +11,25 @@ def post_to_telegraph(
     author: str = "[ 𝖧𝖾𝗅𝗅𝖡𝗈𝗍 ]",
     url: str = "https://t.me/Its_HellBot",
 ) -> str:
-    client = TelegraphPoster(use_api=True)
-    client.create_api_token(author)
-    response = client.post(title, author, content, url)
-    return str(response["url"]).replace("telegra.ph", "te.legra.ph")
+    content = content.replace("\n", "<br>")
+    try:
+        response = TGraph.telegraph.create_page(
+            title=title,
+            html_content=content,
+            author_name=author,
+            author_url=url,
+        )
+    except Exception:
+        rnd_key = uuid.uuid4().hex[:8]
+        title = f"{title}_{rnd_key}"
+        response = TGraph.telegraph.create_page(
+            title=title,
+            html_content=content,
+            author_name=author,
+            author_url=url,
+        )
+
+    return f"https://te.legra.ph/{response['path']}"
 
 
 def spaceBin(data: str, extension: str = "none") -> str:
