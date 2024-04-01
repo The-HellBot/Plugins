@@ -134,7 +134,7 @@ async def gatchainfo(client: Client, message: Message):
             f"**{Symbols.diamond_2} Chat:** `{'All groups' if info.get('chat_id') == 0 else message.chat.title}`\n"
             f"**{Symbols.diamond_2} Added On:** `{info.get('date')}`"
         )
-        return await hellbot.edit(message, text, disable_web_page_preview=True)
+        return await hellbot.edit(message, text)
 
     await hellbot.delete(message, "Bot not found in the gatcha bots list.")
 
