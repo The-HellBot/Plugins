@@ -157,22 +157,36 @@ async def instagramPost(_, message: Message):
         driver.get(query)
         wait = WebDriverWait(driver, 10)
 
-        for _ in range(10):
+        # get the first media
+        try:
+            element = wait.until(visibility_of_element_located((By.TAG_NAME, "video")))
+            extention = "mp4"
+        except:
+            element = wait.until(visibility_of_element_located((By.TAG_NAME, "img")))
+            extention = "jpg"
+        media.append((element.get_attribute("src"), extention))
+
+        # check if there are more media
+        try:
+            button = driver.find_element(By.XPATH, "//button[@aria-label='Next']")
+        except:
+            button = False
+
+        # get all media
+        while button:
             try:
+                button.click()
                 try:
                     element = wait.until(visibility_of_element_located((By.TAG_NAME, "video")))
                     extention = "mp4"
                 except:
-                    try:
-                        element = wait.until(visibility_of_element_located((By.TAG_NAME, "img")))
-                        extention = "jpg"
-                    except Exception as e:
-                        LOGS.info("--> " + str(e))
-                        driver.find_element(By.XPATH, "//button[@aria-label='Next']").click()
-                        continue
-
+                    element = wait.until(visibility_of_element_located((By.TAG_NAME, "img")))
+                    extention = "jpg"
                 media.append((element.get_attribute("src"), extention))
-                driver.find_element(By.XPATH, "//button[@aria-label='Next']").click()
+                try:
+                    button = driver.find_element(By.XPATH, "//button[@aria-label='Next']")
+                except:
+                    button = False
             except Exception as e:
                 LOGS.info("--> " + str(e))
 
