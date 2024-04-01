@@ -50,6 +50,7 @@ async def addgatcha(client: Client, message: Message):
         f"**{Symbols.anchor} Chat:** `{'All groups' if chat_id == 0 else message.chat.title}`",
         30,
     )
+    Config.GACHA_BOTS.add(bot.id)
 
 
 @on_message("delgatcha", chat_type=group_only, allow_stan=True)
@@ -83,6 +84,7 @@ async def delgatcha(client: Client, message: Message):
             message,
             f"**Removed {bot.username} from gatcha bots list from {'All groups' if chat_id == 0 else message.chat.title}.**",
         )
+        Config.GACHA_BOTS.remove(bot.id)
     else:
         await hellbot.delete(
             message, f"{bot.username} is not in the gatcha bots list for this chat."
@@ -182,15 +184,15 @@ async def gacha_handler(client: Client, message: Message):
 
 HelpMenu("gatcha").add(
     "addgatcha",
-    "<bot id> <catch command> <--g (optional)>",
-    "Auto-catch spawns from gatcha bots in the current chat. Use --g to auto-catch in all groups else it only enables in the current chat.",
+    "<bot id> <catch command> <-g (optional)>",
+    "Auto-catch spawns from gatcha bots in the current chat. Use -g to auto-catch in all groups else it only enables in the current chat.",
     "addgatcha 69696969 /protecc",
 ).add(
     "delgatcha",
     "<bot id> <flag (optional)>",
     "Remove a bot from the gatcha bots list in the current chat. Use flag for better control.",
-    "delgatcha 69696969 --g",
-    "Flags: \n ->   --g: Remove from all groups\n ->   --a: Remove from all chats\n",
+    "delgatcha 69696969 -g",
+    "Flags: \n ->   -g: Remove from all groups\n ->   -a: Remove from all chats\n",
 ).add(
     "gatchalist",
     None,

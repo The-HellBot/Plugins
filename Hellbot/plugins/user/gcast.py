@@ -14,14 +14,14 @@ async def broadcast(client: Client, message: Message):
     if len(message.command) < 2 or not message.reply_to_message:
         return await hellbot.delete(
             message,
-            f"Reply to a message with {handler}gcast <all / groups / users> <copy>",
+            f"Reply to a message with `{handler}gcast (all/groups/users) (copy)`",
         )
 
     mode = message.command[1].lower()
     if mode not in ["all", "groups", "users"]:
         return await hellbot.delete(
             message,
-            f"Reply to a message with {handler}gcast <all / groups / users> <copy>",
+            f"Reply to a message with `{handler}gcast (all/groups/users) (copy)`",
         )
 
     tag = True
