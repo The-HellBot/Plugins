@@ -8,7 +8,7 @@ from pyrogram.errors import FloodWait
 from pyrogram.types import Message
 from telegraph import Telegraph
 
-from Hellbot.core import ENV, db
+from Hellbot.core import ENV, LOGS, db
 
 from .formatter import readable_time
 
@@ -21,8 +21,11 @@ class TelegraphAPI:
     async def setup(self):
         shortname = await db.get_env(ENV.telegraph_account) or self.shortname
 
-        self.telegraph = Telegraph(domain="telegra.ph")
-        self.telegraph.create_account(shortname)
+        try:
+            self.telegraph = Telegraph(domain="telegra.ph")
+            self.telegraph.create_account(shortname)
+        except:
+            LOGS.warning("Failed to setup Telegraph API")
 
 
 class Gcast:
