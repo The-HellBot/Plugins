@@ -13,10 +13,10 @@ from . import (
     Symbols,
     custom_handler,
     db,
+    group_only,
     handler,
     hellbot,
     on_message,
-    group_only,
 )
 
 
@@ -99,7 +99,7 @@ async def gatchalist(client: Client, message: Message):
     gatchabots = await db.get_all_gachabots(client.me.id)
 
     if len(gatchabots) > 0:
-        text = f"**🎰 gatcha Bots List:**\n\n"
+        text = f"**🎰 Gatcha Bots List:**\n\n"
         for bot in gatchabots:
             text += f"**{Symbols.diamond_2} @{bot.get('username')} :** `{bot.get('catch_command')}`\n"
         text += f"\n**Total:** `{len(gatchabots)}`"
@@ -122,22 +122,21 @@ async def gatchainfo(client: Client, message: Message):
         return await hellbot.error(message, str(e))
 
     chat_id = message.chat.id
-    if len(message.command) > 2 and message.command[2].lower() == "--g":
+    if len(message.command) > 2 and message.command[2].lower() == "-g":
         chat_id = 0
 
-    if not await db.is_gachabot(client.me.id, bot.id, chat_id):
-        return await hellbot.delete(message, "Bot not found in the gatcha bots list.")
+    if await db.is_gachabot(client.me.id, bot.id, chat_id):
+        info = await db.get_gachabot(client.me.id, bot.id, chat_id)
+        text = (
+            f"**🎰 Gatcha Bot Info:**\n\n"
+            f"**{Symbols.diamond_2} Bot:** @{bot.username}\n"
+            f"**{Symbols.diamond_2} Catch Command:** `{info.get('catch_command')}`\n"
+            f"**{Symbols.diamond_2} Chat:** `{'All groups' if info.get('chat_id') == 0 else message.chat.title}`\n"
+            f"**{Symbols.diamond_2} Added On:** `{info.get('date')}`"
+        )
+        return await hellbot.edit(message, text, disable_web_page_preview=True)
 
-    info = await db.get_gachabot(client.me.id, bot.id, chat_id)
-    text = (
-        f"**🎰 gatcha Bot Info:**\n\n"
-        f"**{Symbols.diamond_2} Bot:** @{bot.username}\n"
-        f"**{Symbols.diamond_2} Catch Command:** `{info.get('catch_command')}`\n"
-        f"**{Symbols.diamond_2} Chat:** `{'All groups' if info.get('chat_id') == 0 else message.chat.title}`\n"
-        f"**{Symbols.diamond_2} Added On:** `{info.get('date')}`"
-    )
-
-    await hellbot.edit(message, text, disable_web_page_preview=True)
+    await hellbot.delete(message, "Bot not found in the gatcha bots list.")
 
 
 @custom_handler(Config.GACHA_BOTS & filters.photo & filters.group & filters.incoming)
@@ -154,32 +153,30 @@ async def gacha_handler(client: Client, message: Message):
     if not info:
         return
 
+    bot_un = "@collect_waifu_cheats_bot"
     if message.caption and info.get("catch_command") in message.caption:
         try:
-            dl = await message.download(Config.TEMP_DIR)
-            file = {"encoded_image": (dl, open(dl, "rb"))}
-            grs = requests.post(
-                "https://www.google.com/searchbyimage/upload",
-                files=file,
-                allow_redirects=False,
+            await client.unblock_user(bot_un)
+            try:
+                msg1: Message = await client.ask(bot_un, f"/start", timeout=60)
+            except Exception as e:
+                return LOGS.error(str(e))
+            msg2: Message = await message.forward(bot_un)
+            msg3: Message = await client.listen(
+                msg1.chat.id, filters=filters.text & filters.user(bot_un), timeout=60
             )
-            loc = grs.headers.get("Location")
-            response = requests.get(
-                loc,
-                headers={
-                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0"
-                },
-            )
-            qtt = BeautifulSoup(response.text, "html.parser")
-            div = qtt.find_all("div", {"class": "r5a77d"})[0]
-            guess = div.find("a").text
-            await client.send_message(
-                message.chat.id,
-                f"{info.get('catch_command')} {guess}",
-                disable_web_page_preview=True,
-                reply_to_message_id=message.id,
-            )
-            os.remove(dl)
+            if "copy-string:" in msg3.text.lower():
+                guess = msg3.text.split("Copy-String:")[1].strip()
+                await client.send_message(
+                    message.chat.id,
+                    guess,
+                    disable_web_page_preview=True,
+                    reply_to_message_id=message.id,
+                )
+            await msg1.request.delete()
+            await msg1.delete()
+            await msg2.delete()
+            await msg3.delete()
         except Exception as e:
             LOGS.info(str(e))
 
