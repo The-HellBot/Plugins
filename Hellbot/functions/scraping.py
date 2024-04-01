@@ -246,7 +246,7 @@ async def get_filler_info(search_term: str) -> str:
     message = ""
 
     for anime in animes:
-        html_message = f"<h1>{Symbols.check_mark} {anime[0]} Filler Guide:</h1>\n\n"
+        html_message = f"<strong>{Symbols.check_mark} {anime[0]} Filler Guide:</strong>\n\n"
 
         for data in anime[1]:
             html_message += (
