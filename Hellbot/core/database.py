@@ -166,7 +166,7 @@ class Database:
         return [i async for i in self.gmute.find({})]
 
     async def set_afk(
-        self, user_id: int, reason: str, media: str, media_type: str
+        self, user_id: int, reason: str, media: int, media_type: str
     ) -> None:
         await self.afk.update_one(
             {"user_id": user_id},
