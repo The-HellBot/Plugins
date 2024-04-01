@@ -28,6 +28,7 @@ class Database:
         self.session = self.db["session"]
         self.snips = self.db["snips"]
         self.stan_users = self.db["stan_users"]
+        self.gachabots = self.db["gachabots"]
 
     async def connect(self):
         try:
@@ -514,6 +515,46 @@ class Database:
 
     async def get_all_forcesubs(self) -> list:
         return [i async for i in self.forcesub.find({})]
+
+    async def add_gachabot(
+        self, client: int, bot: tuple[int, str], catch_command: str, chat_id: int
+    ):
+        await self.gachabots.update_one(
+            {"client": client, "bot": bot[0]},
+            {
+                "$set": {
+                    "username": bot[1],
+                    "catch_command": catch_command,
+                    "chat_id": chat_id,
+                    "date": self.get_datetime(),
+                }
+            },
+            upsert=True,
+        )
+
+    async def rm_gachabot(self, client: int, bot: int, chat_id: int = None):
+        if chat_id:
+            await self.gachabots.delete_one(
+                {"client": client, "bot": bot, "chat_id": chat_id}
+            )
+        else:
+            await self.gachabots.delete_one({"client": client, "bot": bot})
+
+    async def is_gachabot(self, client: int, bot: int, chat_id: int) -> bool:
+        data = await self.get_gachabot(client, bot, chat_id)
+        return True if data else False
+
+    async def get_gachabot(self, client: int, bot: int, chat_id: int):
+        data = await self.gachabots.find_one({"client": client, "bot": bot, "chat_id": chat_id})
+
+        return data
+
+    async def get_all_gachabots(self, client: int) -> list:
+        return [i async for i in self.gachabots.find({"client": client})]
+
+    async def get_all_gachabots_id(self) -> list:
+        data = await self.gachabots.distinct("bot")
+        return data
 
 
 db = Database(Config.DATABASE_URL)

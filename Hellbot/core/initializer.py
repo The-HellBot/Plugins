@@ -63,3 +63,10 @@ async def ForcesubSetup() -> None:
     for chat in chats:
         if chat not in Config.FORCESUBS:
             Config.FORCESUBS.add(chat["chat"])
+
+
+async def GachaBotsSetup() -> None:
+    """Initialize GachaBots Config"""
+    bots = await db.get_all_gachabots_id()
+    for bot in bots:
+        Config.GACHA_BOTS.add(bot)

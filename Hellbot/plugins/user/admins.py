@@ -91,7 +91,7 @@ async def demote(client: Client, message: Message):
 
 
 @on_message(
-    "ban",
+    ["ban", "dban"],
     chat_type=group_only,
     admin_only=True,
     allow_stan=True,
@@ -103,6 +103,8 @@ async def ban(client: Client, message: Message):
             reason = None
         else:
             reason = await hellbot.input(message)
+        if message.command[0][0].lower() == "d":
+            await message.reply_to_message.delete()
     elif len(message.command) == 2:
         user = await client.get_users(message.command[1])
         reason = None
@@ -161,7 +163,7 @@ async def unban(client: Client, message: Message):
 
 
 @on_message(
-    "kick",
+    ["kick", "dkick"],
     chat_type=group_only,
     admin_only=True,
     allow_stan=True,
@@ -173,6 +175,8 @@ async def kick(client: Client, message: Message):
             reason = None
         else:
             reason = await hellbot.input(message)
+        if message.command[0][0].lower() == "d":
+            await message.reply_to_message.delete()
     elif len(message.command) == 2:
         user = await client.get_users(message.command[1])
         reason = None
@@ -204,7 +208,7 @@ async def kick(client: Client, message: Message):
 
 
 @on_message(
-    "mute",
+    ["mute", "dmute"],
     chat_type=group_only,
     admin_only=True,
     allow_stan=True,
@@ -216,6 +220,8 @@ async def mute(client: Client, message: Message):
             reason = None
         else:
             reason = await hellbot.input(message)
+        if message.command[0][0].lower() == "d":
+            await message.reply_to_message.delete()
     elif len(message.command) == 2:
         user = await client.get_users(message.command[1])
         reason = None
@@ -373,13 +379,13 @@ HelpMenu("admin").add(
 ).add(
     "demote", "<username/id/reply>", "Demote a user from admin.", "demote @ForGo10God"
 ).add(
-    "ban", "<username/id/reply> <reason>", "Ban a user from the group.", "ban @ForGo10God"
+    "ban", "<username/id/reply> <reason>", "Ban a user from the group.", "ban @ForGo10God", "You can also use dban to delete the message of the user."
 ).add(
     "unban", "<username/id/reply>", "Unban a user from the group.", "unban @ForGo10God"
 ).add(
-    "kick", "<username/id/reply> <reason>", "Kick a user from the group.", "kick @ForGo10God"
+    "kick", "<username/id/reply> <reason>", "Kick a user from the group.", "kick @ForGo10God", "You can also use dkick to delete the message of the user."
 ).add(
-    "mute", "<username/id/reply> <reason>", "Mute a user in the group", "mute @ForGo10God"
+    "mute", "<username/id/reply> <reason>", "Mute a user in the group", "mute @ForGo10God", "You can also use dmute to delete the message of the user."
 ).add(
     "unmute", "<username/id/reply>", "Unmute a user in the group.", "unmute @ForGo10God"
 ).add(
