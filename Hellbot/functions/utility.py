@@ -21,7 +21,7 @@ class TelegraphAPI:
     async def setup(self):
         shortname = await db.get_env(ENV.telegraph_account) or self.shortname
 
-        self.telegraph = Telegraph(domain="te.legra.ph")
+        self.telegraph = Telegraph(domain="telegra.ph")
         self.telegraph.create_account(shortname)
 
 
