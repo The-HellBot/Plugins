@@ -184,7 +184,7 @@ class Database:
         return False
 
     async def get_mute(self, client: int, user_id: int, chat_id: int):
-        data = await self.mute.find_one({"client": client, "user_id": user_id, chat_id: int})
+        data = await self.mute.find_one({"client": client, "user_id": user_id, "chat_id": chat_id})
         return data
 
     async def set_afk(
