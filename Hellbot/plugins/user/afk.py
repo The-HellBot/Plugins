@@ -61,7 +61,9 @@ async def afk(_, message: Message):
     reason = await hellbot.input(message)
     reason = reason if reason else "Not specified"
 
-    await db.set_afk(message.from_user.id, reason, media.id, media_type)
+    await db.set_afk(
+        message.from_user.id, reason, media.id if media else None, media_type
+    )
     await hellbot.delete(message, "🫡 𝖦𝗈𝗂𝗇𝗀 𝖠𝖥𝖪! 𝖲𝖾𝖾 𝗒𝖺'𝗅𝗅 𝗅𝖺𝗍𝖾𝗋.")
     await hellbot.check_and_log(
         "afk",
