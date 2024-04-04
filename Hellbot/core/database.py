@@ -21,14 +21,15 @@ class Database:
         self.env = self.db["env"]
         self.filter = self.db["filter"]
         self.forcesub = self.db["forcesub"]
+        self.gachabots = self.db["gachabots"]
         self.gban = self.db["gban"]
         self.gmute = self.db["gmute"]
         self.greetings = self.db["greetings"]
+        self.mute = self.db["mute"]
         self.pmpermit = self.db["pmpermit"]
         self.session = self.db["session"]
         self.snips = self.db["snips"]
         self.stan_users = self.db["stan_users"]
-        self.gachabots = self.db["gachabots"]
 
     async def connect(self):
         try:
@@ -164,6 +165,27 @@ class Database:
 
     async def get_gmute(self) -> list:
         return [i async for i in self.gmute.find({})]
+
+    async def add_mute(self, client: int, user_id: int, chat_id: int, reason: str):
+        await self.mute.update_one(
+            {"client": client, "user_id": user_id, "chat_id": chat_id},
+            {"$set": {"reason": reason, "date": self.get_datetime()}},
+            upsert=True,
+        )
+
+    async def rm_mute(self, client: int, user_id: int, chat_id: int) -> str:
+        reason = (await self.get_mute(client, user_id, chat_id))["reason"]
+        await self.mute.delete_one({"client": client, "user_id": user_id, "chat_id": chat_id})
+        return reason
+
+    async def is_muted(self, client: int, user_id: int, chat_id: int) -> bool:
+        if await self.get_mute(client, user_id, chat_id):
+            return True
+        return False
+
+    async def get_mute(self, client: int, user_id: int, chat_id: int):
+        data = await self.mute.find_one({"client": client, "user_id": user_id, chat_id: int})
+        return data
 
     async def set_afk(
         self, user_id: int, reason: str, media: int, media_type: str
@@ -545,7 +567,9 @@ class Database:
         return True if data else False
 
     async def get_gachabot(self, client: int, bot: int, chat_id: int):
-        data = await self.gachabots.find_one({"client": client, "bot": bot, "chat_id": chat_id})
+        data = await self.gachabots.find_one(
+            {"client": client, "bot": bot, "chat_id": chat_id}
+        )
 
         return data
 
