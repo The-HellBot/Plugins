@@ -197,7 +197,7 @@ async def set_pmpermit(_, message: Message):
         await hellbot.delete(message, "**Invalid Argument!**")
 
 
-@custom_handler(filters.outgoing & filters.private)
+@custom_handler(filters.outgoing & filters.private & ~filters.bot)
 async def handler_outgoing_pm(client: Client, message: Message):
     if message.chat.id == 777000:
         return
@@ -207,8 +207,9 @@ async def handler_outgoing_pm(client: Client, message: Message):
 
     if not await db.is_pmpermit(client.me.id, message.chat.id):
         await db.add_pmpermit(client.me.id, message.chat.id)
+        hell = await client.send_message(message.chat.id, "Approving ...")
         await hellbot.delete(
-            message,
+            hell,
             f"**{Symbols.check_mark} Auto-Approved Outgoing PM:** {message.chat.first_name}",
         )
 

@@ -515,15 +515,6 @@ async def gmutelist(_, message: Message):
     await hell.edit(text)
 
 
-@custom_handler(filters.incoming & ~filters.service)
-async def globalmutewatcher(_, message: Message):
-    if not message.from_user:
-        return
-
-    if await db.is_gmuted(message.from_user.id):
-        await message.delete()
-
-
 @custom_handler(filters.new_chat_members)
 async def globalbanwatcher(_, message: Message):
     if not message.from_user:

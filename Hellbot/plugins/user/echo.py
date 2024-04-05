@@ -1,11 +1,9 @@
-import asyncio
-
-from pyrogram import Client, filters
+from pyrogram import Client
 from pyrogram.types import Message
 
 from Hellbot.core import Symbols
 
-from . import HelpMenu, custom_handler, db, hellbot, on_message
+from . import HelpMenu, db, hellbot, on_message
 
 
 @on_message("echo", allow_stan=True)
@@ -55,17 +53,6 @@ async def listecho(client: Client, message: Message):
         text += f"    {Symbols.anchor} `{echo}`\n"
 
     await hellbot.edit(message, text)
-
-
-@custom_handler(filters.incoming & filters.text & filters.sticker & ~filters.service)
-async def echo_handler(client: Client, message: Message):
-    if not await db.is_echo(client.me.id, message.chat.id, message.from_user.id):
-        return
-
-    if message.sticker:
-        await message.reply_sticker(message.sticker.file_id)
-    else:
-        await message.reply(message.text)
 
 
 @on_message(["resend", "copy"], allow_stan=True)

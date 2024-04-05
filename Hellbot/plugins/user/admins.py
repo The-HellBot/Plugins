@@ -437,14 +437,24 @@ async def zombies(_, message: Message):
 
 
 @custom_handler(filters.incoming)
-async def delete_muted_user_msg(client: Client, message: Message):
-    if not await db.is_muted(client.me.id, message.from_user.id, message.chat.id):
+async def multiple_handler(client: Client, message: Message):
+    if not message.from_user:
         return
 
-    try:
-        await message.delete()
-    except:
-        pass
+    if await db.is_muted(client.me.id, message.from_user.id, message.chat.id):
+        try:
+            await message.delete()
+        except:
+            pass
+
+    elif await db.is_gmuted(message.from_user.id):
+        try:
+            await message.delete()
+        except:
+            pass
+
+    elif await db.is_echo(client.me.id, message.chat.id, message.from_user.id):
+        await message.copy(message.chat.id, reply_to_message_id=message.id)
 
 
 HelpMenu("admin").add(
