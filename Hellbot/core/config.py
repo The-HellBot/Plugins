@@ -27,8 +27,8 @@ class Config:
     # storage dir: you may or may not edit
     DWL_DIR = "./downloads/"
     TEMP_DIR = "./temp/"
-    CHROME_BIN = getenv("CHROME_BIN", "/app/.apt/usr/bin/google-chrome")
-    CHROME_DRIVER = getenv("CHROME_DRIVER", "/app/.chromedriver/bin/chromedriver")
+    CHROME_BIN = getenv("CHROME_BIN", "/app/.chrome-for-testing/chrome-linux64/chrome")
+    CHROME_DRIVER = getenv("CHROME_DRIVER", "/app/.chrome-for-testing/chromedriver-linux64/chromedriver")
     FONT_PATH = "./Hellbot/resources/fonts/Montserrat.ttf"
 
     # users config: do not edit
