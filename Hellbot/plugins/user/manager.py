@@ -39,7 +39,7 @@ async def getvar(_, message: Message):
         await hellbot.delete(message, f"**𝖵𝖺𝗋𝗂𝖺𝖻𝗅𝖾 {varname} 𝖽𝗈𝖾𝗌 𝗇𝗈𝗍 𝖾𝗑𝗂𝗌𝗍𝗌!**")
 
 
-@on_message("getallvar", allow_stan=True)
+@on_message(["getallvar", "getallvars"], allow_stan=True)
 async def getallvar(_, message: Message):
     text = "**📃 𝖫𝗂𝗌𝗍 𝗈𝖿 𝖺𝗅𝗅 𝗏𝖺𝗋𝗂𝖺𝖻𝗅𝖾 𝖺𝗋𝖾:**\n\n"
     for env in all_env:
@@ -59,8 +59,9 @@ async def setvar(_, message: Message):
         )
 
     is_heroku = False
-    varname = message.command[1]
-    varvalue = " ".join(message.command[2:])
+    input_str = (await hellbot.input(message)).split(" ", 1)
+    varname = input_str[0]
+    varvalue = input_str[1]
 
     if varname.upper() in os_configs:
         if HEROKU_APP:

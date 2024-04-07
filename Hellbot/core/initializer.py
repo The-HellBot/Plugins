@@ -1,3 +1,4 @@
+import sys
 from .clients import hellbot
 from .config import Config, Symbols
 from .database import db
@@ -70,3 +71,24 @@ async def GachaBotsSetup() -> None:
     bots = await db.get_all_gachabots_id()
     for bot in bots:
         Config.GACHA_BOTS.add(bot)
+
+
+async def TemplateSetup() -> None:
+    """Initialize Templates Config"""
+    module_name = "temp_module"
+    module = sys.modules.get(module_name)
+    if module is None:
+        module = type(sys)(module_name)
+
+    with open("Hellbot/functions/templates.py", "r", encoding="utf-8") as file:
+        exec(file.read(), module.__dict__)
+
+    global_vars = module.__dict__
+
+    var_n_value: dict[str, str] = {
+        var_name: global_vars[var_name][0]
+        for var_name in global_vars
+        if var_name.isupper() and not callable(global_vars[var_name])
+    }
+
+    Config.TEMPLATES = var_n_value
