@@ -130,6 +130,7 @@ async def template_example(_, message: Message):
         )
 
     await hellbot.edit(
+        message,
         f"**{message.command[1].upper()} Template Example:**\n\n```{Config.TEMPLATES[message.command[1].upper()]}```"
     )
 
