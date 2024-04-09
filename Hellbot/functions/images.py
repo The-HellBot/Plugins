@@ -3,9 +3,11 @@ import os
 import random
 import textwrap
 import time
-from unidecode import unidecode
+
 import httpx
+from icrawler.builtin import BingImageCrawler
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
+from unidecode import unidecode
 
 from .formatter import format_text, limit_per_page
 
@@ -375,3 +377,12 @@ async def create_thumbnail(photo: str, xy: tuple[int, int], file_size: int):
         quality -= 5
 
     return photo
+
+
+async def download_images(query: str, limit: int) -> list[str]:
+    offset = random.randint(0, 20)
+
+    crawler = BingImageCrawler()
+    crawler.crawl(query, offset=offset, max_num=limit)
+
+    return [os.path.join("images", image) for image in os.listdir("images")]

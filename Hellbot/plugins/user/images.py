@@ -10,8 +10,7 @@ from pyrogram.enums import MessageMediaType
 from pyrogram.types import InputMediaDocument, InputMediaPhoto, Message
 
 from Hellbot.core import ENV
-from Hellbot.functions.google import googleimagesdownload
-from Hellbot.functions.images import deep_fry, get_wallpapers
+from Hellbot.functions.images import deep_fry, download_images, get_wallpapers
 from Hellbot.functions.tools import runcmd
 
 from . import Config, HelpMenu, db, hellbot, on_message
@@ -29,22 +28,12 @@ async def searchImage(_, message: Message):
     if ";" in query:
         try:
             query, limit = query.split(";", 1)
-            limit = int(limit)
         except:
             pass
 
-    googleImage = googleimagesdownload()
     to_send = []
-    args = {
-        "keywords": query,
-        "limit": limit,
-        "format": "jpg",
-        "output_directory": Config.DWL_DIR,
-        "chromedriver": Config.CHROME_DRIVER,
-    }
+    images = await download_images(query, int(limit))
 
-    path_args, _ = googleImage.download(args)
-    images = path_args.get(query)
     for image in images:
         to_send.append(InputMediaPhoto(image))
 
@@ -55,7 +44,7 @@ async def searchImage(_, message: Message):
         await hellbot.delete(hell, "No images found.")
 
     try:
-        rmtree(Config.DWL_DIR + query + "/")
+        rmtree("./images")
     except:
         pass
 
