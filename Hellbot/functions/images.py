@@ -1,4 +1,5 @@
 import calendar
+import logging
 import os
 import random
 import textwrap
@@ -382,7 +383,7 @@ async def create_thumbnail(photo: str, xy: tuple[int, int], file_size: int):
 async def download_images(query: str, limit: int) -> list[str]:
     offset = random.randint(0, 20)
 
-    crawler = BingImageCrawler()
+    crawler = BingImageCrawler(log_level=logging.ERROR)
     crawler.crawl(query, offset=offset, max_num=limit)
 
     return [os.path.join("images", image) for image in os.listdir("images")]
