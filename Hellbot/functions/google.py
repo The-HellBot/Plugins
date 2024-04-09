@@ -1,10 +1,3 @@
-#!/usr/bin/env python
-# In[ ]:
-#  coding: utf-8
-
-###### Searching and Downloading Google Images to the local disk ######
-
-# Import Libraries
 import codecs
 import datetime
 import http.client
@@ -13,15 +6,19 @@ import os
 import re
 import ssl
 import sys
-import time  # Importing the time library to check the time of code execution
+import time
 import urllib.request
 from http.client import BadStatusLine
 from urllib.parse import quote
 from urllib.request import HTTPError, Request, URLError, urlopen
 
-from selenium import webdriver
+from selenium.webdriver import Chrome
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+
+from Hellbot.core import Config
 
 http.client._MAXHEADERS = 1000
 args_list = [
@@ -124,13 +121,15 @@ class googleimagesdownload:
             sys.exit()
 
     # Download Page for more than 100 images
-    def download_extended_page(self, url, chromedriver):
-        options = webdriver.ChromeOptions()
+    def download_extended_page(self, url):
+        options = Options()
+        options.binary_location(Config.CHROME_BIN)
         options.add_argument("--no-sandbox")
         options.add_argument("--headless")
 
+        service = Service(Config.CHROME_DRIVER)
         try:
-            browser = webdriver.Chrome(chromedriver, chrome_options=options)
+            browser = Chrome(options, service)
         except Exception as e:
             print(
                 "Looks like we cannot locate the path the 'chromedriver' (use the '--chromedriver' "
@@ -182,7 +181,7 @@ class googleimagesdownload:
             time.sleep(0.3)
 
         try:
-            browser.find_element_by_xpath('//input[@value="Show more results"]').click()
+            browser.find_element(By.XPATH, '//input[@value="Show more results"]').click()
             for _ in range(50):
                 element.send_keys(Keys.PAGE_DOWN)
                 time.sleep(0.3)  # bot id protection
@@ -503,8 +502,8 @@ class googleimagesdownload:
                 else:
                     built_url = f"{built_url},{ext_param}"
                 counter += 1
-        built_url = lang_url + built_url + exact_size
-        return built_url
+
+        return lang_url + built_url + exact_size
 
     # building main search URL
     def build_search_url(
@@ -1188,9 +1187,7 @@ class googleimagesdownload:
                     if limit < 101:
                         images, tabs = self.download_page(url)  # download page
                     else:
-                        images, tabs = self.download_extended_page(
-                            url, arguments["chromedriver"]
-                        )
+                        images, tabs = self.download_extended_page(url)
 
                     if not arguments["silent_mode"]:
                         if arguments["no_download"]:
@@ -1224,9 +1221,7 @@ class googleimagesdownload:
                             if limit < 101:
                                 images, _ = self.download_page(value)  # download page
                             else:
-                                images, _ = self.download_extended_page(
-                                    value, arguments["chromedriver"]
-                                )
+                                images, _ = self.download_extended_page(value)
                             self.create_directories(
                                 main_directory,
                                 final_search_term,
