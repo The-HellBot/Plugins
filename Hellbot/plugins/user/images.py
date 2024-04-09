@@ -16,6 +16,10 @@ from Hellbot.functions.tools import runcmd
 from . import Config, HelpMenu, db, hellbot, on_message
 
 
+def _chunk(images: list[str]) -> list[list]:
+    return [images[i : i + 10] for i in range(0, len(images), 10)]
+
+
 @on_message(["image", "img"], allow_stan=True)
 async def searchImage(_, message: Message):
     if len(message.command) < 2:
@@ -38,7 +42,12 @@ async def searchImage(_, message: Message):
         to_send.append(InputMediaPhoto(image))
 
     if to_send:
-        await hell.reply_media_group(to_send)
+        if len(to_send) > 10:
+            for chunk in _chunk(to_send):
+                await hell.reply_media_group(chunk)
+        else:
+            await hell.reply_media_group(to_send)
+
         await hellbot.delete(hell, "Uploaded!")
     else:
         await hellbot.delete(hell, "No images found.")
