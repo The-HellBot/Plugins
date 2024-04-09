@@ -1,16 +1,17 @@
 import io
 import os
-from shutil import rmtree
 import time
+from shutil import rmtree
+
 import requests
 from glitch_this import ImageGlitcher
 from PIL import Image
 from pyrogram.enums import MessageMediaType
-from pyrogram.types import InputMediaPhoto, Message, InputMediaDocument
+from pyrogram.types import InputMediaDocument, InputMediaPhoto, Message
 
 from Hellbot.core import ENV
 from Hellbot.functions.google import googleimagesdownload
-from Hellbot.functions.images import get_wallpapers, deep_fry
+from Hellbot.functions.images import deep_fry, get_wallpapers
 from Hellbot.functions.tools import runcmd
 
 from . import Config, HelpMenu, db, hellbot, on_message
@@ -39,6 +40,7 @@ async def searchImage(_, message: Message):
         "limit": limit,
         "format": "jpg",
         "output_directory": Config.DWL_DIR,
+        "chromedriver": Config.CHROME_DRIVER,
     }
 
     path_args, _ = googleImage.download(args)

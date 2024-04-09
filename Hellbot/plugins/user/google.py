@@ -171,6 +171,7 @@ async def reverseSearch(_, message: Message):
         "limit": 3,
         "format": "jpg",
         "output_directory": Config.DWL_DIR,
+        "chromedriver": Config.CHROME_DRIVER,
     }
 
     path_args, _ = googleImage.download(args)
