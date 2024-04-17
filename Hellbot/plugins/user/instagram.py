@@ -124,88 +124,6 @@ async def instagramPost(_, message: Message):
         await hellbot.error(hell, f"`{e}`")
 
 
-@on_message("igpost", allow_stan=True)
-async def instagramPost(_, message: Message):
-    if len(message.command) < 2:
-        return await hellbot.delete(message, "Give an instagram post link to download.")
-
-    hell = await hellbot.edit(message, "Searching...")
-
-    query = await hellbot.input(message)
-    isInstagramLink = lambda link: bool(
-        (re.compile(r"^https?://(?:www\.)?instagram\.com/p/")).match(link)
-    )
-
-    if not isInstagramLink(query):
-        return await hellbot.error(hell, "Give a valid instagram post link.")
-
-    try:
-        driver, _ = Driver.get()
-        if not driver:
-            return await hellbot.error(hell, _)
-
-        media = []
-        driver.get(query)
-        wait = WebDriverWait(driver, 10)
-
-        # get the first media
-        try:
-            element = wait.until(visibility_of_element_located((By.TAG_NAME, "video")))
-            extention = "mp4"
-        except:
-            element = wait.until(visibility_of_element_located((By.TAG_NAME, "img")))
-            extention = "jpg"
-        media.append((element.get_attribute("src"), extention))
-
-        # check if there are more media
-        try:
-            button = driver.find_element(By.XPATH, "//button[@aria-label='Next']")
-        except:
-            button = False
-
-        # get all media
-        while button:
-            try:
-                button.click()
-                try:
-                    element = wait.until(visibility_of_element_located((By.TAG_NAME, "video")))
-                    extention = "mp4"
-                except:
-                    element = wait.until(visibility_of_element_located((By.TAG_NAME, "img")))
-                    extention = "jpg"
-                media.append((element.get_attribute("src"), extention))
-                try:
-                    button = driver.find_element(By.XPATH, "//button[@aria-label='Next']")
-                except:
-                    button = False
-            except Exception as e:
-                LOGS.info("--> " + str(e))
-
-        driver.quit()
-
-        if media:
-            await hell.edit("**Downloading...**")
-
-            for post in media:
-                binary = requests.get(post[0]).content
-                fileName = f"post_{int(time.time())}.{post[1]}"
-                with open(fileName, "wb") as file:
-                    file.write(binary)
-                await message.reply_document(
-                    fileName,
-                    caption=f"__💫 Downloaded Instagram Post!__ \n\n**</> @HellBot_Networks**",
-                    force_document=False,
-                )
-                await hell.delete()
-                os.remove(fileName)
-        else:
-            await hellbot.error(
-                hell,
-                "Unable to download the post. Make sure the link is valid or the post is not from a private account.",
-            )
-    except Exception as e:
-        await hellbot.error(hell, f"`{e}`")
-
 
 @on_message("iguser", allow_stan=True)
 async def instagramUser(_, message: Message):
@@ -281,7 +199,6 @@ async def instagramUser(_, message: Message):
         os.remove(profile_pic)
     except Exception as e:
         return await hellbot.error(hell, f"`{e}`")
-
 
 HelpMenu("instagram").add(
     "reels",
