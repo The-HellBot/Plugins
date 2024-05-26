@@ -20,12 +20,14 @@ async def promote(client: Client, message: Message):
             message, "𝖭𝖾𝖾𝖽 𝖺 𝗎𝗌𝖾𝗋𝗇𝖺𝗆𝖾/𝗂𝖽 𝗈𝗋 𝗋𝖾𝗉𝗅𝗒 𝗍𝗈 𝖺 𝗎𝗌𝖾𝗋 𝗍𝗈 𝗉𝗋𝗈𝗆𝗈𝗍𝖾 𝗍𝗁𝖾𝗆!"
         )
 
+    title = ""
     if message.reply_to_message:
         user = message.reply_to_message.from_user
         title = await hellbot.input(message)
     else:
         user = await client.get_users(message.command[1])
-        title = (await hellbot.input(message)).split(" ", 1)[1].strip() or ""
+        if len(message.command) > 2:
+            title = (await hellbot.input(message)).split(" ", 1)[1].strip()
 
     try:
         privileges = ChatPrivileges(

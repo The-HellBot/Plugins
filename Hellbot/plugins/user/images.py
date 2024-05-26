@@ -36,7 +36,7 @@ async def searchImage(_, message: Message):
             pass
 
     to_send = []
-    images = await download_images(query, int(limit))
+    images = await download_images(query.strip(), int(limit))
 
     for image in images:
         to_send.append(InputMediaPhoto(image))
