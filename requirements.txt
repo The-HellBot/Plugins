@@ -16,7 +16,7 @@ motor
 pillow
 psutil
 pyroaddon
-git+https://github.com/KurimuzonAkuma/pyrogram.git@v2.1.18
+git+https://github.com/KurimuzonAkuma/pyrogram.git@v2.1.21
 pySmartDL
 python-dotenv
 pytz
