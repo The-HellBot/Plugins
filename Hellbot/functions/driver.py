@@ -1,5 +1,6 @@
 import datetime
 import json
+import os
 import random
 import re
 import time
@@ -13,6 +14,9 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.expected_conditions import \
+    presence_of_element_located
+from selenium.webdriver.support.wait import WebDriverWait
 
 from Hellbot.core import ENV, Config, db
 
@@ -312,6 +316,144 @@ class YoutubeDriver:
             "quiet": True,
             "logtostderr": False,
         }
+
+
+class SCRAP_DATA:
+    """Class to get and handel scrapped data"""
+
+    def __init__(self, urls: list[str] | str) -> None:
+        self.urls = urls
+        self.path = "./scrapped/"
+        if not os.path.isdir(self.path):
+            os.makedirs("./scrapped/")
+
+    def get_images(self) -> list:
+        images = []
+        if isinstance(self.urls, str):
+            requested = requests.get(self.urls)
+            try:
+                name = self.path + f"img_{time.time()}.jpg"
+                with open(name, "wb") as f:
+                    f.write(requested.content)
+                images.append(name)
+            except Exception as e:
+                requested.close()
+        else:
+            for i in self.urls:
+                if i:
+                    requested = requests.get(i)
+                else:
+                    continue
+                try:
+                    name = self.path + f"img_{time.time()}.jpg"
+                    with open(name, "wb") as f:
+                        f.write(requested.content)
+                    images.append(name)
+                except Exception as e:
+
+                    requested.close()
+                    continue
+        return images
+
+    def get_videos(self) -> list:
+        videos = []
+        if isinstance(self.urls, str):
+            if i:
+                requested = requests.get(i)
+            else:
+                return []
+            try:
+                name = self.path + f"vid_{time.time()}.mp4"
+                with open(name, "wb") as f:
+                    f.write(requested.content)
+                videos.append(name)
+            except Exception as e:
+                requested.close()
+        else:
+            for i in self.urls:
+                if i:
+                    requested = requests.get(i)
+                else:
+                    continue
+                try:
+                    name = self.path + f"vid_{time.time()}.mp4"
+                    with open(name, "wb") as f:
+                        f.write(requested.content)
+                    videos.append(name)
+                except Exception as e:
+
+                    requested.close()
+                    continue
+        return videos
+
+
+class INSTAGRAM(ChromeDriver):
+    """Class to scrap data from instagram"""
+
+    def __init__(self, url: str) -> None:
+        self.url = url
+        self.article = "article._aa6a"
+        self.ul_class = "_acay"
+        self.image_class = "x5yr21d"
+        self.video_class = "x1lliihq"
+        self.next_button = "button._afxw"
+        self.return_dict = {"image": [], "video": []}
+        super().__init__()
+
+    def get_all(self):
+        driver, error = self.get()
+        if not driver:
+            return error
+
+        driver.get(self.url)
+        wait = WebDriverWait(driver, 30)
+        image_links = []
+        video_links = []
+        try:
+            element = wait.until(presence_of_element_located(
+                (By.CLASS_NAME, self.ul_class)))
+
+            while True:
+                sub_element = element.find_elements(
+                    By.CLASS_NAME, self.image_class)
+                for i in sub_element:
+                    url = i.get_attribute("src")
+                    image_links.append(url)
+
+                sub_element = element.find_elements(
+                    By.CLASS_NAME, self.video_class)
+                for i in sub_element:
+                    url = i.get_attribute("src")
+                    video_links.append(url)
+
+                try:
+                    driver.find_element(
+                        By.CSS_SELECTOR, self.next_button).click()
+                except:  # Failed to either find the element or click on next i.e. no more media left in post
+                    break
+        except:
+            element = wait.until(presence_of_element_located((By.CSS_SELECTOR, self.article)))
+            try:
+                sub_element = element.find_element(By.TAG_NAME, "img")
+                url = sub_element.get_attribute("src")
+                image_links.append(url)
+            except:
+                sub_element = element.find_element(By.TAG_NAME, "video")
+                url = sub_element.get_attribute("src")
+                video_links.append(url)
+
+        self.close(driver)
+        # To remove duplicates here I am converting into set
+        if image_links:
+            image_links = list(set(image_links))
+        if video_links:
+            video_links = list(set(video_links))
+            for i in video_links:
+                image_links.remove(i)
+
+        self.return_dict.get("image").extend(image_links)
+        self.return_dict.get("video").extend(video_links)
+        return self.return_dict
 
 
 Driver = ChromeDriver()
